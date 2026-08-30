@@ -645,11 +645,13 @@ function initForms() {
     window.open(`https://wa.me/${country.whatsapp}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
   });
 
-  // Selector de País Global (Header)
+  // Selector de País Global (si existe)
   const globalSelect = document.getElementById("global-country-select");
-  globalSelect.addEventListener("change", (e) => {
-    applyDetectedCountry(e.target.value, false);
-  });
+  if (globalSelect) {
+    globalSelect.addEventListener("change", (e) => {
+      applyDetectedCountry(e.target.value, false);
+    });
+  }
 
   // Selector de País en Donaciones
   const donateSelect = document.getElementById("donate-country-select");
