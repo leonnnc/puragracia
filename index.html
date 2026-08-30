@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Pura Gracia — Deja tu petición de oración. Queremos conocerte y orar por ti."
+    />
+    <title>Pura Gracia · Peticiones de oración</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🙏</text></svg>" />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="logo" href="#inicio">
+          <span class="logo-mark" aria-hidden="true"></span>
+          <span>Pura Gracia</span>
+        </a>
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="menu"
+          aria-label="Abrir menú"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <nav id="menu" class="nav">
+          <a href="#inicio">Inicio</a>
+          <a href="#peticiones">Peticiones</a>
+          <a href="#oracion">Tiempo de oración</a>
+          <a href="#quienes-somos">Quiénes somos</a>
+          <a href="#reuniones">Reuniones</a>
+          <a href="#donar" class="nav-cta">Donar</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenido">
+      <section id="inicio" class="hero">
+        <div class="hero-glow" aria-hidden="true"></div>
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">Comunidad de oración</p>
+            <h1>Pura Gracia</h1>
+            <p class="lema">
+              Si tú también tienes una petición, escríbenos. Queremos conocerte y
+              orar por ti.
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#escribir">Deja tu petición</a>
+              <a class="btn btn-ghost" href="#oracion">Unirme a orar</a>
+            </div>
+          </div>
+          <aside class="hero-board" aria-hidden="true">
+            <div class="mini-note n1">Salud y paz</div>
+            <div class="mini-note n2">Familia</div>
+            <div class="mini-note n3">Trabajo</div>
+            <div class="mini-note n4">Gratitud</div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="escribir" class="section form-section">
+        <div class="container split">
+          <div>
+            <p class="eyebrow">Déjanos tu petición</p>
+            <h2>Escríbenos lo que pesa en tu corazón</h2>
+            <p class="muted">
+              Tu petición se publica en la pizarra para que la comunidad ore por
+              ti. Si quieres una respuesta personal, deja tu teléfono o correo.
+            </p>
+          </div>
+          <form id="form-peticion" class="card form-card">
+            <label>
+              Tu nombre
+              <input type="text" name="nombre" required maxlength="60" placeholder="Cómo te llamas" />
+            </label>
+            <label>
+              Tu petición
+              <textarea
+                name="texto"
+                required
+                maxlength="280"
+                rows="4"
+                placeholder="Cuéntanos por quién o por qué quieres que oremos…"
+              ></textarea>
+            </label>
+            <fieldset class="contact-fields">
+              <legend>¿Cómo te contactamos? (opcional)</legend>
+              <label>
+                Correo
+                <input type="email" name="correo" placeholder="tu@correo.com" />
+              </label>
+              <label>
+                Teléfono / WhatsApp
+                <input
+                  type="tel"
+                  name="telefono"
+                  inputmode="tel"
+                  placeholder="Ej. 3001234567"
+                />
+              </label>
+            </fieldset>
+            <p class="form-hint">Al menos uno de los dos si deseas una reflexión por WhatsApp o correo.</p>
+            <button class="btn btn-primary" type="submit">Publicar en la pizarra</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="peticiones" class="section board-section">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">La pizarra</p>
+              <h2>Notas de petición</h2>
+              <p class="muted">Notas amarillas, en orden, como en el tablero de la calle.</p>
+            </div>
+            <p class="count-pill"><span id="total-notas">0</span> peticiones</p>
+          </div>
+          <div id="pizarra" class="pizarra" role="list"></div>
+        </div>
+      </section>
+
+      <section id="oracion" class="section prayer-section">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Tiempo de oración</p>
+              <h2>Reúnete para orar hoy</h2>
+              <p class="muted">
+                Entra a la sala, mira las peticiones del día y envía una reflexión
+                por WhatsApp a quien dejó su número.
+              </p>
+            </div>
+          </div>
+          <div class="prayer-layout">
+            <form id="form-sala" class="card form-card sala-card">
+              <label>
+                Tu nombre para orar
+                <input type="text" name="orante" required maxlength="60" placeholder="Nombre" />
+              </label>
+              <button class="btn btn-primary" type="submit">Entrar a la sala de hoy</button>
+              <p id="sala-estado" class="form-hint"></p>
+            </form>
+            <div class="card sala-panel">
+              <div class="sala-toolbar">
+                <h3>Peticiones de hoy</h3>
+                <span id="orantes-activos" class="count-pill subtle">0 orando</span>
+              </div>
+              <ul id="lista-hoy" class="peticiones-hoy"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="quienes-somos" class="section about-section">
+        <div class="container split">
+          <div>
+            <p class="eyebrow">Quiénes somos</p>
+            <h2>Una comunidad que ora en la calle y en el corazón</h2>
+            <p>
+              Pura Gracia nace de un tablero sencillo: un marcador, notas de colores
+              y la invitación a dejar lo que duele, lo que se espera y lo que se
+              agradece. Creemos que nadie tiene que cargar solo.
+            </p>
+            <p class="muted">
+              Recibimos peticiones, nos reunimos a orar y devolvemos una palabra de
+              aliento. Si hoy estás pasando por algo, este espacio es para ti.
+            </p>
+          </div>
+          <ul class="values">
+            <li>
+              <strong>Cercanía</strong>
+              Te conocemos por tu nombre, no por un formulario frío.
+            </li>
+            <li>
+              <strong>Oración</strong>
+              Cada nota se lee. Cada historia se pone delante de Dios.
+            </li>
+            <li>
+              <strong>Respuesta</strong>
+              Si dejas tu WhatsApp, te escribimos una reflexión después de orar.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="reuniones" class="section meetings-section">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Programaciones</p>
+              <h2>Reuniones de oración</h2>
+              <p class="muted">Fotos de encuentros pasados y un mapa con las próximas fechas.</p>
+            </div>
+          </div>
+
+          <div class="gallery-wrap">
+            <button class="gallery-nav prev" type="button" aria-label="Foto anterior">‹</button>
+            <div id="galeria" class="gallery" tabindex="0"></div>
+            <button class="gallery-nav next" type="button" aria-label="Foto siguiente">›</button>
+          </div>
+
+          <div class="map-layout">
+            <aside class="card dates-list">
+              <h3>Próximas fechas</h3>
+              <div id="lista-fechas"></div>
+            </aside>
+            <div class="map-wrap">
+              <div id="mapa" role="region" aria-label="Mapa de próximas reuniones"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="donar" class="section donate-section">
+        <div class="container split">
+          <div>
+            <p class="eyebrow">Sostén la obra</p>
+            <h2>Donar</h2>
+            <p>
+              Tu ofrenda ayuda a mantener los tableros, los materiales y los
+              espacios donde nos reunimos a orar.
+            </p>
+            <p class="muted">Elige un monto o escribe el tuyo. Te llevamos a WhatsApp para coordinar la donación.</p>
+          </div>
+          <form id="form-donar" class="card form-card">
+            <div class="amount-row" role="group" aria-label="Monto">
+              <button type="button" class="chip" data-monto="20000">$20.000</button>
+              <button type="button" class="chip" data-monto="50000">$50.000</button>
+              <button type="button" class="chip" data-monto="100000">$100.000</button>
+            </div>
+            <label>
+              Otro monto (COP)
+              <input type="number" name="monto" min="1000" step="1000" placeholder="Ej. 30000" />
+            </label>
+            <label>
+              Mensaje (opcional)
+              <input type="text" name="mensaje" maxlength="120" placeholder="Una palabra de ánimo" />
+            </label>
+            <button class="btn btn-primary" type="submit">Donar por WhatsApp</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p><strong>Pura Gracia</strong> · Queremos conocerte y orar por ti.</p>
+        <p class="muted">Hecho con fe y notas amarillas.</p>
+      </div>
+    </footer>
+
+    <div id="modal-reflexion" class="modal" hidden>
+      <div class="modal-card" role="dialog" aria-labelledby="modal-titulo" aria-modal="true">
+        <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+        <h3 id="modal-titulo">Reflexión de oración</h3>
+        <p class="muted" id="modal-destino"></p>
+        <label>
+          Tu reflexión
+          <textarea id="texto-reflexion" rows="5" maxlength="400" placeholder="Una palabra de fe, un versículo o un abrazo escrito…"></textarea>
+        </label>
+        <button id="enviar-reflexion" class="btn btn-primary" type="button">Enviar por WhatsApp</button>
+      </div>
+    </div>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
