@@ -61,7 +61,7 @@
         <div class="hero-glow" aria-hidden="true"></div>
         <div class="container hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow" id="hero-country-badge">Comunidad de oración · Perú</p>
+            <p class="eyebrow" id="hero-country-badge">Red de Oración Comunitaria</p>
             <h1>Pura Gracia</h1>
             <p class="lema">
               Si tú también tienes una petición, escríbenos. Queremos conocerte y
@@ -69,7 +69,7 @@
             </p>
             <div class="hero-actions">
               <a class="btn btn-primary" href="#escribir">Deja tu petición</a>
-              <a class="btn btn-ghost" href="#oracion">🌐 Unirme al mapa mundial</a>
+              <a class="btn btn-ghost" href="#oracion">🌍 Ver el Mapa Mundial de Oración</a>
             </div>
           </div>
           <aside class="hero-board" aria-hidden="true">
@@ -168,71 +168,79 @@
         </div>
       </section>
 
-      <!-- SISTEMA DE ORACIÓN MUNDIAL EN VIVO -->
-      <section id="oracion" class="section prayer-section">
+      <!-- ========================================================
+           SISTEMA Y PLANO COMPLETO DE ORACIÓN MUNDIAL
+           ======================================================== -->
+      <section id="oracion" class="section world-prayer-section">
         <div class="container">
-          <div class="section-head">
-            <div>
-              <div class="live-status-pill">
-                <span class="live-dot"></span>
-                <strong>RED MUNDIAL DE INTERCESIÓN EN VIVO</strong>
-              </div>
-              <h2>Mapa y Sala de Oración Mundial</h2>
-              <p class="muted">
-                Únete a creyentes orando al mismo tiempo en diferentes países. Tu punto se iluminará en el mapa mundial al ingresar.
-              </p>
+          <!-- Encabezado de la Sala Mundial -->
+          <div class="world-header-center">
+            <div class="live-status-pill">
+              <span class="live-dot"></span>
+              <strong>RED MUNDIAL DE INTERCESIÓN EN VIVO</strong>
             </div>
-            <div class="live-counter-box" id="live-prayer-counter">
-              🔥 <span id="orantes-activos-count">8</span> intercesores orando en vivo
+            <h2>Plano Completo de Oración Mundial</h2>
+            <p class="muted">
+              Escribe tu nombre, país y motivo de oración para iluminar tu punto en el plano de la Tierra junto a todos los intercesores conectados.
+            </p>
+            <div class="live-counter-pill" id="live-prayer-counter">
+              🔥 <span id="orantes-activos-count">8</span> creyentes orando en vivo alrededor del mundo
             </div>
           </div>
 
-          <!-- Formulario de Ingreso al Mapa Mundial -->
-          <div class="world-prayer-grid">
-            <div class="card form-card sala-card">
-              <h3><span>📍</span> Únete al Mapa Mundial</h3>
-              <form id="form-sala">
+          <!-- PASO 1: Formulario de Ingreso al Mapa Mundial (Centrado y Destacado) -->
+          <div class="join-world-card card">
+            <form id="form-sala" class="join-world-form">
+              <div class="jw-row-top">
                 <label>
-                  Tu nombre para orar
-                  <input type="text" id="input-orante-name" name="orante" required maxlength="60" placeholder="Ej. Leonel" />
+                  Tu Nombre
+                  <input type="text" id="input-orante-name" name="orante" required maxlength="60" placeholder="Ej. Leonel C." />
                 </label>
-                <div class="form-row-2">
-                  <label>
-                    Tu ciudad
-                    <input type="text" id="input-orante-city" name="ciudad" required maxlength="60" placeholder="Ej. Lima" />
-                  </label>
-                  <label>
-                    Tu país
-                    <input type="text" id="input-orante-country" name="pais" required maxlength="60" placeholder="Ej. Perú" />
-                  </label>
-                </div>
-                <button class="btn btn-primary" type="submit" style="width: 100%; margin-top: 0.4rem;">
-                  ✨ Entrar a la sala y unirme al mapa
-                </button>
-                <p id="sala-estado" class="form-hint" style="margin-top: 0.5rem;"></p>
-              </form>
-
-              <!-- Lista de Intercesores Activos Recientes -->
-              <div class="active-intercessors-box">
-                <div class="aib-header">
-                  <strong>👥 Orantes conectados recientemente:</strong>
-                </div>
-                <ul id="lista-orantes-conectados" class="orantes-mini-list"></ul>
+                <label>
+                  Tu Ciudad
+                  <input type="text" id="input-orante-city" name="ciudad" required maxlength="60" placeholder="Ej. Lima" />
+                </label>
+                <label>
+                  Tu País
+                  <input type="text" id="input-orante-country" name="pais" required maxlength="60" placeholder="Ej. Perú" />
+                </label>
               </div>
+
+              <div class="jw-row-bottom">
+                <label style="flex: 1;">
+                  Tu Solicitud o Motivo de Oración
+                  <input type="text" id="input-orante-motivo" name="motivo" required maxlength="140" placeholder="Ej. Por sanidad, bendición a mi familia y paz en el trabajo" />
+                </label>
+                <button class="btn btn-primary btn-join-world" type="submit">
+                  🌍 Conectarme al Plano Mundial
+                </button>
+              </div>
+              <p id="sala-estado" class="form-hint jw-status"></p>
+            </form>
+          </div>
+
+          <!-- PASO 2: PLANO COMPLETO DE LA TIERRA (Full Width World Map) -->
+          <div class="full-world-map-wrap card">
+            <div class="map-top-bar">
+              <div class="mtb-title">
+                <strong>🗺️ Plano Global de Intercesores Activos</strong>
+                <span>(Haz clic en cualquier punto del mundo para ver el nombre y la solicitud de oración)</span>
+              </div>
+              <span class="badge-live-pulse">🔴 EN TIEMPO REAL</span>
             </div>
 
-            <!-- Mapa Mundial Interactivo de Leaflet -->
-            <div class="card world-map-card">
-              <div class="world-map-header">
-                <h3><span>🌎</span> Intercesores Conectados en el Mundo</h3>
-                <span class="badge-live">En tiempo real</span>
-              </div>
-              <div id="mapa-mundial" role="region" aria-label="Mapa mundial de intercesores en vivo"></div>
+            <!-- Mapa Leaflet Full Width (Toda la Tierra) -->
+            <div id="mapa-mundial" class="full-map-canvas" role="region" aria-label="Plano completo de la tierra con orantes mundiales"></div>
+
+            <!-- Ticker inferior de intercesores recientes en vivo -->
+            <div class="map-live-stream">
+              <div class="mls-label">⚡ Conectados recientemente:</div>
+              <div class="mls-carousel" id="lista-orantes-stream"></div>
             </div>
           </div>
 
           <!-- Peticiones de Hoy para Interceder -->
-          <div class="card sala-panel" style="margin-top: 1.8rem;">
+          <div class="card sala-panel" style="margin-top: 2rem;">
             <div class="sala-toolbar">
               <div>
                 <h3>📜 Peticiones del Día para Interceder</h3>
@@ -276,13 +284,13 @@
         </div>
       </section>
 
-      <!-- REUNIONES Y MAPA LEAFLET -->
+      <!-- REUNIONES Y MAPA LOCAL -->
       <section id="reuniones" class="section meetings-section">
         <div class="container">
           <div class="section-head">
             <div>
               <p class="eyebrow">Programaciones</p>
-              <h2 id="reuniones-title">Reuniones de oración · Perú</h2>
+              <h2 id="reuniones-title">Reuniones de oración locales</h2>
               <p class="muted">Encuentros presenciales en tu ciudad y mapa con las próximas fechas.</p>
             </div>
           </div>

@@ -3,81 +3,8 @@
  */
 
 const PG_DEFAULTS = {
-  activeCountry: "CO",
+  activeCountry: "PE",
   countries: {
-    CO: {
-      code: "CO",
-      name: "Colombia",
-      flag: "🇨🇴",
-      currency: "COP",
-      currencySymbol: "$",
-      whatsapp: "573001112233",
-      defaultAmounts: [20000, 50000, 100000],
-      defaultAmountStep: 5000,
-      minAmount: 5000,
-      paymentMethods: [
-        {
-          id: "nequi",
-          name: "Nequi",
-          icon: "📱",
-          account: "300 123 4567",
-          holder: "Comunidad Pura Gracia Colombia",
-          instructions: "Envía a través de Nequi al número indicado o escanea en la app."
-        },
-        {
-          id: "daviplata",
-          name: "Daviplata",
-          icon: "💳",
-          account: "300 123 4567",
-          holder: "Comunidad Pura Gracia Colombia",
-          instructions: "Transfiere desde Daviplata al número de celular."
-        },
-        {
-          id: "bancolombia",
-          name: "Bancolombia",
-          icon: "🏦",
-          account: "Ahorros # 123-456789-00",
-          holder: "Iglesia Pura Gracia NIT: 900.123.456-1",
-          instructions: "Transferencia directa o consignación nacional."
-        }
-      ],
-      cities: ["Bogotá", "Medellín", "Cali", "Barranquilla"],
-      reuniones: [
-        {
-          id: "r_co_1",
-          country: "CO",
-          city: "Bogotá",
-          titulo: "Oración en el parque",
-          fecha: "2026-09-06",
-          hora: "7:00 p. m.",
-          lugar: "Parque de los Novios, Bogotá",
-          lat: 4.6686,
-          lng: -74.064
-        },
-        {
-          id: "r_co_2",
-          country: "CO",
-          city: "Bogotá",
-          titulo: "Noche de intercesión",
-          fecha: "2026-09-13",
-          hora: "6:30 p. m.",
-          lugar: "Salón comunal La Soledad, Bogotá",
-          lat: 4.647,
-          lng: -74.072
-        },
-        {
-          id: "r_co_3",
-          country: "CO",
-          city: "Bogotá",
-          titulo: "Mañana de alabanza",
-          fecha: "2026-09-20",
-          hora: "9:00 a. m.",
-          lugar: "Plazoleta Lourdes, Bogotá",
-          lat: 4.6548,
-          lng: -74.0622
-        }
-      ]
-    },
     PE: {
       code: "PE",
       name: "Perú",
@@ -140,6 +67,68 @@ const PG_DEFAULTS = {
         }
       ]
     },
+    CO: {
+      code: "CO",
+      name: "Colombia",
+      flag: "🇨🇴",
+      currency: "COP",
+      currencySymbol: "$",
+      whatsapp: "573001112233",
+      defaultAmounts: [20000, 50000, 100000],
+      defaultAmountStep: 5000,
+      minAmount: 5000,
+      paymentMethods: [
+        {
+          id: "nequi",
+          name: "Nequi",
+          icon: "📱",
+          account: "300 123 4567",
+          holder: "Comunidad Pura Gracia Colombia",
+          instructions: "Envía a través de Nequi al número indicado o escanea en la app."
+        },
+        {
+          id: "daviplata",
+          name: "Daviplata",
+          icon: "💳",
+          account: "300 123 4567",
+          holder: "Comunidad Pura Gracia Colombia",
+          instructions: "Transfiere desde Daviplata al número de celular."
+        },
+        {
+          id: "bancolombia",
+          name: "Bancolombia",
+          icon: "🏦",
+          account: "Ahorros # 123-456789-00",
+          holder: "Iglesia Pura Gracia NIT: 900.123.456-1",
+          instructions: "Transferencia directa o consignación nacional."
+        }
+      ],
+      cities: ["Bogotá", "Medellín", "Cali", "Barranquilla"],
+      reuniones: [
+        {
+          id: "r_co_1",
+          country: "CO",
+          city: "Bogotá",
+          titulo: "Oración en el parque",
+          fecha: "2026-09-06",
+          hora: "7:00 p. m.",
+          lugar: "Parque de los Novios, Bogotá",
+          lat: 4.6686,
+          lng: -74.064
+        },
+        {
+          id: "r_co_2",
+          country: "CO",
+          city: "Bogotá",
+          titulo: "Noche de intercesión",
+          fecha: "2026-09-13",
+          hora: "6:30 p. m.",
+          lugar: "Salón comunal La Soledad, Bogotá",
+          lat: 4.647,
+          lng: -74.072
+        }
+      ]
+    },
     MX: {
       code: "MX",
       name: "México",
@@ -166,14 +155,6 @@ const PG_DEFAULTS = {
           account: "Tarjeta: 4152 3138 9012 3456",
           holder: "Pura Gracia México",
           instructions: "Deposita en cualquier tienda OXXO del país."
-        },
-        {
-          id: "bbva_mx",
-          name: "BBVA Bancomer",
-          icon: "💳",
-          account: "Cuenta: 0123456789",
-          holder: "Pura Gracia México",
-          instructions: "Depósito en ventanilla o cajero practicaja."
         }
       ],
       cities: ["Ciudad de México", "Guadalajara", "Monterrey", "Puebla"],
@@ -209,14 +190,6 @@ const PG_DEFAULTS = {
           account: "CVU: 0000003100012345678901 / Alias: puragracia.mp",
           holder: "Pura Gracia Argentina",
           instructions: "Envía dinero por Mercado Pago usando el Alias o CVU."
-        },
-        {
-          id: "cbu_ar",
-          name: "Cuenta Bancaria (CBU)",
-          icon: "🏦",
-          account: "CBU: 0720123488000012345678 / Alias: PURA.GRACIA.BANCO",
-          holder: "Asociación Pura Gracia",
-          instructions: "Transferencia bancaria inmediata."
         }
       ],
       cities: ["Buenos Aires", "Córdoba", "Rosario", "Mendoza"],
@@ -252,14 +225,6 @@ const PG_DEFAULTS = {
           account: "donate@puragracia.org",
           holder: "Pure Grace Community Inc.",
           instructions: "Send directly through your bank's Zelle feature with no fees."
-        },
-        {
-          id: "paypal",
-          name: "PayPal",
-          icon: "🅿️",
-          account: "paypal.me/puragracia",
-          holder: "Pura Gracia International",
-          instructions: "Dona de forma segura con tarjeta de crédito o saldo PayPal."
         }
       ],
       cities: ["Miami", "Orlando", "Houston", "Internacional Online"],
@@ -279,14 +244,15 @@ const PG_DEFAULTS = {
     }
   },
   orantesMundiales: [
-    { id: "o1", nombre: "Leonel C.", ciudad: "Lima", pais: "Perú", flag: "🇵🇪", lat: -12.0464, lng: -77.0428, time: "Hace 2 min" },
-    { id: "o2", nombre: "Pastor David", ciudad: "Bogotá", pais: "Colombia", flag: "🇨🇴", lat: 4.7110, lng: -74.0721, time: "Hace 5 min" },
-    { id: "o3", nombre: "María Isabel", ciudad: "Medellín", pais: "Colombia", flag: "🇨🇴", lat: 6.2442, lng: -75.5812, time: "Hace 8 min" },
-    { id: "o4", nombre: "Carlos Mendoza", ciudad: "Arequipa", pais: "Perú", flag: "🇵🇪", lat: -16.4090, lng: -71.5375, time: "Hace 10 min" },
-    { id: "o5", nombre: "Fernanda R.", ciudad: "Ciudad de México", pais: "México", flag: "🇲🇽", lat: 19.4326, lng: -99.1332, time: "Hace 12 min" },
-    { id: "o6", nombre: "Mateo & Familia", ciudad: "Buenos Aires", pais: "Argentina", flag: "🇦🇷", lat: -34.6037, lng: -58.3816, time: "Hace 15 min" },
-    { id: "o7", nombre: "Jennifer S.", ciudad: "Miami", pais: "EE.UU.", flag: "🇺🇸", lat: 25.7617, lng: -80.1918, time: "Hace 20 min" },
-    { id: "o8", nombre: "Andrés V.", ciudad: "Trujillo", pais: "Perú", flag: "🇵🇪", lat: -8.1116, lng: -79.0287, time: "Hace 25 min" }
+    { id: "o1", nombre: "Leonel C.", ciudad: "Lima", pais: "Perú", flag: "🇵🇪", motivo: "Por sanidad de mi familia, sabiduría y paz en el hogar", lat: -12.0464, lng: -77.0428, time: "Hace 2 min" },
+    { id: "o2", nombre: "Pastor David", ciudad: "Bogotá", pais: "Colombia", flag: "🇨🇴", motivo: "Por avivamiento espiritual y fortaleza en la juventud", lat: 4.7110, lng: -74.0721, time: "Hace 5 min" },
+    { id: "o3", nombre: "María Isabel", ciudad: "Medellín", pais: "Colombia", flag: "🇨🇴", motivo: "Por provisión en los emprendimientos y salud para mi madre", lat: 6.2442, lng: -75.5812, time: "Hace 8 min" },
+    { id: "o4", nombre: "Carlos Mendoza", ciudad: "Arequipa", pais: "Perú", flag: "🇵🇪", motivo: "Por restauración en los matrimonios de mi congregación", lat: -16.4090, lng: -71.5375, time: "Hace 10 min" },
+    { id: "o5", nombre: "Fernanda R.", ciudad: "Ciudad de México", pais: "México", flag: "🇲🇽", motivo: "Pidiendo protección divina y paz en mi país", lat: 19.4326, lng: -99.1332, time: "Hace 12 min" },
+    { id: "o6", nombre: "Mateo & Familia", ciudad: "Buenos Aires", pais: "Argentina", flag: "🇦🇷", motivo: "Gratitud por nuevas oportunidades laborales", lat: -34.6037, lng: -58.3816, time: "Hace 15 min" },
+    { id: "o7", nombre: "Jennifer S.", ciudad: "Miami", pais: "EE.UU.", flag: "🇺🇸", motivo: "Por sanidad de un amigo en tratamiento médico", lat: 25.7617, lng: -80.1918, time: "Hace 20 min" },
+    { id: "o8", nombre: "Andrés V.", ciudad: "Trujillo", pais: "Perú", flag: "🇵🇪", motivo: "Por dirección en mis estudios y proyectos", lat: -8.1116, lng: -79.0287, time: "Hace 25 min" },
+    { id: "o9", nombre: "Lucas M.", ciudad: "Madrid", pais: "España", flag: "🇪🇸", motivo: "Unidad y amor fraternal entre creyentes", lat: 40.4168, lng: -3.7038, time: "Hace 30 min" }
   ],
   admins: [
     {
@@ -296,46 +262,6 @@ const PG_DEFAULTS = {
       country: "GLOBAL",
       password: "admin123",
       role: "superadmin"
-    },
-    {
-      id: "adm_co",
-      email: "colombia@puragracia.org",
-      name: "Líder Colombia",
-      country: "CO",
-      password: "admin123",
-      role: "country_admin"
-    },
-    {
-      id: "adm_pe",
-      email: "peru@puragracia.org",
-      name: "Líder Perú",
-      country: "PE",
-      password: "admin123",
-      role: "country_admin"
-    },
-    {
-      id: "adm_mx",
-      email: "mexico@puragracia.org",
-      name: "Líder México",
-      country: "MX",
-      password: "admin123",
-      role: "country_admin"
-    },
-    {
-      id: "adm_ar",
-      email: "argentina@puragracia.org",
-      name: "Líder Argentina",
-      country: "AR",
-      password: "admin123",
-      role: "country_admin"
-    },
-    {
-      id: "adm_us",
-      email: "usa@puragracia.org",
-      name: "Líder USA / Global",
-      country: "US",
-      password: "admin123",
-      role: "country_admin"
     }
   ],
   firebase: {
@@ -365,9 +291,7 @@ const PGStorage = {
     try {
       const stored = localStorage.getItem(this.KEYS.COUNTRIES);
       if (stored) return JSON.parse(stored);
-    } catch (e) {
-      console.warn("Error leyendo países:", e);
-    }
+    } catch (e) {}
     this.saveCountries(PG_DEFAULTS.countries);
     return PG_DEFAULTS.countries;
   },
@@ -387,7 +311,7 @@ const PGStorage = {
   getActiveCountry() {
     const countries = this.getCountries();
     const code = this.getActiveCountryCode() || PG_DEFAULTS.activeCountry;
-    return countries[code] || countries["CO"] || PG_DEFAULTS.countries.CO;
+    return countries[code] || countries["PE"] || PG_DEFAULTS.countries.PE;
   },
 
   getOrantesMundiales() {
@@ -459,11 +383,7 @@ const PGStorage = {
     const initial = [
       { id: "p1", country: "PE", category: "Salud", nombre: "Leonel", texto: "Por la salud y bienestar de toda mi familia en Lima.", correo: "", telefono: "987654321", praysCount: 18, createdAt: new Date(Date.now() - 18e5).toISOString() },
       { id: "p2", country: "CO", category: "Salud", nombre: "María", texto: "Por la salud de mi mamá y paz en casa.", correo: "", telefono: "3001234567", praysCount: 12, createdAt: new Date(Date.now() - 36e5).toISOString() },
-      { id: "p3", country: "PE", category: "Trabajo", nombre: "Andrés", texto: "Trabajo estable y sabiduría para emprender.", correo: "", telefono: "987654321", praysCount: 8, createdAt: new Date(Date.now() - 72e5).toISOString() },
-      { id: "p4", country: "CO", category: "Familia", nombre: "Lucía", texto: "Por mi hijo, que encuentre camino y consuelo.", correo: "", telefono: "", praysCount: 15, createdAt: new Date(Date.now() - 108e5).toISOString() },
-      { id: "p5", country: "MX", category: "Gratitud", nombre: "Camilo", texto: "Gratitud por la provisión. Oración por mi ciudad.", correo: "", telefono: "", praysCount: 5, createdAt: new Date(Date.now() - 144e5).toISOString() },
-      { id: "p6", country: "AR", category: "Salud", nombre: "Elena", texto: "Sanidad y fuerzas para este tratamiento médico.", correo: "", telefono: "", praysCount: 20, createdAt: new Date(Date.now() - 180e5).toISOString() },
-      { id: "p7", country: "US", category: "Paz", nombre: "Sofía", texto: "Protección en el viaje y unidad espiritual.", correo: "", telefono: "", praysCount: 7, createdAt: new Date(Date.now() - 216e5).toISOString() }
+      { id: "p3", country: "PE", category: "Trabajo", nombre: "Andrés", texto: "Trabajo estable y sabiduría para emprender.", correo: "", telefono: "987654321", praysCount: 8, createdAt: new Date(Date.now() - 72e5).toISOString() }
     ];
     this.savePeticiones(initial);
     return initial;
