@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Pura Gracia — Deja tu petición de oración. Queremos conocerte y orar por ti."
+      content="Pura Gracia — Deja tu petición de oración. Queremos conocerte y orar por ti en Colombia, Perú, México, Argentina e Internacional."
     />
-    <title>Pura Gracia · Peticiones de oración</title>
+    <title>Pura Gracia · Comunidad y Peticiones de Oración</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -32,6 +32,19 @@
           <span class="logo-mark" aria-hidden="true"></span>
           <span>Pura Gracia</span>
         </a>
+
+        <!-- Selector de País Global en Header -->
+        <div class="header-country-picker">
+          <label for="global-country-select" class="sr-only">País:</label>
+          <select id="global-country-select" class="country-pill-select" aria-label="Seleccionar País">
+            <option value="CO">🇨🇴 Colombia</option>
+            <option value="PE">🇵🇪 Perú</option>
+            <option value="MX">🇲🇽 México</option>
+            <option value="AR">🇦🇷 Argentina</option>
+            <option value="US">🌎 Internacional / USA</option>
+          </select>
+        </div>
+
         <button
           class="nav-toggle"
           type="button"
@@ -43,6 +56,7 @@
           <span></span>
           <span></span>
         </button>
+
         <nav id="menu" class="nav">
           <a href="#inicio">Inicio</a>
           <a href="#peticiones">Peticiones</a>
@@ -59,7 +73,7 @@
         <div class="hero-glow" aria-hidden="true"></div>
         <div class="container hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow">Comunidad de oración</p>
+            <p class="eyebrow" id="hero-country-badge">Comunidad de oración · Colombia</p>
             <h1>Pura Gracia</h1>
             <p class="lema">
               Si tú también tienes una petición, escríbenos. Queremos conocerte y
@@ -79,21 +93,34 @@
         </div>
       </section>
 
+      <!-- FORMULARIO DE PETICIÓN -->
       <section id="escribir" class="section form-section">
         <div class="container split">
           <div>
             <p class="eyebrow">Déjanos tu petición</p>
             <h2>Escríbenos lo que pesa en tu corazón</h2>
             <p class="muted">
-              Tu petición se publica en la pizarra para que la comunidad ore por
-              ti. Si quieres una respuesta personal, deja tu teléfono o correo.
+              Tu petición se publica en la pizarra comunitaria. Puedes elegir tu país y categoría. Si deseas una respuesta pastoral, déjanos tu teléfono o correo.
             </p>
           </div>
           <form id="form-peticion" class="card form-card">
-            <label>
-              Tu nombre
-              <input type="text" name="nombre" required maxlength="60" placeholder="Cómo te llamas" />
-            </label>
+            <div class="form-row-2">
+              <label>
+                Tu nombre
+                <input type="text" name="nombre" required maxlength="60" placeholder="Cómo te llamas" />
+              </label>
+              <label>
+                Categoría
+                <select name="category" class="select-styled" required>
+                  <option value="Salud">🏥 Salud</option>
+                  <option value="Familia">👨‍👩‍👧 Familia</option>
+                  <option value="Trabajo">💼 Trabajo y Finanzas</option>
+                  <option value="Gratitud">✨ Gratitud</option>
+                  <option value="Paz">🕊️ Paz y Consuelo</option>
+                </select>
+              </label>
+            </div>
+
             <label>
               Tu petición
               <textarea
@@ -104,6 +131,7 @@
                 placeholder="Cuéntanos por quién o por qué quieres que oremos…"
               ></textarea>
             </label>
+
             <fieldset class="contact-fields">
               <legend>¿Cómo te contactamos? (opcional)</legend>
               <label>
@@ -116,30 +144,43 @@
                   type="tel"
                   name="telefono"
                   inputmode="tel"
-                  placeholder="Ej. 3001234567"
+                  placeholder="Ej. 3001234567 o 987654321"
                 />
               </label>
             </fieldset>
-            <p class="form-hint">Al menos uno de los dos si deseas una reflexión por WhatsApp o correo.</p>
+            <p class="form-hint">Si dejas tu WhatsApp, te escribiremos una reflexión personalizada después de orar.</p>
             <button class="btn btn-primary" type="submit">Publicar en la pizarra</button>
           </form>
         </div>
       </section>
 
+      <!-- LA PIZARRA DE NOTAS -->
       <section id="peticiones" class="section board-section">
         <div class="container">
           <div class="section-head">
             <div>
-              <p class="eyebrow">La pizarra</p>
+              <p class="eyebrow">La pizarra comunitaria</p>
               <h2>Notas de petición</h2>
-              <p class="muted">Notas amarillas, en orden, como en el tablero de la calle.</p>
+              <p class="muted">Haz clic en <strong>🙏 Me uno a orar</strong> para apoyar a quien lo necesita.</p>
             </div>
             <p class="count-pill"><span id="total-notas">0</span> peticiones</p>
           </div>
+
+          <!-- Filtros de Categoría -->
+          <div class="category-filters" role="group" aria-label="Filtrar por categoría">
+            <button type="button" class="filter-chip active" data-cat="ALL">Todas</button>
+            <button type="button" class="filter-chip" data-cat="Salud">🏥 Salud</button>
+            <button type="button" class="filter-chip" data-cat="Familia">👨‍👩‍👧 Familia</button>
+            <button type="button" class="filter-chip" data-cat="Trabajo">💼 Trabajo</button>
+            <button type="button" class="filter-chip" data-cat="Gratitud">✨ Gratitud</button>
+            <button type="button" class="filter-chip" data-cat="Paz">🕊️ Paz</button>
+          </div>
+
           <div id="pizarra" class="pizarra" role="list"></div>
         </div>
       </section>
 
+      <!-- TIEMPO DE ORACIÓN -->
       <section id="oracion" class="section prayer-section">
         <div class="container">
           <div class="section-head">
@@ -172,6 +213,7 @@
         </div>
       </section>
 
+      <!-- QUIÉNES SOMOS -->
       <section id="quienes-somos" class="section about-section">
         <div class="container split">
           <div>
@@ -183,8 +225,7 @@
               agradece. Creemos que nadie tiene que cargar solo.
             </p>
             <p class="muted">
-              Recibimos peticiones, nos reunimos a orar y devolvemos una palabra de
-              aliento. Si hoy estás pasando por algo, este espacio es para ti.
+              Recibimos peticiones en diferentes países y ciudades, nos reunimos a orar y devolvemos una palabra de aliento.
             </p>
           </div>
           <ul class="values">
@@ -193,24 +234,25 @@
               Te conocemos por tu nombre, no por un formulario frío.
             </li>
             <li>
-              <strong>Oración</strong>
+              <strong>Oración Comunitaria</strong>
               Cada nota se lee. Cada historia se pone delante de Dios.
             </li>
             <li>
-              <strong>Respuesta</strong>
+              <strong>Respuesta Personal</strong>
               Si dejas tu WhatsApp, te escribimos una reflexión después de orar.
             </li>
           </ul>
         </div>
       </section>
 
+      <!-- REUNIONES Y MAPA LEAFLET -->
       <section id="reuniones" class="section meetings-section">
         <div class="container">
           <div class="section-head">
             <div>
               <p class="eyebrow">Programaciones</p>
-              <h2>Reuniones de oración</h2>
-              <p class="muted">Fotos de encuentros pasados y un mapa con las próximas fechas.</p>
+              <h2 id="reuniones-title">Reuniones de oración · Colombia</h2>
+              <p class="muted">Encuentros presenciales en tu ciudad y mapa con las próximas fechas.</p>
             </div>
           </div>
 
@@ -232,32 +274,58 @@
         </div>
       </section>
 
+      <!-- DONACIONES DINÁMICAS MULTI-PAÍS (OPCIÓN 3) -->
       <section id="donar" class="section donate-section">
         <div class="container split">
           <div>
             <p class="eyebrow">Sostén la obra</p>
-            <h2>Donar</h2>
+            <h2>Donaciones y Ofrendas</h2>
             <p>
-              Tu ofrenda ayuda a mantener los tableros, los materiales y los
-              espacios donde nos reunimos a orar.
+              Tu ofrenda ayuda a mantener los tableros, materiales impresos y los espacios donde nos reunimos a orar en cada ciudad.
             </p>
-            <p class="muted">Elige un monto o escribe el tuyo. Te llevamos a WhatsApp para coordinar la donación.</p>
-          </div>
-          <form id="form-donar" class="card form-card">
-            <div class="amount-row" role="group" aria-label="Monto">
-              <button type="button" class="chip" data-monto="20000">$20.000</button>
-              <button type="button" class="chip" data-monto="50000">$50.000</button>
-              <button type="button" class="chip" data-monto="100000">$100.000</button>
+            <p class="muted">
+              Selecciona tu país para ver las cuentas bancarias locales (Yape, Plin, Nequi, Daviplata, SPEI, Mercado Pago o Zelle) y reportar tu donación.
+            </p>
+
+            <!-- Cuentas bancarias dinámicas -->
+            <div class="payment-methods-card" id="payment-methods-card">
+              <div class="pm-header">
+                <strong>💳 Métodos de Depósito Local:</strong>
+              </div>
+              <div class="pm-tabs" id="pm-tabs-container"></div>
+              <div class="pm-content-box" id="pm-content-box"></div>
             </div>
+          </div>
+
+          <form id="form-donar" class="card form-card">
+            <!-- Selector de País de Donación -->
             <label>
-              Otro monto (COP)
-              <input type="number" name="monto" min="1000" step="1000" placeholder="Ej. 30000" />
+              País de la Donación
+              <select id="donate-country-select" class="select-styled">
+                <option value="CO">🇨🇴 Colombia (Pesos COP)</option>
+                <option value="PE">🇵🇪 Perú (Soles PEN)</option>
+                <option value="MX">🇲🇽 México (Pesos MXN)</option>
+                <option value="AR">🇦🇷 Argentina (Pesos ARS)</option>
+                <option value="US">🌎 Internacional / USA (Dólares USD)</option>
+              </select>
             </label>
+
+            <!-- Montos sugeridos dinámicos -->
+            <div class="amount-row" id="donate-chips-container" role="group" aria-label="Monto sugerido"></div>
+
             <label>
-              Mensaje (opcional)
-              <input type="text" name="mensaje" maxlength="120" placeholder="Una palabra de ánimo" />
+              <span id="donate-amount-label">Otro monto (COP)</span>
+              <input type="number" id="donate-custom-amount" name="monto" min="1000" step="1000" placeholder="Ej. 30000" />
             </label>
-            <button class="btn btn-primary" type="submit">Donar por WhatsApp</button>
+
+            <label>
+              Mensaje o motivo de la ofrenda (opcional)
+              <input type="text" name="mensaje" maxlength="120" placeholder="Ej. Ofrenda de gratitud" />
+            </label>
+
+            <button class="btn btn-primary" type="submit" id="btn-donate-submit">
+              <span>📱</span> Donar y Confirmar por WhatsApp
+            </button>
           </form>
         </div>
       </section>
@@ -265,11 +333,14 @@
 
     <footer class="site-footer">
       <div class="container footer-inner">
-        <p><strong>Pura Gracia</strong> · Queremos conocerte y orar por ti.</p>
-        <p class="muted">Hecho con fe y notas amarillas.</p>
+        <div>
+          <p><strong>Pura Gracia</strong> · Queremos conocerte y orar por ti.</p>
+          <p class="muted">Hecho con fe y notas amarillas.</p>
+        </div>
       </div>
     </footer>
 
+    <!-- MODAL DE REFLEXIÓN -->
     <div id="modal-reflexion" class="modal" hidden>
       <div class="modal-card" role="dialog" aria-labelledby="modal-titulo" aria-modal="true">
         <button class="modal-close" type="button" aria-label="Cerrar">×</button>
@@ -283,11 +354,13 @@
       </div>
     </div>
 
+    <!-- Scripts -->
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
+    <script src="js/firebase-config.js"></script>
     <script src="js/app.js"></script>
   </body>
 </html>

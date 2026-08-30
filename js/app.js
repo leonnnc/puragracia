@@ -1,68 +1,27 @@
-const CONFIG = {
-  iglesiaWhatsApp: "573001112233",
-  storageKey: "puraGracia.peticiones",
-  orantesKey: "puraGracia.orantes",
-};
-
-const SEED = [
-  { nombre: "María", texto: "Por la salud de mi mamá y paz en casa.", correo: "", telefono: "" },
-  { nombre: "Andrés", texto: "Trabajo estable y sabiduría para decidir.", correo: "", telefono: "" },
-  { nombre: "Lucía", texto: "Por mi hijo, que encuentre camino y consuelo.", correo: "", telefono: "" },
-  { nombre: "Camilo", texto: "Gratitud. Oración por una familia en duelo.", correo: "", telefono: "" },
-  { nombre: "Elena", texto: "Sanidad y fuerzas para este tratamiento.", correo: "", telefono: "" },
-  { nombre: "Sofía", texto: "Protección en el viaje y unidad familiar.", correo: "", telefono: "" },
-];
-
-const REUNIONES = [
-  {
-    id: "r1",
-    titulo: "Oración en el parque",
-    fecha: "2026-09-06",
-    hora: "7:00 p. m.",
-    lugar: "Parque de los Novios",
-    lat: 4.6686,
-    lng: -74.064,
-  },
-  {
-    id: "r2",
-    titulo: "Noche de intercesión",
-    fecha: "2026-09-13",
-    hora: "6:30 p. m.",
-    lugar: "Salón comunal La Soledad",
-    lat: 4.647,
-    lng: -74.072,
-  },
-  {
-    id: "r3",
-    titulo: "Mañana de alabanza",
-    fecha: "2026-09-20",
-    hora: "9:00 a. m.",
-    lugar: "Plazoleta Lourdes",
-    lat: 4.6548,
-    lng: -74.0622,
-  },
-];
+/**
+ * Pura Gracia - Lógica del Sitio Web Público Multi-País
+ */
 
 const FOTOS = [
   {
     src: "https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=900&q=80",
     alt: "Personas reunidas en círculo de oración",
-    caption: "Círculo de oración · agosto 2026",
+    caption: "Círculo de oración comunitaria",
   },
   {
     src: "https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=900&q=80",
     alt: "Encuentro comunitario al atardecer",
-    caption: "Noche de gratitud · julio 2026",
+    caption: "Noche de gratitud y alabanza",
   },
   {
     src: "https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=900&q=80",
     alt: "Manos unidas en oración",
-    caption: "Intercesión en el parque · junio 2026",
+    caption: "Intercesión en el parque",
   },
   {
     src: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=900&q=80",
     alt: "Grupo compartiendo alrededor de una mesa",
-    caption: "Café y oración · mayo 2026",
+    caption: "Café, palabra y comunión",
   },
 ];
 
@@ -75,79 +34,96 @@ function hoyISO() {
 }
 
 function formatFecha(iso) {
-  return new Date(iso + "T12:00:00").toLocaleDateString("es-CO", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
-}
-
-function loadPeticiones() {
   try {
-    const raw = localStorage.getItem(CONFIG.storageKey);
-    if (raw) return JSON.parse(raw);
-  } catch {
-    /* ignore */
+    return new Date(iso + "T12:00:00").toLocaleDateString("es-CO", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    });
+  } catch (e) {
+    return iso;
   }
-  const seeded = SEED.map((item, i) => ({
-    ...item,
-    id: uid(),
-    createdAt: new Date(Date.now() - i * 36e5).toISOString(),
-  }));
-  savePeticiones(seeded);
-  return seeded;
-}
-
-function savePeticiones(list) {
-  localStorage.setItem(CONFIG.storageKey, JSON.stringify(list));
-}
-
-function digitsPhone(value) {
-  const digits = String(value || "").replace(/\D/g, "");
-  if (!digits) return "";
-  if (digits.startsWith("57") && digits.length >= 12) return digits;
-  if (digits.length === 10) return "57" + digits;
-  return digits;
-}
-
-let peticiones = loadPeticiones();
-let oranteActual = sessionStorage.getItem(CONFIG.orantesKey) || "";
-let reflexionTarget = null;
-let map;
-let markers = {};
-
-function renderPizarra() {
-  const board = document.getElementById("pizarra");
-  const ordered = [...peticiones].sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  );
-  document.getElementById("total-notas").textContent = ordered.length;
-  board.replaceChildren(
-    ...ordered.map((p) => {
-      const el = document.createElement("article");
-      el.className = "nota";
-      el.setAttribute("role", "listitem");
-      const time = new Date(p.createdAt);
-      el.innerHTML = `
-        <h3>${escapeHtml(p.nombre)}</h3>
-        <p>${escapeHtml(p.texto)}</p>
-        <time datetime="${p.createdAt}">${time.toLocaleDateString("es-CO")}</time>
-      `;
-      return el;
-    })
-  );
 }
 
 function escapeHtml(str) {
-  return String(str)
+  return String(str || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
 
+function digitsPhone(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  if (!digits) return "";
+  if (digits.startsWith("57") && digits.length >= 12) return digits;
+  if (digits.startsWith("51") && digits.length >= 11) return digits;
+  if (digits.startsWith("52") && digits.length >= 12) return digits;
+  if (digits.startsWith("54") && digits.length >= 12) return digits;
+  return digits;
+}
+
+// Variables de estado
+let activeFilterCategory = "ALL";
+let oranteActual = sessionStorage.getItem("puraGracia.orantes") || "";
+let reflexionTarget = null;
+let mapInstance = null;
+let mapMarkers = [];
+
+// RENDERIZADO DE LA PIZARRA
+function renderPizarra() {
+  const board = document.getElementById("pizarra");
+  const peticiones = PGStorage.getPeticiones();
+  
+  let filtered = [...peticiones].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  if (activeFilterCategory !== "ALL") {
+    filtered = filtered.filter(p => (p.category || "Salud") === activeFilterCategory);
+  }
+
+  document.getElementById("total-notas").textContent = peticiones.length;
+
+  if (!filtered.length) {
+    board.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #c5d6cf;">No hay notas en esta categoría todavía. ¡Sé el primero en dejar una!</div>`;
+    return;
+  }
+
+  board.replaceChildren(
+    ...filtered.map((p) => {
+      const el = document.createElement("article");
+      el.className = "nota";
+      el.setAttribute("role", "listitem");
+      const time = new Date(p.createdAt || Date.now());
+      const flag = p.country === "PE" ? "🇵🇪" : p.country === "MX" ? "🇲🇽" : p.country === "AR" ? "🇦🇷" : p.country === "US" ? "🌎" : "🇨🇴";
+      
+      el.innerHTML = `
+        <div class="nota-badge">${flag} ${escapeHtml(p.category || "General")}</div>
+        <h3>${escapeHtml(p.nombre)}</h3>
+        <p>${escapeHtml(p.texto)}</p>
+        <div class="nota-footer">
+          <time datetime="${p.createdAt}">${time.toLocaleDateString("es-CO")}</time>
+          <button type="button" class="btn-pray-join" data-id="${p.id}" title="Unirme a orar por esta petición">
+            <span>🙏</span> <span class="pray-count">${p.praysCount || 0}</span>
+          </button>
+        </div>
+      `;
+
+      const prayBtn = el.querySelector(".btn-pray-join");
+      prayBtn.addEventListener("click", () => {
+        const newCount = PGStorage.addPrayCount(p.id);
+        prayBtn.querySelector(".pray-count").textContent = newCount;
+        prayBtn.style.transform = "scale(1.2)";
+        setTimeout(() => { prayBtn.style.transform = "scale(1)"; }, 200);
+      });
+
+      return el;
+    })
+  );
+}
+
+// PETICIONES DE HOY & SALA
 function peticionesDeHoy() {
-  return peticiones.filter((p) => p.createdAt.slice(0, 10) === hoyISO());
+  const peticiones = PGStorage.getPeticiones();
+  return peticiones.filter((p) => (p.createdAt || "").slice(0, 10) === hoyISO());
 }
 
 function renderHoy() {
@@ -155,14 +131,16 @@ function renderHoy() {
   const today = peticionesDeHoy();
   const orantes = oranteActual ? 1 : 0;
   document.getElementById("orantes-activos").textContent = `${orantes} orando`;
+  
   if (!oranteActual) {
-    list.innerHTML = `<li class="peticion-hoy">Entra a la sala para ver las peticiones del día y responder.</li>`;
+    list.innerHTML = `<li class="peticion-hoy">Entra a la sala con tu nombre para ver las peticiones del día y responder.</li>`;
     return;
   }
   if (!today.length) {
-    list.innerHTML = `<li class="peticion-hoy">Aún no hay peticiones nuevas hoy. Puedes orar también por las de la pizarra.</li>`;
+    list.innerHTML = `<li class="peticion-hoy">Aún no hay peticiones nuevas hoy. Puedes unirte en oración por las notas de la pizarra.</li>`;
     return;
   }
+
   list.replaceChildren(
     ...today.map((p) => {
       const li = document.createElement("li");
@@ -171,7 +149,10 @@ function renderHoy() {
       const canWa = Boolean(phone);
       const canMail = Boolean(p.correo);
       li.innerHTML = `
-        <strong>${escapeHtml(p.nombre)}</strong>
+        <div style="display: flex; justify-content: space-between;">
+          <strong>${escapeHtml(p.nombre)}</strong>
+          <span style="font-size: 0.8rem; color: #5b6b66;">${escapeHtml(p.category || "General")}</span>
+        </div>
         <p>${escapeHtml(p.texto)}</p>
         <div class="actions"></div>
       `;
@@ -180,7 +161,7 @@ function renderHoy() {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "btn btn-small btn-whatsapp";
-        btn.textContent = "Reflexión por WhatsApp";
+        btn.textContent = "Enviar reflexión por WhatsApp";
         btn.addEventListener("click", () => openReflexion(p, "whatsapp"));
         actions.appendChild(btn);
       }
@@ -194,7 +175,7 @@ function renderHoy() {
       if (!canWa && !canMail) {
         const span = document.createElement("span");
         span.className = "muted";
-        span.textContent = "Esta petición es anónima: ora en silencio.";
+        span.textContent = "Petición anónima: ora en silencio.";
         actions.appendChild(span);
       }
       return li;
@@ -202,12 +183,13 @@ function renderHoy() {
   );
 }
 
+// MODAL DE REFLEXIÓN
 function openReflexion(peticion, canal) {
   reflexionTarget = { ...peticion, canal };
   const modal = document.getElementById("modal-reflexion");
-  document.getElementById("modal-destino").textContent = `Para ${peticion.nombre}`;
+  document.getElementById("modal-destino").textContent = `Para ${peticion.nombre} (${peticion.telefono})`;
   document.getElementById("texto-reflexion").value =
-    `Hola ${peticion.nombre}, soy ${oranteActual} de Pura Gracia. Oramos por ti: "${peticion.texto}". Que la paz de Dios te cubra hoy.`;
+    `Hola ${peticion.nombre}, soy ${oranteActual} de la comunidad Pura Gracia. Oramos por tu petición: "${peticion.texto}". Que la paz y la gracia de Dios te acompañen hoy.`;
   modal.hidden = false;
   document.getElementById("texto-reflexion").focus();
 }
@@ -227,6 +209,7 @@ function enviarReflexion() {
   closeModal();
 }
 
+// GALERÍA
 function renderGaleria() {
   const galeria = document.getElementById("galeria");
   galeria.replaceChildren(
@@ -239,32 +222,250 @@ function renderGaleria() {
   );
 }
 
-function initMapa() {
-  map = L.map("mapa", { scrollWheelZoom: false }).setView([4.653, -74.066], 13);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap",
-  }).addTo(map);
+// MAPA Y REUNIONES DINÁMICAS POR PAÍS
+function updateMeetingsAndMap() {
+  const country = PGStorage.getActiveCountry();
+  const reuniones = country.reuniones || [];
+
+  document.getElementById("reuniones-title").textContent = `Reuniones de oración · ${country.name}`;
+  document.getElementById("hero-country-badge").textContent = `Comunidad de oración · ${country.name}`;
 
   const list = document.getElementById("lista-fechas");
-  list.replaceChildren(
-    ...REUNIONES.map((r, index) => {
-      const marker = L.marker([r.lat, r.lng]).addTo(map);
-      marker.bindPopup(`<strong>${r.titulo}</strong><br>${formatFecha(r.fecha)} · ${r.hora}<br>${r.lugar}`);
-      markers[r.id] = marker;
+  if (!reuniones.length) {
+    list.innerHTML = `<p class="muted">Pronto anunciaremos nuevas fechas y sedes para ${country.name}.</p>`;
+  } else {
+    list.replaceChildren(
+      ...reuniones.map((r, index) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "date-btn" + (index === 0 ? " active" : "");
+        btn.innerHTML = `<strong>${escapeHtml(r.titulo)}</strong><br><span style="font-size:0.85rem; color:var(--teal); font-weight:600;">${escapeHtml(r.city)}</span> · ${formatFecha(r.fecha)}<br><small style="color:var(--muted);">${escapeHtml(r.lugar)}</small>`;
+        
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".date-btn").forEach((el) => el.classList.remove("active"));
+          btn.classList.add("active");
+          if (mapInstance && r.lat && r.lng) {
+            mapInstance.flyTo([r.lat, r.lng], 15);
+            if (mapMarkers[index]) mapMarkers[index].openPopup();
+          }
+        });
+        return btn;
+      })
+    );
+  }
 
+  // Actualizar mapa Leaflet
+  if (typeof L !== "undefined") {
+    if (!mapInstance) {
+      mapInstance = L.map("mapa", { scrollWheelZoom: false }).setView([4.653, -74.066], 13);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(mapInstance);
+    }
+
+    // Limpiar marcadores anteriores
+    mapMarkers.forEach(m => m.remove());
+    mapMarkers = [];
+
+    if (reuniones.length > 0) {
+      reuniones.forEach((r, i) => {
+        if (r.lat && r.lng) {
+          const marker = L.marker([r.lat, r.lng]).addTo(mapInstance);
+          marker.bindPopup(`<strong>${escapeHtml(r.titulo)}</strong><br>${escapeHtml(r.city)}<br>${formatFecha(r.fecha)} · ${escapeHtml(r.hora)}<br>${escapeHtml(r.lugar)}`);
+          mapMarkers.push(marker);
+        }
+      });
+
+      // Centrar en el primer evento del país
+      const first = reuniones[0];
+      if (first && first.lat && first.lng) {
+        mapInstance.setView([first.lat, first.lng], 13);
+      }
+    }
+  }
+}
+
+// SECCIÓN DE DONACIONES DINÁMICAS (OPCIÓN 3)
+function updateDonationsUI() {
+  const country = PGStorage.getActiveCountry();
+  const symbol = country.currencySymbol || "$";
+  const currency = country.currency || "COP";
+  const amounts = country.defaultAmounts || [20000, 50000, 100000];
+
+  // Actualizar label de moneda
+  document.getElementById("donate-amount-label").textContent = `Otro monto (${currency} ${symbol})`;
+
+  // Selector sincronizado
+  const donateSelect = document.getElementById("donate-country-select");
+  if (donateSelect) donateSelect.value = country.code;
+
+  // Chips dinámicos
+  const chipsContainer = document.getElementById("donate-chips-container");
+  chipsContainer.replaceChildren(
+    ...amounts.map((monto) => {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "date-btn" + (index === 0 ? " active" : "");
-      btn.innerHTML = `<strong>${r.titulo}</strong><br>${formatFecha(r.fecha)} · ${r.hora}<br>${r.lugar}`;
+      btn.className = "chip";
+      btn.dataset.monto = monto;
+      btn.textContent = `${symbol} ${Number(monto).toLocaleString("es-CO")}`;
       btn.addEventListener("click", () => {
-        document.querySelectorAll(".date-btn").forEach((el) => el.classList.remove("active"));
+        document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
         btn.classList.add("active");
-        map.flyTo([r.lat, r.lng], 15);
-        marker.openPopup();
+        document.getElementById("donate-custom-amount").value = monto;
       });
       return btn;
     })
   );
+
+  // Tabs de métodos de pago (Yape, Plin, Nequi, etc.)
+  const methods = country.paymentMethods || [];
+  const tabsContainer = document.getElementById("pm-tabs-container");
+  const contentBox = document.getElementById("pm-content-box");
+
+  if (!methods.length) {
+    tabsContainer.innerHTML = "";
+    contentBox.innerHTML = "<p class='muted'>Contáctanos por WhatsApp para coordinar tu ofrenda.</p>";
+    return;
+  }
+
+  tabsContainer.replaceChildren(
+    ...methods.map((m, idx) => {
+      const tab = document.createElement("button");
+      tab.type = "button";
+      tab.className = "pm-tab" + (idx === 0 ? " active" : "");
+      tab.innerHTML = `${m.icon || "💳"} ${escapeHtml(m.name)}`;
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".pm-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        renderPaymentMethodContent(m);
+      });
+      return tab;
+    })
+  );
+
+  renderPaymentMethodContent(methods[0]);
+}
+
+function renderPaymentMethodContent(method) {
+  const contentBox = document.getElementById("pm-content-box");
+  if (!method) return;
+
+  contentBox.innerHTML = `
+    <strong>${method.icon || "💳"} ${escapeHtml(method.name)}</strong>
+    <p style="margin: 0.2rem 0; font-size: 0.9rem;">${escapeHtml(method.instructions || "")}</p>
+    <div class="pm-account-row">
+      <code>${escapeHtml(method.account)}</code>
+      <button type="button" class="btn-copy" id="btn-copy-acc">Copiar</button>
+    </div>
+    <div style="font-size: 0.85rem; color: #4d5b56;">Titular: <strong>${escapeHtml(method.holder || "Pura Gracia")}</strong></div>
+  `;
+
+  document.getElementById("btn-copy-acc").addEventListener("click", (e) => {
+    navigator.clipboard.writeText(method.account).then(() => {
+      e.target.textContent = "¡Copiado!";
+      setTimeout(() => { e.target.textContent = "Copiar"; }, 2000);
+    });
+  });
+}
+
+// INICIALIZACIÓN DE FORMULARIOS Y EVENTOS
+function initForms() {
+  // Petición Submit
+  document.getElementById("form-peticion").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    const nombre = String(data.get("nombre") || "").trim();
+    const category = String(data.get("category") || "Salud");
+    const texto = String(data.get("texto") || "").trim();
+    const correo = String(data.get("correo") || "").trim();
+    const telefono = String(data.get("telefono") || "").trim();
+    const activeCountry = PGStorage.getActiveCountryCode();
+
+    if (!nombre || !texto) return;
+
+    const list = PGStorage.getPeticiones();
+    list.unshift({
+      id: uid(),
+      country: activeCountry,
+      category,
+      nombre,
+      texto,
+      correo,
+      telefono,
+      praysCount: 1,
+      createdAt: new Date().toISOString(),
+    });
+
+    PGStorage.savePeticiones(list);
+    e.target.reset();
+    renderPizarra();
+    renderHoy();
+    document.getElementById("peticiones").scrollIntoView({ behavior: "smooth" });
+  });
+
+  // Filtros de categoría en la pizarra
+  document.querySelectorAll(".filter-chip").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".filter-chip").forEach((c) => c.classList.remove("active"));
+      btn.classList.add("active");
+      activeFilterCategory = btn.dataset.cat;
+      renderPizarra();
+    });
+  });
+
+  // Entrada a la sala de oración
+  document.getElementById("form-sala").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nombre = String(new FormData(e.target).get("orante") || "").trim();
+    if (!nombre) return;
+    oranteActual = nombre;
+    sessionStorage.setItem("puraGracia.orantes", nombre);
+    document.getElementById("sala-estado").textContent = `Estás orando como ${nombre}.`;
+    renderHoy();
+  });
+
+  // Sincronizar input libre de monto para deseleccionar chips
+  const customAmountInput = document.getElementById("donate-custom-amount");
+  customAmountInput.addEventListener("input", () => {
+    document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
+  });
+
+  // Envío de donación por WhatsApp
+  document.getElementById("form-donar").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const country = PGStorage.getActiveCountry();
+    const data = new FormData(e.target);
+    const monto = data.get("monto") || "una ofrenda";
+    const mensaje = String(data.get("mensaje") || "").trim();
+    const symbol = country.currencySymbol || "$";
+    const currency = country.currency || "COP";
+    const text = `Hola, quiero enviar una ofrenda a Pura Gracia (${country.name}). Monto: ${symbol} ${monto} ${currency}. ${mensaje ? `Mensaje: "${mensaje}"` : ""}`.trim();
+    
+    window.open(`https://wa.me/${country.whatsapp}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+  });
+
+  // Selector de País Global (Header)
+  const globalSelect = document.getElementById("global-country-select");
+  globalSelect.value = PGStorage.getActiveCountryCode();
+  globalSelect.addEventListener("change", (e) => {
+    PGStorage.setActiveCountryCode(e.target.value);
+    updateMeetingsAndMap();
+    updateDonationsUI();
+  });
+
+  // Selector de País en Donaciones
+  const donateSelect = document.getElementById("donate-country-select");
+  donateSelect.addEventListener("change", (e) => {
+    globalSelect.value = e.target.value;
+    globalSelect.dispatchEvent(new Event("change"));
+  });
+
+  // Modales
+  document.querySelector(".modal-close").addEventListener("click", closeModal);
+  document.getElementById("enviar-reflexion").addEventListener("click", enviarReflexion);
+  document.getElementById("modal-reflexion").addEventListener("click", (e) => {
+    if (e.target.id === "modal-reflexion") closeModal();
+  });
 }
 
 function initNav() {
@@ -280,64 +481,6 @@ function initNav() {
       toggle.setAttribute("aria-expanded", "false");
     })
   );
-}
-
-function initForms() {
-  document.getElementById("form-peticion").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const data = new FormData(e.target);
-    const nombre = String(data.get("nombre") || "").trim();
-    const texto = String(data.get("texto") || "").trim();
-    const correo = String(data.get("correo") || "").trim();
-    const telefono = String(data.get("telefono") || "").trim();
-    if (!nombre || !texto) return;
-    peticiones.unshift({
-      id: uid(),
-      nombre,
-      texto,
-      correo,
-      telefono,
-      createdAt: new Date().toISOString(),
-    });
-    savePeticiones(peticiones);
-    e.target.reset();
-    renderPizarra();
-    renderHoy();
-    document.getElementById("peticiones").scrollIntoView({ behavior: "smooth" });
-  });
-
-  document.getElementById("form-sala").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const nombre = String(new FormData(e.target).get("orante") || "").trim();
-    if (!nombre) return;
-    oranteActual = nombre;
-    sessionStorage.setItem(CONFIG.orantesKey, nombre);
-    document.getElementById("sala-estado").textContent = `Estás orando como ${nombre}.`;
-    renderHoy();
-  });
-
-  document.querySelectorAll(".chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
-      chip.classList.add("active");
-      document.querySelector("#form-donar [name=monto]").value = chip.dataset.monto;
-    });
-  });
-
-  document.getElementById("form-donar").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const data = new FormData(e.target);
-    const monto = data.get("monto") || "una ofrenda";
-    const mensaje = String(data.get("mensaje") || "").trim();
-    const text = `Hola, quiero donar a Pura Gracia. Monto: ${monto} COP. ${mensaje}`.trim();
-    window.open(`https://wa.me/${CONFIG.iglesiaWhatsApp}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
-  });
-
-  document.querySelector(".modal-close").addEventListener("click", closeModal);
-  document.getElementById("enviar-reflexion").addEventListener("click", enviarReflexion);
-  document.getElementById("modal-reflexion").addEventListener("click", (e) => {
-    if (e.target.id === "modal-reflexion") closeModal();
-  });
 }
 
 function initGalleryNav() {
@@ -357,7 +500,9 @@ document.addEventListener("DOMContentLoaded", () => {
   renderHoy();
   renderGaleria();
   initGalleryNav();
-  initMapa();
+  updateMeetingsAndMap();
+  updateDonationsUI();
+
   if (oranteActual) {
     document.querySelector("#form-sala [name=orante]").value = oranteActual;
     document.getElementById("sala-estado").textContent = `Estás orando como ${oranteActual}.`;
