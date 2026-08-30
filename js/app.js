@@ -1,5 +1,5 @@
 /**
- * Pura Gracia - Lógica del Sitio Web Público con Plano Mundial Completo y Red de Oración
+ * Pura Gracia - Lógica del Sitio Web Público con Red de Oración Mundial en 2 Pantallas / Modal Fullscreen
  */
 
 const FOTOS = [
@@ -99,7 +99,7 @@ let oranteActual = sessionStorage.getItem("puraGracia.orantes") || "";
 let reflexionTarget = null;
 let mapMeetings = null;
 let mapMeetingsMarkers = [];
-let mapWorldPrayer = null;
+let mapWorldFullscreen = null;
 let worldPrayerMarkers = {};
 
 // ========================================================
@@ -165,41 +165,79 @@ function applyDetectedCountry(code) {
 }
 
 // ========================================================
-// 2. PLANO COMPLETO DE LA TIERRA (MAPA MUNDIAL & SALA)
+// 2. MODAL FULLSCREEN - PLANO COMPLETO DE LA TIERRA
 // ========================================================
-function initMapaMundial() {
-  if (typeof L === "undefined") return;
+function openWorldPrayerFullscreen(currentOrante = null) {
+  const modal = document.getElementById("modal-mapa-mundial");
+  if (!modal) return;
 
-  const mapContainer = document.getElementById("mapa-mundial");
-  if (!mapContainer || mapWorldPrayer) return;
+  modal.hidden = false;
+  document.body.style.overflow = "hidden"; // Evitar scroll de fondo
 
-  // Inicializar plano completo de toda la Tierra (Zoom nivel 2, centrado en el mundo)
-  mapWorldPrayer = L.map("mapa-mundial", {
-    scrollWheelZoom: false,
-    minZoom: 1,
-    maxZoom: 12,
-    worldCopyJump: true
-  }).setView([20, 0], 2);
+  const orantes = PGStorage.getOrantesMundiales();
+  document.getElementById("mf-live-count").textContent = orantes.length;
 
-  // Usar tiles oficiales de OpenStreetMap limpios (sin marcas de agua de Carto ni requerimiento de API Key)
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 18,
-  }).addTo(mapWorldPrayer);
+  if (currentOrante) {
+    document.getElementById("mf-user-name").textContent = `🙏 ${currentOrante.nombre}`;
+    document.getElementById("mf-user-location").textContent = `Conectado desde ${currentOrante.ciudad}, ${currentOrante.pais}`;
+  } else if (oranteActual) {
+    document.getElementById("mf-user-name").textContent = `🙏 ${oranteActual}`;
+  }
 
-  renderOrantesEnMapaMundial();
-  renderOrantesLiveStream();
+  // Inicializar o redimensionar mapa Leaflet
+  setTimeout(() => {
+    if (typeof L === "undefined") return;
+
+    if (!mapWorldFullscreen) {
+      mapWorldFullscreen = L.map("mapa-mundial-fullscreen", {
+        scrollWheelZoom: true,
+        minZoom: 2,
+        maxZoom: 12,
+        worldCopyJump: true
+      }).setView([20, 0], 2);
+
+      // Tiles limpios de OpenStreetMap sin marcas de agua
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 18,
+      }).addTo(mapWorldFullscreen);
+    } else {
+      mapWorldFullscreen.invalidateSize();
+    }
+
+    renderFullscreenOrantesMarkers();
+    renderFullscreenLiveStream();
+
+    // Si viene de registrarse, volar a su ubicación
+    if (currentOrante && currentOrante.lat && currentOrante.lng) {
+      mapWorldFullscreen.flyTo([currentOrante.lat, currentOrante.lng], 5, { duration: 1.5 });
+      setTimeout(() => {
+        if (worldPrayerMarkers[currentOrante.id]) {
+          worldPrayerMarkers[currentOrante.id].openPopup();
+        }
+      }, 1600);
+    } else {
+      mapWorldFullscreen.setView([20, 0], 2);
+    }
+  }, 100);
 }
 
-function renderOrantesEnMapaMundial() {
-  if (!mapWorldPrayer) return;
+function closeWorldPrayerFullscreen() {
+  const modal = document.getElementById("modal-mapa-mundial");
+  if (modal) modal.hidden = true;
+  document.body.style.overflow = "";
+}
 
-  // Limpiar marcadores anteriores
+function renderFullscreenOrantesMarkers() {
+  if (!mapWorldFullscreen) return;
+
+  // Limpiar marcadores
   Object.values(worldPrayerMarkers).forEach(m => m.remove());
   worldPrayerMarkers = {};
 
   const orantes = PGStorage.getOrantesMundiales();
   document.getElementById("orantes-activos-count").textContent = orantes.length;
+  document.getElementById("mf-live-count").textContent = orantes.length;
 
   orantes.forEach((o) => {
     if (!o.lat || !o.lng) return;
@@ -207,27 +245,27 @@ function renderOrantesEnMapaMundial() {
     // Marcador pulsante en el plano de la tierra
     const pulseIcon = L.divIcon({
       className: "pulse-prayer-marker",
-      iconSize: [38, 38],
-      iconAnchor: [19, 19],
-      popupAnchor: [0, -20],
+      iconSize: [42, 42],
+      iconAnchor: [21, 21],
+      popupAnchor: [0, -22],
       html: `
         <div class="pulse-glow"></div>
         <div class="pulse-pin">🙏</div>
       `
     });
 
-    const marker = L.marker([o.lat, o.lng], { icon: pulseIcon }).addTo(mapWorldPrayer);
+    const marker = L.marker([o.lat, o.lng], { icon: pulseIcon }).addTo(mapWorldFullscreen);
     
     marker.bindPopup(`
-      <div style="font-family: Outfit, sans-serif; min-width: 200px; padding: 4px;">
-        <strong style="font-size: 1.1rem; display:block; color:#1c2422; margin-bottom: 2px;">
+      <div style="font-family: Outfit, sans-serif; min-width: 220px; padding: 4px;">
+        <strong style="font-size: 1.15rem; display:block; color:#1c2422; margin-bottom: 2px;">
           🙏 ${escapeHtml(o.nombre)}
         </strong>
-        <div style="color:#2f6f62; font-weight:700; font-size:0.88rem; margin-bottom: 6px;">
+        <div style="color:#2f6f62; font-weight:700; font-size:0.9rem; margin-bottom: 6px;">
           ${o.flag || "📍"} ${escapeHtml(o.ciudad)}, ${escapeHtml(o.pais)}
         </div>
-        <div style="font-size: 0.85rem; background:#fffaf0; padding: 8px; border-radius: 8px; border:1px solid #e2d8c3; margin-bottom: 8px;">
-          <strong style="display:block; color:#7b1f18; font-size:0.75rem; text-transform:uppercase; margin-bottom:2px;">Solicitud de Oración:</strong>
+        <div style="font-size: 0.88rem; background:#fffaf0; padding: 8px 10px; border-radius: 8px; border:1px solid #e2d8c3; margin-bottom: 8px;">
+          <strong style="display:block; color:#7b1f18; font-size:0.75rem; text-transform:uppercase; margin-bottom:3px;">Solicitud de Oración:</strong>
           "${escapeHtml(o.motivo || 'Orando por salud, paz y bendición')}"
         </div>
         <div style="font-size: 0.75rem; color:#718096; text-align:right;">Conectado ${escapeHtml(o.time || 'en vivo')}</div>
@@ -238,7 +276,7 @@ function renderOrantesEnMapaMundial() {
   });
 }
 
-function renderOrantesLiveStream() {
+function renderFullscreenLiveStream() {
   const streamContainer = document.getElementById("lista-orantes-stream");
   if (!streamContainer) return;
 
@@ -246,7 +284,7 @@ function renderOrantesLiveStream() {
   streamContainer.innerHTML = orantes.map(o => `
     <div class="stream-orante-card" data-id="${o.id}">
       <strong>${o.flag || "📍"} ${escapeHtml(o.nombre)}</strong>
-      <span style="color:var(--teal); font-weight:600;">(${escapeHtml(o.ciudad)})</span>
+      <span style="color:#34d399; font-weight:600;">(${escapeHtml(o.ciudad)})</span>
       <span class="motivo-preview">· "${escapeHtml(o.motivo || 'En oración')}"</span>
     </div>
   `).join("");
@@ -255,8 +293,8 @@ function renderOrantesLiveStream() {
     card.addEventListener("click", () => {
       const id = card.dataset.id;
       const orante = orantes.find(o => o.id === id);
-      if (orante && mapWorldPrayer) {
-        mapWorldPrayer.flyTo([orante.lat, orante.lng], 6, { duration: 1.2 });
+      if (orante && mapWorldFullscreen) {
+        mapWorldFullscreen.flyTo([orante.lat, orante.lng], 6, { duration: 1.2 });
         if (worldPrayerMarkers[id]) {
           setTimeout(() => { worldPrayerMarkers[id].openPopup(); }, 1300);
         }
@@ -596,7 +634,7 @@ function initForms() {
     });
   });
 
-  // Entrada a la Red y Plano Mundial de Oración
+  // Entrada a la Red y Plano Mundial de Oración (PANTALLA 1 -> PANTALLA 2 FULLSCREEN)
   document.getElementById("form-sala").addEventListener("submit", (e) => {
     e.preventDefault();
     const data = new FormData(e.target);
@@ -627,21 +665,16 @@ function initForms() {
     };
 
     PGStorage.addOranteMundial(nuevoOrante);
-    renderOrantesEnMapaMundial();
-    renderOrantesLiveStream();
 
-    document.getElementById("sala-estado").innerHTML = `✨ <strong>¡Conectado al Plano Mundial!</strong> Tu punto está brillando en el mapa como <em>${escapeHtml(nombre)} (${escapeHtml(ciudad)}, ${escapeHtml(pais)})</em>. Motivo: <em>"${escapeHtml(motivo)}"</em>.`;
-
-    // Hacer animación suave de zoom hacia la ubicación del orante en el plano de la tierra
-    if (mapWorldPrayer) {
-      mapWorldPrayer.flyTo([nuevoOrante.lat, nuevoOrante.lng], 5, { duration: 1.5 });
-      setTimeout(() => {
-        if (worldPrayerMarkers[nuevoOrante.id]) {
-          worldPrayerMarkers[nuevoOrante.id].openPopup();
-        }
-      }, 1600);
-    }
+    // ABRIR PANTALLA 2 (MODAL FULLSCREEN DEL PLANO DE LA TIERRA)
+    openWorldPrayerFullscreen(nuevoOrante);
   });
+
+  // Botón para salir del plano mundial fullscreen
+  const btnCerrarMapa = document.getElementById("btn-cerrar-mapa-mundial");
+  if (btnCerrarMapa) {
+    btnCerrarMapa.addEventListener("click", closeWorldPrayerFullscreen);
+  }
 
   // Sincronizar input libre de monto para deseleccionar chips
   const customAmountInput = document.getElementById("donate-custom-amount");
@@ -712,10 +745,8 @@ document.addEventListener("DOMContentLoaded", () => {
   renderHoy();
   renderGaleria();
   initGalleryNav();
-  initMapaMundial();
 
   if (oranteActual) {
     document.getElementById("input-orante-name").value = oranteActual;
-    document.getElementById("sala-estado").textContent = `Estás orando como ${oranteActual}.`;
   }
 });

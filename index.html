@@ -69,7 +69,7 @@
             </p>
             <div class="hero-actions">
               <a class="btn btn-primary" href="#escribir">Deja tu petición</a>
-              <a class="btn btn-ghost" href="#oracion">🌍 Ver el Mapa Mundial de Oración</a>
+              <a class="btn btn-ghost" href="#oracion">🌍 Unirme a la Oración Mundial</a>
             </div>
           </div>
           <aside class="hero-board" aria-hidden="true">
@@ -169,11 +169,11 @@
       </section>
 
       <!-- ========================================================
-           SISTEMA Y PLANO COMPLETO DE ORACIÓN MUNDIAL
+           SECCIÓN DE INGRESO A LA ORACIÓN MUNDIAL (PANTALLA 1)
            ======================================================== -->
       <section id="oracion" class="section world-prayer-section">
         <div class="container">
-          <!-- Encabezado de la Sala Mundial -->
+          <!-- Encabezado -->
           <div class="world-header-center">
             <div class="live-status-pill">
               <span class="live-dot"></span>
@@ -188,7 +188,7 @@
             </div>
           </div>
 
-          <!-- PASO 1: Formulario de Ingreso al Mapa Mundial (Centrado y Destacado) -->
+          <!-- Formulario de Ingreso (PANTALLA 1) -->
           <div class="join-world-card card">
             <form id="form-sala" class="join-world-form">
               <div class="jw-row-top">
@@ -217,26 +217,6 @@
               </div>
               <p id="sala-estado" class="form-hint jw-status"></p>
             </form>
-          </div>
-
-          <!-- PASO 2: PLANO COMPLETO DE LA TIERRA (Full Width World Map) -->
-          <div class="full-world-map-wrap card">
-            <div class="map-top-bar">
-              <div class="mtb-title">
-                <strong>🗺️ Plano Global de Intercesores Activos</strong>
-                <span>(Haz clic en cualquier punto del mundo para ver el nombre y la solicitud de oración)</span>
-              </div>
-              <span class="badge-live-pulse">🔴 EN TIEMPO REAL</span>
-            </div>
-
-            <!-- Mapa Leaflet Full Width (Toda la Tierra) -->
-            <div id="mapa-mundial" class="full-map-canvas" role="region" aria-label="Plano completo de la tierra con orantes mundiales"></div>
-
-            <!-- Ticker inferior de intercesores recientes en vivo -->
-            <div class="map-live-stream">
-              <div class="mls-label">⚡ Conectados recientemente:</div>
-              <div class="mls-carousel" id="lista-orantes-stream"></div>
-            </div>
           </div>
 
           <!-- Peticiones de Hoy para Interceder -->
@@ -378,6 +358,41 @@
         </div>
       </div>
     </footer>
+
+    <!-- ========================================================
+         MODAL FULLSCREEN DE PANTALLA COMPLETA: PLANO DE LA TIERRA
+         ======================================================== -->
+    <div id="modal-mapa-mundial" class="modal-fullscreen" hidden>
+      <div class="modal-fullscreen-content">
+        <!-- Topbar del Mapa Fullscreen -->
+        <header class="mf-topbar">
+          <div class="mf-user-badge">
+            <span class="live-dot"></span>
+            <div>
+              <strong id="mf-user-name">Conectado en Oración</strong>
+              <span id="mf-user-location" class="mf-subtext">Plano de la Tierra en Vivo</span>
+            </div>
+          </div>
+
+          <div class="mf-counter-pill">
+            🔥 <span id="mf-live-count">8</span> intercesores en vivo
+          </div>
+
+          <button type="button" class="btn-exit-world" id="btn-cerrar-mapa-mundial" aria-label="Salir de la sala de oración">
+            ✕ Salir de la Sala
+          </button>
+        </header>
+
+        <!-- Canvas del Mapa Mundial Fullscreen -->
+        <div id="mapa-mundial-fullscreen" class="fullscreen-map-canvas" role="region" aria-label="Plano completo de la tierra con intercesores en vivo"></div>
+
+        <!-- Ticker inferior de orantes conectados con sus solicitudes -->
+        <div class="mf-bottom-ticker">
+          <div class="mf-ticker-label">⚡ En oración ahora:</div>
+          <div class="mf-ticker-stream" id="lista-orantes-stream"></div>
+        </div>
+      </div>
+    </div>
 
     <!-- MODAL DE REFLEXIÓN -->
     <div id="modal-reflexion" class="modal" hidden>
