@@ -278,6 +278,16 @@ const PG_DEFAULTS = {
       ]
     }
   },
+  orantesMundiales: [
+    { id: "o1", nombre: "Leonel C.", ciudad: "Lima", pais: "Perú", flag: "🇵🇪", lat: -12.0464, lng: -77.0428, time: "Hace 2 min" },
+    { id: "o2", nombre: "Pastor David", ciudad: "Bogotá", pais: "Colombia", flag: "🇨🇴", lat: 4.7110, lng: -74.0721, time: "Hace 5 min" },
+    { id: "o3", nombre: "María Isabel", ciudad: "Medellín", pais: "Colombia", flag: "🇨🇴", lat: 6.2442, lng: -75.5812, time: "Hace 8 min" },
+    { id: "o4", nombre: "Carlos Mendoza", ciudad: "Arequipa", pais: "Perú", flag: "🇵🇪", lat: -16.4090, lng: -71.5375, time: "Hace 10 min" },
+    { id: "o5", nombre: "Fernanda R.", ciudad: "Ciudad de México", pais: "México", flag: "🇲🇽", lat: 19.4326, lng: -99.1332, time: "Hace 12 min" },
+    { id: "o6", nombre: "Mateo & Familia", ciudad: "Buenos Aires", pais: "Argentina", flag: "🇦🇷", lat: -34.6037, lng: -58.3816, time: "Hace 15 min" },
+    { id: "o7", nombre: "Jennifer S.", ciudad: "Miami", pais: "EE.UU.", flag: "🇺🇸", lat: 25.7617, lng: -80.1918, time: "Hace 20 min" },
+    { id: "o8", nombre: "Andrés V.", ciudad: "Trujillo", pais: "Perú", flag: "🇵🇪", lat: -8.1116, lng: -79.0287, time: "Hace 25 min" }
+  ],
   admins: [
     {
       id: "adm_global",
@@ -345,6 +355,7 @@ const PGStorage = {
     ACTIVE_COUNTRY: "puraGracia.activeCountry",
     PETICIONES: "puraGracia.peticiones",
     ORANTES: "puraGracia.orantes",
+    ORANTES_MUNDIALES: "puraGracia.orantesMundiales",
     ADMINS: "puraGracia.admins",
     ADMIN_SESSION: "puraGracia.adminSession",
     FIREBASE_CONFIG: "puraGracia.firebaseConfig"
@@ -366,7 +377,7 @@ const PGStorage = {
   },
 
   getActiveCountryCode() {
-    return localStorage.getItem(this.KEYS.ACTIVE_COUNTRY) || PG_DEFAULTS.activeCountry;
+    return localStorage.getItem(this.KEYS.ACTIVE_COUNTRY) || "";
   },
 
   setActiveCountryCode(code) {
@@ -375,8 +386,28 @@ const PGStorage = {
 
   getActiveCountry() {
     const countries = this.getCountries();
-    const code = this.getActiveCountryCode();
+    const code = this.getActiveCountryCode() || PG_DEFAULTS.activeCountry;
     return countries[code] || countries["CO"] || PG_DEFAULTS.countries.CO;
+  },
+
+  getOrantesMundiales() {
+    try {
+      const stored = localStorage.getItem(this.KEYS.ORANTES_MUNDIALES);
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    this.saveOrantesMundiales(PG_DEFAULTS.orantesMundiales);
+    return PG_DEFAULTS.orantesMundiales;
+  },
+
+  saveOrantesMundiales(list) {
+    localStorage.setItem(this.KEYS.ORANTES_MUNDIALES, JSON.stringify(list));
+  },
+
+  addOranteMundial(orante) {
+    const list = this.getOrantesMundiales();
+    list.unshift(orante);
+    this.saveOrantesMundiales(list);
+    return list;
   },
 
   getFirebaseConfig() {
@@ -426,12 +457,13 @@ const PGStorage = {
       if (stored) return JSON.parse(stored);
     } catch (e) {}
     const initial = [
-      { id: "p1", country: "CO", category: "Salud", nombre: "María", texto: "Por la salud de mi mamá y paz en casa.", correo: "", telefono: "3001234567", praysCount: 12, createdAt: new Date(Date.now() - 36e5).toISOString() },
-      { id: "p2", country: "PE", category: "Trabajo", nombre: "Andrés", texto: "Trabajo estable y sabiduría para emprender.", correo: "", telefono: "987654321", praysCount: 8, createdAt: new Date(Date.now() - 72e5).toISOString() },
-      { id: "p3", country: "CO", category: "Familia", nombre: "Lucía", texto: "Por mi hijo, que encuentre camino y consuelo.", correo: "", telefono: "", praysCount: 15, createdAt: new Date(Date.now() - 108e5).toISOString() },
-      { id: "p4", country: "MX", category: "Gratitud", nombre: "Camilo", texto: "Gratitud por la provisión. Oración por mi ciudad.", correo: "", telefono: "", praysCount: 5, createdAt: new Date(Date.now() - 144e5).toISOString() },
-      { id: "p5", country: "AR", category: "Salud", nombre: "Elena", texto: "Sanidad y fuerzas para este tratamiento médico.", correo: "", telefono: "", praysCount: 20, createdAt: new Date(Date.now() - 180e5).toISOString() },
-      { id: "p6", country: "US", category: "Paz", nombre: "Sofía", texto: "Protección en el viaje y unidad espiritual.", correo: "", telefono: "", praysCount: 7, createdAt: new Date(Date.now() - 216e5).toISOString() }
+      { id: "p1", country: "PE", category: "Salud", nombre: "Leonel", texto: "Por la salud y bienestar de toda mi familia en Lima.", correo: "", telefono: "987654321", praysCount: 18, createdAt: new Date(Date.now() - 18e5).toISOString() },
+      { id: "p2", country: "CO", category: "Salud", nombre: "María", texto: "Por la salud de mi mamá y paz en casa.", correo: "", telefono: "3001234567", praysCount: 12, createdAt: new Date(Date.now() - 36e5).toISOString() },
+      { id: "p3", country: "PE", category: "Trabajo", nombre: "Andrés", texto: "Trabajo estable y sabiduría para emprender.", correo: "", telefono: "987654321", praysCount: 8, createdAt: new Date(Date.now() - 72e5).toISOString() },
+      { id: "p4", country: "CO", category: "Familia", nombre: "Lucía", texto: "Por mi hijo, que encuentre camino y consuelo.", correo: "", telefono: "", praysCount: 15, createdAt: new Date(Date.now() - 108e5).toISOString() },
+      { id: "p5", country: "MX", category: "Gratitud", nombre: "Camilo", texto: "Gratitud por la provisión. Oración por mi ciudad.", correo: "", telefono: "", praysCount: 5, createdAt: new Date(Date.now() - 144e5).toISOString() },
+      { id: "p6", country: "AR", category: "Salud", nombre: "Elena", texto: "Sanidad y fuerzas para este tratamiento médico.", correo: "", telefono: "", praysCount: 20, createdAt: new Date(Date.now() - 180e5).toISOString() },
+      { id: "p7", country: "US", category: "Paz", nombre: "Sofía", texto: "Protección en el viaje y unidad espiritual.", correo: "", telefono: "", praysCount: 7, createdAt: new Date(Date.now() - 216e5).toISOString() }
     ];
     this.savePeticiones(initial);
     return initial;

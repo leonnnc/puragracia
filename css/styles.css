@@ -11,6 +11,7 @@
   --blue-frame: #3a6ea5;
   --pink: #f08ab0;
   --orange: #f0a04b;
+  --danger: #ef4444;
   --shadow: 0 18px 50px rgba(28, 36, 34, 0.12);
   --radius: 18px;
   --header: 72px;
@@ -78,7 +79,7 @@ a {
 }
 
 .container {
-  width: min(1120px, calc(100% - 2rem));
+  width: min(1140px, calc(100% - 2rem));
   margin-inline: auto;
 }
 
@@ -139,21 +140,34 @@ a {
   box-shadow: 4px 4px 0 var(--teal);
 }
 
-.country-pill-select {
+.country-picker-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   background: #fff;
   border: 1.5px solid rgba(47, 111, 98, 0.3);
   border-radius: 999px;
-  padding: 0.4rem 0.8rem;
+  padding: 0.2rem 0.5rem 0.2rem 0.6rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.auto-detect-tag {
+  font-size: 0.72rem;
+  background: rgba(47, 111, 98, 0.12);
+  color: var(--teal);
+  padding: 0.15rem 0.4rem;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.country-pill-select {
+  background: transparent;
+  border: 0;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--ink);
   cursor: pointer;
   outline: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.country-pill-select:focus {
-  border-color: var(--teal);
 }
 
 .sr-only {
@@ -191,19 +205,6 @@ a {
   padding: 0.45rem 0.9rem;
   border-radius: 999px;
   font-weight: 600 !important;
-}
-
-.nav-admin {
-  background: rgba(28, 36, 34, 0.08);
-  padding: 0.4rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.85rem !important;
-  font-weight: 600 !important;
-}
-
-.nav-admin:hover {
-  background: var(--ink);
-  color: #fff !important;
 }
 
 .nav-toggle {
@@ -532,22 +533,183 @@ textarea {
   transform: scale(1.05);
 }
 
-/* Prayer section */
+/* ========================================================
+   SISTEMA DE ORACIÓN MUNDIAL EN VIVO (ESTILOS NUEVOS)
+   ======================================================== */
 .prayer-section {
   background: #efe7d4;
 }
 
-.prayer-layout {
-  display: grid;
-  grid-template-columns: 0.85fr 1.15fr;
-  gap: 1.4rem;
+.live-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #065f46;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
 }
 
-.sala-toolbar {
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: pulseLive 1.5s infinite;
+}
+
+@keyframes pulseLive {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+
+.live-counter-box {
+  background: #fff;
+  border: 1.5px solid rgba(47, 111, 98, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--teal);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
+}
+
+.world-prayer-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 1.4rem;
+  align-items: stretch;
+}
+
+.world-map-card {
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.world-map-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.world-map-header h3 {
+  font-size: 1.15rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.badge-live {
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  animation: pulseLive 2s infinite;
+}
+
+#mapa-mundial {
+  flex: 1;
+  min-height: 440px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(28, 36, 34, 0.1);
+}
+
+/* Marcadores Pulsantes en el Mapa */
+.pulse-prayer-marker {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.pulse-glow {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(47, 111, 98, 0.4);
+  animation: markerGlow 1.8s infinite;
+}
+
+.pulse-pin {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  background: var(--yellow);
+  border: 2px solid var(--teal);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.pulse-pin:hover {
+  transform: scale(1.3);
+}
+
+@keyframes markerGlow {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* Lista de orantes conectados recientemente */
+.active-intercessors-box {
+  margin-top: 1rem;
+  border-top: 1px dashed rgba(28, 36, 34, 0.15);
+  padding-top: 0.8rem;
+}
+
+.aib-header {
+  font-size: 0.82rem;
+  margin-bottom: 0.5rem;
+  color: #5b6b66;
+}
+
+.orantes-mini-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.orante-item {
+  background: #fff;
+  border: 1px solid rgba(28, 36, 34, 0.08);
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.82rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.orante-item strong {
+  color: var(--ink);
+}
+
+.orante-time {
+  font-size: 0.72rem;
+  color: #718096;
 }
 
 .peticiones-hoy {
@@ -607,7 +769,7 @@ textarea {
   margin-bottom: 0.2rem;
 }
 
-/* Gallery & Map */
+/* Gallery & Meetings Map */
 .gallery-wrap {
   position: relative;
   margin-bottom: 2rem;
@@ -814,21 +976,6 @@ textarea {
   border-top: 1px solid rgba(28, 36, 34, 0.08);
 }
 
-.admin-link-footer {
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.88rem;
-  color: var(--teal);
-  padding: 0.4rem 0.8rem;
-  background: rgba(47, 111, 98, 0.08);
-  border-radius: 8px;
-}
-
-.admin-link-footer:hover {
-  background: var(--teal);
-  color: #fff;
-}
-
 .modal {
   position: fixed;
   inset: 0;
@@ -864,10 +1011,10 @@ textarea {
 }
 
 /* Responsive */
-@media (max-width: 900px) {
+@media (max-width: 960px) {
   .hero-grid,
   .split,
-  .prayer-layout,
+  .world-prayer-grid,
   .map-layout,
   .pizarra {
     grid-template-columns: 1fr;

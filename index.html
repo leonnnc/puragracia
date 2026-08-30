@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Pura Gracia — Deja tu petición de oración. Queremos conocerte y orar por ti en Colombia, Perú, México, Argentina e Internacional."
+      content="Pura Gracia — Deja tu petición de oración. Sala y mapa de oración mundial en vivo."
     />
-    <title>Pura Gracia · Comunidad y Peticiones de Oración</title>
+    <title>Pura Gracia · Red y Peticiones de Oración Mundial</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -33,16 +33,19 @@
           <span>Pura Gracia</span>
         </a>
 
-        <!-- Selector de País Global en Header -->
+        <!-- Selector de País con Detección Automática -->
         <div class="header-country-picker">
           <label for="global-country-select" class="sr-only">País:</label>
-          <select id="global-country-select" class="country-pill-select" aria-label="Seleccionar País">
-            <option value="CO">🇨🇴 Colombia</option>
-            <option value="PE">🇵🇪 Perú</option>
-            <option value="MX">🇲🇽 México</option>
-            <option value="AR">🇦🇷 Argentina</option>
-            <option value="US">🌎 Internacional / USA</option>
-          </select>
+          <div class="country-picker-wrap">
+            <span class="auto-detect-tag" id="auto-detect-tag" title="País detectado automáticamente">📍 Auto</span>
+            <select id="global-country-select" class="country-pill-select" aria-label="Seleccionar País">
+              <option value="PE">🇵🇪 Perú</option>
+              <option value="CO">🇨🇴 Colombia</option>
+              <option value="MX">🇲🇽 México</option>
+              <option value="AR">🇦🇷 Argentina</option>
+              <option value="US">🌎 Internacional / USA</option>
+            </select>
+          </div>
         </div>
 
         <button
@@ -60,7 +63,7 @@
         <nav id="menu" class="nav">
           <a href="#inicio">Inicio</a>
           <a href="#peticiones">Peticiones</a>
-          <a href="#oracion">Tiempo de oración</a>
+          <a href="#oracion">Oración Mundial</a>
           <a href="#quienes-somos">Quiénes somos</a>
           <a href="#reuniones">Reuniones</a>
           <a href="#donar" class="nav-cta">Donar</a>
@@ -73,7 +76,7 @@
         <div class="hero-glow" aria-hidden="true"></div>
         <div class="container hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow" id="hero-country-badge">Comunidad de oración · Colombia</p>
+            <p class="eyebrow" id="hero-country-badge">Comunidad de oración · Perú</p>
             <h1>Pura Gracia</h1>
             <p class="lema">
               Si tú también tienes una petición, escríbenos. Queremos conocerte y
@@ -81,7 +84,7 @@
             </p>
             <div class="hero-actions">
               <a class="btn btn-primary" href="#escribir">Deja tu petición</a>
-              <a class="btn btn-ghost" href="#oracion">Unirme a orar</a>
+              <a class="btn btn-ghost" href="#oracion">🌐 Unirme al mapa mundial</a>
             </div>
           </div>
           <aside class="hero-board" aria-hidden="true">
@@ -100,7 +103,7 @@
             <p class="eyebrow">Déjanos tu petición</p>
             <h2>Escríbenos lo que pesa en tu corazón</h2>
             <p class="muted">
-              Tu petición se publica en la pizarra comunitaria. Puedes elegir tu país y categoría. Si deseas una respuesta pastoral, déjanos tu teléfono o correo.
+              Tu petición se publica en la pizarra comunitaria para que intercesores de todo el mundo oren por ti. Si deseas una respuesta pastoral, déjanos tu WhatsApp.
             </p>
           </div>
           <form id="form-peticion" class="card form-card">
@@ -144,7 +147,7 @@
                   type="tel"
                   name="telefono"
                   inputmode="tel"
-                  placeholder="Ej. 3001234567 o 987654321"
+                  placeholder="Ej. 987654321 o 3001234567"
                 />
               </label>
             </fieldset>
@@ -180,35 +183,78 @@
         </div>
       </section>
 
-      <!-- TIEMPO DE ORACIÓN -->
+      <!-- SISTEMA DE ORACIÓN MUNDIAL EN VIVO -->
       <section id="oracion" class="section prayer-section">
         <div class="container">
           <div class="section-head">
             <div>
-              <p class="eyebrow">Tiempo de oración</p>
-              <h2>Reúnete para orar hoy</h2>
+              <div class="live-status-pill">
+                <span class="live-dot"></span>
+                <strong>RED MUNDIAL DE INTERCESIÓN EN VIVO</strong>
+              </div>
+              <h2>Mapa y Sala de Oración Mundial</h2>
               <p class="muted">
-                Entra a la sala, mira las peticiones del día y envía una reflexión
-                por WhatsApp a quien dejó su número.
+                Únete a creyentes orando al mismo tiempo en diferentes países. Tu punto se iluminará en el mapa mundial al ingresar.
               </p>
             </div>
-          </div>
-          <div class="prayer-layout">
-            <form id="form-sala" class="card form-card sala-card">
-              <label>
-                Tu nombre para orar
-                <input type="text" name="orante" required maxlength="60" placeholder="Nombre" />
-              </label>
-              <button class="btn btn-primary" type="submit">Entrar a la sala de hoy</button>
-              <p id="sala-estado" class="form-hint"></p>
-            </form>
-            <div class="card sala-panel">
-              <div class="sala-toolbar">
-                <h3>Peticiones de hoy</h3>
-                <span id="orantes-activos" class="count-pill subtle">0 orando</span>
-              </div>
-              <ul id="lista-hoy" class="peticiones-hoy"></ul>
+            <div class="live-counter-box" id="live-prayer-counter">
+              🔥 <span id="orantes-activos-count">8</span> intercesores orando en vivo
             </div>
+          </div>
+
+          <!-- Formulario de Ingreso al Mapa Mundial -->
+          <div class="world-prayer-grid">
+            <div class="card form-card sala-card">
+              <h3><span>📍</span> Únete al Mapa Mundial</h3>
+              <form id="form-sala">
+                <label>
+                  Tu nombre para orar
+                  <input type="text" id="input-orante-name" name="orante" required maxlength="60" placeholder="Ej. Leonel" />
+                </label>
+                <div class="form-row-2">
+                  <label>
+                    Tu ciudad
+                    <input type="text" id="input-orante-city" name="ciudad" required maxlength="60" placeholder="Ej. Lima" />
+                  </label>
+                  <label>
+                    Tu país
+                    <input type="text" id="input-orante-country" name="pais" required maxlength="60" placeholder="Ej. Perú" />
+                  </label>
+                </div>
+                <button class="btn btn-primary" type="submit" style="width: 100%; margin-top: 0.4rem;">
+                  ✨ Entrar a la sala y unirme al mapa
+                </button>
+                <p id="sala-estado" class="form-hint" style="margin-top: 0.5rem;"></p>
+              </form>
+
+              <!-- Lista de Intercesores Activos Recientes -->
+              <div class="active-intercessors-box">
+                <div class="aib-header">
+                  <strong>👥 Orantes conectados recientemente:</strong>
+                </div>
+                <ul id="lista-orantes-conectados" class="orantes-mini-list"></ul>
+              </div>
+            </div>
+
+            <!-- Mapa Mundial Interactivo de Leaflet -->
+            <div class="card world-map-card">
+              <div class="world-map-header">
+                <h3><span>🌎</span> Intercesores Conectados en el Mundo</h3>
+                <span class="badge-live">En tiempo real</span>
+              </div>
+              <div id="mapa-mundial" role="region" aria-label="Mapa mundial de intercesores en vivo"></div>
+            </div>
+          </div>
+
+          <!-- Peticiones de Hoy para Interceder -->
+          <div class="card sala-panel" style="margin-top: 1.8rem;">
+            <div class="sala-toolbar">
+              <div>
+                <h3>📜 Peticiones del Día para Interceder</h3>
+                <p class="muted" style="margin: 0; font-size: 0.9rem;">Ora por las peticiones de hoy y envíales una bendición por WhatsApp.</p>
+              </div>
+            </div>
+            <ul id="lista-hoy" class="peticiones-hoy"></ul>
           </div>
         </div>
       </section>
@@ -234,8 +280,8 @@
               Te conocemos por tu nombre, no por un formulario frío.
             </li>
             <li>
-              <strong>Oración Comunitaria</strong>
-              Cada nota se lee. Cada historia se pone delante de Dios.
+              <strong>Oración Comunitaria Mundial</strong>
+              Cada nota se lee. Nos unimos hermanos de múltiples naciones.
             </li>
             <li>
               <strong>Respuesta Personal</strong>
@@ -251,7 +297,7 @@
           <div class="section-head">
             <div>
               <p class="eyebrow">Programaciones</p>
-              <h2 id="reuniones-title">Reuniones de oración · Colombia</h2>
+              <h2 id="reuniones-title">Reuniones de oración · Perú</h2>
               <p class="muted">Encuentros presenciales en tu ciudad y mapa con las próximas fechas.</p>
             </div>
           </div>
@@ -274,7 +320,7 @@
         </div>
       </section>
 
-      <!-- DONACIONES DINÁMICAS MULTI-PAÍS (OPCIÓN 3) -->
+      <!-- DONACIONES DINÁMICAS MULTI-PAÍS -->
       <section id="donar" class="section donate-section">
         <div class="container split">
           <div>
@@ -284,7 +330,7 @@
               Tu ofrenda ayuda a mantener los tableros, materiales impresos y los espacios donde nos reunimos a orar en cada ciudad.
             </p>
             <p class="muted">
-              Selecciona tu país para ver las cuentas bancarias locales (Yape, Plin, Nequi, Daviplata, SPEI, Mercado Pago o Zelle) y reportar tu donación.
+              Cuentas bancarias locales detectadas automáticamente (Yape, Plin, Nequi, Daviplata, SPEI, Mercado Pago o Zelle).
             </p>
 
             <!-- Cuentas bancarias dinámicas -->
@@ -302,8 +348,8 @@
             <label>
               País de la Donación
               <select id="donate-country-select" class="select-styled">
-                <option value="CO">🇨🇴 Colombia (Pesos COP)</option>
                 <option value="PE">🇵🇪 Perú (Soles PEN)</option>
+                <option value="CO">🇨🇴 Colombia (Pesos COP)</option>
                 <option value="MX">🇲🇽 México (Pesos MXN)</option>
                 <option value="AR">🇦🇷 Argentina (Pesos ARS)</option>
                 <option value="US">🌎 Internacional / USA (Dólares USD)</option>
@@ -314,8 +360,8 @@
             <div class="amount-row" id="donate-chips-container" role="group" aria-label="Monto sugerido"></div>
 
             <label>
-              <span id="donate-amount-label">Otro monto (COP)</span>
-              <input type="number" id="donate-custom-amount" name="monto" min="1000" step="1000" placeholder="Ej. 30000" />
+              <span id="donate-amount-label">Otro monto (PEN S/.)</span>
+              <input type="number" id="donate-custom-amount" name="monto" min="1" step="5" placeholder="Ej. 50" />
             </label>
 
             <label>
@@ -334,8 +380,8 @@
     <footer class="site-footer">
       <div class="container footer-inner">
         <div>
-          <p><strong>Pura Gracia</strong> · Queremos conocerte y orar por ti.</p>
-          <p class="muted">Hecho con fe y notas amarillas.</p>
+          <p><strong>Pura Gracia</strong> · Red de Oración Comunitaria.</p>
+          <p class="muted">Uniendo corazones en fe por todo el mundo.</p>
         </div>
       </div>
     </footer>

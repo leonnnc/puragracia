@@ -1,5 +1,5 @@
 /**
- * Pura Gracia - Lógica del Sitio Web Público Multi-País
+ * Pura Gracia - Lógica del Sitio Web Público con Detección Automática y Mapa Mundial de Oración
  */
 
 const FOTOS = [
@@ -24,6 +24,32 @@ const FOTOS = [
     caption: "Café, palabra y comunión",
   },
 ];
+
+// Coordenadas aproximadas de ciudades principales para posicionar en el mapa
+const CITY_COORDS = {
+  "lima": { lat: -12.0464, lng: -77.0428, country: "PE", flag: "🇵🇪" },
+  "arequipa": { lat: -16.4090, lng: -71.5375, country: "PE", flag: "🇵🇪" },
+  "trujillo": { lat: -8.1116, lng: -79.0287, country: "PE", flag: "🇵🇪" },
+  "cusco": { lat: -13.5319, lng: -71.9675, country: "PE", flag: "🇵🇪" },
+  "bogotá": { lat: 4.7110, lng: -74.0721, country: "CO", flag: "🇨🇴" },
+  "bogota": { lat: 4.7110, lng: -74.0721, country: "CO", flag: "🇨🇴" },
+  "medellín": { lat: 6.2442, lng: -75.5812, country: "CO", flag: "🇨🇴" },
+  "medellin": { lat: 6.2442, lng: -75.5812, country: "CO", flag: "🇨🇴" },
+  "cali": { lat: 3.4516, lng: -76.5320, country: "CO", flag: "🇨🇴" },
+  "barranquilla": { lat: 10.9685, lng: -74.7813, country: "CO", flag: "🇨🇴" },
+  "ciudad de méxico": { lat: 19.4326, lng: -99.1332, country: "MX", flag: "🇲🇽" },
+  "cdmx": { lat: 19.4326, lng: -99.1332, country: "MX", flag: "🇲🇽" },
+  "mexico": { lat: 19.4326, lng: -99.1332, country: "MX", flag: "🇲🇽" },
+  "guadalajara": { lat: 20.6597, lng: -103.3496, country: "MX", flag: "🇲🇽" },
+  "monterrey": { lat: 25.6866, lng: -100.3161, country: "MX", flag: "🇲🇽" },
+  "buenos aires": { lat: -34.6037, lng: -58.3816, country: "AR", flag: "🇦🇷" },
+  "córdoba": { lat: -31.4201, lng: -64.1888, country: "AR", flag: "🇦🇷" },
+  "cordoba": { lat: -31.4201, lng: -64.1888, country: "AR", flag: "🇦🇷" },
+  "rosario": { lat: -32.9468, lng: -60.6393, country: "AR", flag: "🇦🇷" },
+  "miami": { lat: 25.7617, lng: -80.1918, country: "US", flag: "🇺🇸" },
+  "orlando": { lat: 28.5383, lng: -81.3792, country: "US", flag: "🇺🇸" },
+  "houston": { lat: 29.7604, lng: -95.3698, country: "US", flag: "🇺🇸" }
+};
 
 function uid() {
   return crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
@@ -56,8 +82,8 @@ function escapeHtml(str) {
 function digitsPhone(value) {
   const digits = String(value || "").replace(/\D/g, "");
   if (!digits) return "";
-  if (digits.startsWith("57") && digits.length >= 12) return digits;
   if (digits.startsWith("51") && digits.length >= 11) return digits;
+  if (digits.startsWith("57") && digits.length >= 12) return digits;
   if (digits.startsWith("52") && digits.length >= 12) return digits;
   if (digits.startsWith("54") && digits.length >= 12) return digits;
   return digits;
@@ -67,10 +93,168 @@ function digitsPhone(value) {
 let activeFilterCategory = "ALL";
 let oranteActual = sessionStorage.getItem("puraGracia.orantes") || "";
 let reflexionTarget = null;
-let mapInstance = null;
-let mapMarkers = [];
+let mapMeetings = null;
+let mapMeetingsMarkers = [];
+let mapWorldPrayer = null;
+let worldPrayerMarkers = [];
 
-// RENDERIZADO DE LA PIZARRA
+// ========================================================
+// 1. DETECCIÓN AUTOMÁTICA DE PAÍS
+// ========================================================
+function autoDetectCountry() {
+  // 1. Si el usuario ya eligió un país en su sesión previa, respetarlo
+  const savedCountry = PGStorage.getActiveCountryCode();
+  if (savedCountry) {
+    applyDetectedCountry(savedCountry, false);
+    return;
+  }
+
+  let detected = "PE"; // Por defecto Perú
+
+  // 2. Detección por Zona Horaria del navegador
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+    if (tz.includes("Lima")) {
+      detected = "PE";
+    } else if (tz.includes("Bogota")) {
+      detected = "CO";
+    } else if (tz.includes("Mexico") || tz.includes("Monterrey") || tz.includes("Cancun") || tz.includes("Tijuana") || tz.includes("Chihuahua") || tz.includes("Hermosillo")) {
+      detected = "MX";
+    } else if (tz.includes("Argentina") || tz.includes("Buenos_Aires") || tz.includes("Cordoba")) {
+      detected = "AR";
+    } else if (tz.includes("New_York") || tz.includes("Chicago") || tz.includes("Los_Angeles") || tz.includes("Denver") || tz.includes("Phoenix") || tz.includes("Miami")) {
+      detected = "US";
+    } else {
+      // 3. Detección por idioma del navegador
+      const lang = (navigator.language || navigator.userLanguage || "").toUpperCase();
+      if (lang.includes("PE")) detected = "PE";
+      else if (lang.includes("CO")) detected = "CO";
+      else if (lang.includes("MX")) detected = "MX";
+      else if (lang.includes("AR")) detected = "AR";
+    }
+  } catch (e) {}
+
+  applyDetectedCountry(detected, true);
+
+  // 4. Verificación asíncrona por IP rápida de fondo
+  fetch("https://api.country.is/")
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.country) {
+        const cCode = data.country.toUpperCase();
+        if (["PE", "CO", "MX", "AR", "US"].includes(cCode)) {
+          applyDetectedCountry(cCode, true);
+        }
+      }
+    })
+    .catch(() => {});
+}
+
+function applyDetectedCountry(code, isAuto = false) {
+  PGStorage.setActiveCountryCode(code);
+  const globalSelect = document.getElementById("global-country-select");
+  if (globalSelect) globalSelect.value = code;
+
+  const autoTag = document.getElementById("auto-detect-tag");
+  if (autoTag) {
+    const c = PGStorage.getActiveCountry();
+    autoTag.textContent = isAuto ? `📍 Auto (${c.name})` : `📍 ${c.name}`;
+  }
+
+  // Prellenar inputs de la sala de oración según país
+  const c = PGStorage.getActiveCountry();
+  const inputCountry = document.getElementById("input-orante-country");
+  const inputCity = document.getElementById("input-orante-city");
+  if (inputCountry && !inputCountry.value) inputCountry.value = c.name;
+  if (inputCity && !inputCity.value && c.cities && c.cities.length) inputCity.value = c.cities[0];
+
+  updateMeetingsAndMap();
+  updateDonationsUI();
+}
+
+// ========================================================
+// 2. SISTEMA DE ORACIÓN MUNDIAL EN VIVO (MAPA & SALA)
+// ========================================================
+function initMapaMundial() {
+  if (typeof L === "undefined") return;
+
+  const mapContainer = document.getElementById("mapa-mundial");
+  if (!mapContainer || mapWorldPrayer) return;
+
+  // Inicializar mapa centrado en América / Mundo
+  mapWorldPrayer = L.map("mapa-mundial", {
+    scrollWheelZoom: false,
+    minZoom: 2,
+    maxZoom: 10
+  }).setView([5, -60], 3);
+
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap',
+  }).addTo(mapWorldPrayer);
+
+  renderOrantesEnMapaMundial();
+  renderOrantesConectados();
+}
+
+function renderOrantesEnMapaMundial() {
+  if (!mapWorldPrayer) return;
+
+  // Limpiar marcadores anteriores
+  worldPrayerMarkers.forEach(m => m.remove());
+  worldPrayerMarkers = [];
+
+  const orantes = PGStorage.getOrantesMundiales();
+  document.getElementById("orantes-activos-count").textContent = orantes.length;
+
+  orantes.forEach((o) => {
+    if (!o.lat || !o.lng) return;
+
+    // Ícono personalizado con animación de pulso
+    const pulseIcon = L.divIcon({
+      className: "pulse-prayer-marker",
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+      popupAnchor: [0, -16],
+      html: `
+        <div class="pulse-glow"></div>
+        <div class="pulse-pin">🙏</div>
+      `
+    });
+
+    const marker = L.marker([o.lat, o.lng], { icon: pulseIcon }).addTo(mapWorldPrayer);
+    
+    marker.bindPopup(`
+      <div style="font-family: Outfit, sans-serif; min-width: 170px;">
+        <strong style="font-size: 1.05rem; display:block; color:#1c2422;">🙏 ${escapeHtml(o.nombre)}</strong>
+        <span style="color:#2f6f62; font-weight:700; font-size:0.85rem;">${escapeHtml(o.ciudad)}, ${escapeHtml(o.pais)} ${o.flag || ""}</span>
+        <div style="font-size: 0.75rem; color:#718096; margin: 4px 0 8px;">Conectado ${escapeHtml(o.time || "en vivo")}</div>
+        <div style="font-size: 0.8rem; background:#f6f1e4; padding: 4px 6px; border-radius: 6px; border:1px dashed #2f6f62;">
+          "Orando por la paz, salud y bendición de las familias."
+        </div>
+      </div>
+    `);
+
+    worldPrayerMarkers.push(marker);
+  });
+}
+
+function renderOrantesConectados() {
+  const list = document.getElementById("lista-orantes-conectados");
+  if (!list) return;
+
+  const orantes = PGStorage.getOrantesMundiales();
+  list.innerHTML = orantes.slice(0, 6).map(o => `
+    <li class="orante-item">
+      <div>
+        <strong>${o.flag || "📍"} ${escapeHtml(o.nombre)}</strong>
+        <span style="color:var(--teal); font-weight:600;">(${escapeHtml(o.ciudad)})</span>
+      </div>
+      <span class="orante-time">${escapeHtml(o.time || "Ahora")}</span>
+    </li>
+  `).join("");
+}
+
+// RENDERIZADO DE LA PIZARRA DE NOTAS
 function renderPizarra() {
   const board = document.getElementById("pizarra");
   const peticiones = PGStorage.getPeticiones();
@@ -120,7 +304,7 @@ function renderPizarra() {
   );
 }
 
-// PETICIONES DE HOY & SALA
+// PETICIONES DE HOY
 function peticionesDeHoy() {
   const peticiones = PGStorage.getPeticiones();
   return peticiones.filter((p) => (p.createdAt || "").slice(0, 10) === hoyISO());
@@ -129,15 +313,9 @@ function peticionesDeHoy() {
 function renderHoy() {
   const list = document.getElementById("lista-hoy");
   const today = peticionesDeHoy();
-  const orantes = oranteActual ? 1 : 0;
-  document.getElementById("orantes-activos").textContent = `${orantes} orando`;
   
-  if (!oranteActual) {
-    list.innerHTML = `<li class="peticion-hoy">Entra a la sala con tu nombre para ver las peticiones del día y responder.</li>`;
-    return;
-  }
   if (!today.length) {
-    list.innerHTML = `<li class="peticion-hoy">Aún no hay peticiones nuevas hoy. Puedes unirte en oración por las notas de la pizarra.</li>`;
+    list.innerHTML = `<li class="peticion-hoy">Aún no hay peticiones nuevas hoy. Puedes unirte en oración por las notas de la pizarra comunitaria.</li>`;
     return;
   }
 
@@ -189,7 +367,7 @@ function openReflexion(peticion, canal) {
   const modal = document.getElementById("modal-reflexion");
   document.getElementById("modal-destino").textContent = `Para ${peticion.nombre} (${peticion.telefono})`;
   document.getElementById("texto-reflexion").value =
-    `Hola ${peticion.nombre}, soy ${oranteActual} de la comunidad Pura Gracia. Oramos por tu petición: "${peticion.texto}". Que la paz y la gracia de Dios te acompañen hoy.`;
+    `Hola ${peticion.nombre}, soy ${oranteActual || "un intercesor"} de la comunidad Pura Gracia. Oramos por tu petición: "${peticion.texto}". Que la paz y la gracia de Dios te acompañen hoy.`;
   modal.hidden = false;
   document.getElementById("texto-reflexion").focus();
 }
@@ -222,7 +400,7 @@ function renderGaleria() {
   );
 }
 
-// MAPA Y REUNIONES DINÁMICAS POR PAÍS
+// MAPA DE REUNIONES LOCALES
 function updateMeetingsAndMap() {
   const country = PGStorage.getActiveCountry();
   const reuniones = country.reuniones || [];
@@ -244,9 +422,9 @@ function updateMeetingsAndMap() {
         btn.addEventListener("click", () => {
           document.querySelectorAll(".date-btn").forEach((el) => el.classList.remove("active"));
           btn.classList.add("active");
-          if (mapInstance && r.lat && r.lng) {
-            mapInstance.flyTo([r.lat, r.lng], 15);
-            if (mapMarkers[index]) mapMarkers[index].openPopup();
+          if (mapMeetings && r.lat && r.lng) {
+            mapMeetings.flyTo([r.lat, r.lng], 15);
+            if (mapMeetingsMarkers[index]) mapMeetingsMarkers[index].openPopup();
           }
         });
         return btn;
@@ -254,52 +432,47 @@ function updateMeetingsAndMap() {
     );
   }
 
-  // Actualizar mapa Leaflet
+  // Actualizar mapa Leaflet de reuniones
   if (typeof L !== "undefined") {
-    if (!mapInstance) {
-      mapInstance = L.map("mapa", { scrollWheelZoom: false }).setView([4.653, -74.066], 13);
+    if (!mapMeetings) {
+      mapMeetings = L.map("mapa", { scrollWheelZoom: false }).setView([-12.0464, -77.0428], 13);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "&copy; OpenStreetMap contributors",
-      }).addTo(mapInstance);
+      }).addTo(mapMeetings);
     }
 
-    // Limpiar marcadores anteriores
-    mapMarkers.forEach(m => m.remove());
-    mapMarkers = [];
+    mapMeetingsMarkers.forEach(m => m.remove());
+    mapMeetingsMarkers = [];
 
     if (reuniones.length > 0) {
-      reuniones.forEach((r, i) => {
+      reuniones.forEach((r) => {
         if (r.lat && r.lng) {
-          const marker = L.marker([r.lat, r.lng]).addTo(mapInstance);
+          const marker = L.marker([r.lat, r.lng]).addTo(mapMeetings);
           marker.bindPopup(`<strong>${escapeHtml(r.titulo)}</strong><br>${escapeHtml(r.city)}<br>${formatFecha(r.fecha)} · ${escapeHtml(r.hora)}<br>${escapeHtml(r.lugar)}`);
-          mapMarkers.push(marker);
+          mapMeetingsMarkers.push(marker);
         }
       });
 
-      // Centrar en el primer evento del país
       const first = reuniones[0];
       if (first && first.lat && first.lng) {
-        mapInstance.setView([first.lat, first.lng], 13);
+        mapMeetings.setView([first.lat, first.lng], 13);
       }
     }
   }
 }
 
-// SECCIÓN DE DONACIONES DINÁMICAS (OPCIÓN 3)
+// SECCIÓN DE DONACIONES DINÁMICAS
 function updateDonationsUI() {
   const country = PGStorage.getActiveCountry();
   const symbol = country.currencySymbol || "$";
   const currency = country.currency || "COP";
-  const amounts = country.defaultAmounts || [20000, 50000, 100000];
+  const amounts = country.defaultAmounts || [20, 50, 100];
 
-  // Actualizar label de moneda
   document.getElementById("donate-amount-label").textContent = `Otro monto (${currency} ${symbol})`;
 
-  // Selector sincronizado
   const donateSelect = document.getElementById("donate-country-select");
   if (donateSelect) donateSelect.value = country.code;
 
-  // Chips dinámicos
   const chipsContainer = document.getElementById("donate-chips-container");
   chipsContainer.replaceChildren(
     ...amounts.map((monto) => {
@@ -317,7 +490,6 @@ function updateDonationsUI() {
     })
   );
 
-  // Tabs de métodos de pago (Yape, Plin, Nequi, etc.)
   const methods = country.paymentMethods || [];
   const tabsContainer = document.getElementById("pm-tabs-container");
   const contentBox = document.getElementById("pm-content-box");
@@ -413,15 +585,44 @@ function initForms() {
     });
   });
 
-  // Entrada a la sala de oración
+  // Entrada a la Sala Mundial y Marcador en Mapa Mundial
   document.getElementById("form-sala").addEventListener("submit", (e) => {
     e.preventDefault();
-    const nombre = String(new FormData(e.target).get("orante") || "").trim();
+    const data = new FormData(e.target);
+    const nombre = String(data.get("orante") || "").trim();
+    const ciudad = String(data.get("ciudad") || "Lima").trim();
+    const pais = String(data.get("pais") || "Perú").trim();
+
     if (!nombre) return;
+
     oranteActual = nombre;
     sessionStorage.setItem("puraGracia.orantes", nombre);
-    document.getElementById("sala-estado").textContent = `Estás orando como ${nombre}.`;
-    renderHoy();
+
+    // Buscar coordenadas de la ciudad o asignar coordenadas por defecto
+    const normalizedCity = ciudad.toLowerCase();
+    const foundCoords = CITY_COORDS[normalizedCity] || { lat: -12.0464, lng: -77.0428, country: "PE", flag: "🇵🇪" };
+
+    const nuevoOrante = {
+      id: "o_" + Date.now(),
+      nombre,
+      ciudad,
+      pais,
+      flag: foundCoords.flag || "📍",
+      lat: foundCoords.lat + (Math.random() * 0.04 - 0.02), // Pequeño jitter para no solapar marcadores exactos
+      lng: foundCoords.lng + (Math.random() * 0.04 - 0.02),
+      time: "Ahora"
+    };
+
+    PGStorage.addOranteMundial(nuevoOrante);
+    renderOrantesEnMapaMundial();
+    renderOrantesConectados();
+
+    document.getElementById("sala-estado").innerHTML = `✨ <strong>¡Conectado en vivo!</strong> Tu punto está brillando en el mapa mundial como <em>${escapeHtml(nombre)} (${escapeHtml(ciudad)}, ${escapeHtml(pais)})</em>.`;
+
+    // Hacer zoom y animación en el mapa mundial hacia la ubicación del orante
+    if (mapWorldPrayer) {
+      mapWorldPrayer.flyTo([nuevoOrante.lat, nuevoOrante.lng], 7, { duration: 1.5 });
+    }
   });
 
   // Sincronizar input libre de monto para deseleccionar chips
@@ -446,18 +647,14 @@ function initForms() {
 
   // Selector de País Global (Header)
   const globalSelect = document.getElementById("global-country-select");
-  globalSelect.value = PGStorage.getActiveCountryCode();
   globalSelect.addEventListener("change", (e) => {
-    PGStorage.setActiveCountryCode(e.target.value);
-    updateMeetingsAndMap();
-    updateDonationsUI();
+    applyDetectedCountry(e.target.value, false);
   });
 
   // Selector de País en Donaciones
   const donateSelect = document.getElementById("donate-country-select");
   donateSelect.addEventListener("change", (e) => {
-    globalSelect.value = e.target.value;
-    globalSelect.dispatchEvent(new Event("change"));
+    applyDetectedCountry(e.target.value, false);
   });
 
   // Modales
@@ -496,15 +693,15 @@ function initGalleryNav() {
 document.addEventListener("DOMContentLoaded", () => {
   initNav();
   initForms();
+  autoDetectCountry();
   renderPizarra();
   renderHoy();
   renderGaleria();
   initGalleryNav();
-  updateMeetingsAndMap();
-  updateDonationsUI();
+  initMapaMundial();
 
   if (oranteActual) {
-    document.querySelector("#form-sala [name=orante]").value = oranteActual;
+    document.getElementById("input-orante-name").value = oranteActual;
     document.getElementById("sala-estado").textContent = `Estás orando como ${oranteActual}.`;
   }
 });
