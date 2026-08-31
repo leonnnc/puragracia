@@ -11,12 +11,12 @@
  */
 
 const FIREBASE_CONFIG = {
-  apiKey: "",             // Ej: "AIzaSy..."
-  authDomain: "",         // Ej: "tu-proyecto.firebaseapp.com"
-  projectId: "",          // Ej: "tu-proyecto-id"
-  storageBucket: "",      // Ej: "tu-proyecto.appspot.com"
-  messagingSenderId: "",  // Ej: "1234567890"
-  appId: ""               // Ej: "1:1234567890:web:abcdef..."
+  apiKey: "AIzaSyA73w4hd6FAru3BQZKM2F6B0CnNb9HkbfI",
+  authDomain: "puragracia-da17c.firebaseapp.com",
+  projectId: "puragracia-da17c",
+  storageBucket: "puragracia-da17c.firebasestorage.app",
+  messagingSenderId: "1039612656582",
+  appId: "1:1039612656582:web:9628ce35d596584f59d0c7"
 };
 
 // ─── Datos por defecto multi-país (fallback y estructura) ─────────────────────
