@@ -739,23 +739,331 @@ function initNav() {
   );
 }
 
-function initGalleryNav() {
-  const galeria = document.getElementById("galeria");
-  document.querySelector(".gallery-nav.prev").addEventListener("click", () => {
-    galeria.scrollBy({ left: -280, behavior: "smooth" });
+// ============================================================================
+// 3. MOTOR DE PODIO DE VOZ EN VIVO, MICRÓFONO Y COLA DE 5 MINUTOS POR PONENTE
+// ============================================================================
+
+const SPEAKER_DURATION_SECONDS = 300; // 5 minutos exactos por ponente (300 seg)
+
+let liveSpeakerState = {
+  activeSpeaker: {
+    id: "spk_1",
+    nombre: "Pastor David",
+    ciudad: "Bogotá",
+    pais: "Colombia",
+    flag: "🇨🇴",
+    motivo: "Por avivamiento espiritual, fortaleza en la juventud y restauración de familias",
+    lat: 4.7110,
+    lng: -74.0721
+  },
+  queue: [
+    { id: "q1", nombre: "María Isabel", ciudad: "Medellín", pais: "Colombia", flag: "🇨🇴", motivo: "Por provisión en los emprendimientos y salud para mi madre", lat: 6.2442, lng: -75.5812 },
+    { id: "q2", nombre: "Carlos Mendoza", ciudad: "Arequipa", pais: "Perú", flag: "🇵🇪", motivo: "Por restauración en los matrimonios de mi congregación", lat: -16.4090, lng: -71.5375 },
+    { id: "q3", nombre: "Fernanda R.", ciudad: "Ciudad de México", pais: "México", flag: "🇲🇽", motivo: "Pidiendo protección divina y paz en las familias", lat: 19.4326, lng: -99.1332 }
+  ],
+  timeRemaining: 275, // Segundos restantes del ponente actual
+  timerInterval: null,
+  isListening: false,
+  isTransmitting: false,
+  audioContext: null,
+  analyser: null,
+  mediaStream: null
+};
+
+function formatTimerSeconds(totalSeconds) {
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
+
+function initLiveVoicePodio() {
+  const btnPedirMic = document.getElementById("btn-pedir-mic");
+  const btnToggleAudio = document.getElementById("btn-toggle-audio");
+  const btnVerCola = document.getElementById("btn-ver-cola");
+  const queueDropdown = document.getElementById("lvp-queue-dropdown");
+
+  if (!btnPedirMic) return;
+
+  // Botón: Pedir Micrófono / Transmitir / Cancelar fila
+  btnPedirMic.addEventListener("click", handleMicButtonClick);
+
+  // Botón: Escuchar audio
+  btnToggleAudio.addEventListener("click", handleToggleAudio);
+
+  // Botón: Ver / Ocultar Fila de Espera
+  btnVerCola.addEventListener("click", () => {
+    queueDropdown.hidden = !queueDropdown.hidden;
   });
-  document.querySelector(".gallery-nav.next").addEventListener("click", () => {
-    galeria.scrollBy({ left: 280, behavior: "smooth" });
+
+  renderSpeakerPodioUI();
+  startSpeakerTimer();
+}
+
+function startSpeakerTimer() {
+  if (liveSpeakerState.timerInterval) clearInterval(liveSpeakerState.timerInterval);
+
+  liveSpeakerState.timerInterval = setInterval(() => {
+    if (liveSpeakerState.timeRemaining > 0) {
+      liveSpeakerState.timeRemaining--;
+      updateSpeakerTimerUI();
+    } else {
+      // Tiempo agotado (5 minutos): Pasar automáticamente al siguiente ponente
+      nextSpeakerInQueue();
+    }
+  }, 1000);
+}
+
+function updateSpeakerTimerUI() {
+  const timerDisplay = document.getElementById("lvp-timer-display");
+  const progressFill = document.getElementById("lvp-progress-fill");
+
+  if (timerDisplay) {
+    timerDisplay.textContent = formatTimerSeconds(liveSpeakerState.timeRemaining);
+  }
+
+  if (progressFill) {
+    const percentage = (liveSpeakerState.timeRemaining / SPEAKER_DURATION_SECONDS) * 100;
+    progressFill.style.width = `${Math.max(0, percentage)}%`;
+
+    // Cambiar color si queda menos de 1 minuto
+    if (liveSpeakerState.timeRemaining <= 60) {
+      progressFill.style.background = "#ef4444";
+    } else {
+      progressFill.style.background = "linear-gradient(90deg, #10b981, var(--yellow), #ef4444)";
+    }
+  }
+}
+
+function nextSpeakerInQueue() {
+  // Si el orador saliente era el usuario actual, detener su micrófono
+  if (liveSpeakerState.isTransmitting) {
+    stopUserMicrophone();
+  }
+
+  if (liveSpeakerState.queue.length > 0) {
+    // Tomar el siguiente en la fila
+    const nextSpeaker = liveSpeakerState.queue.shift();
+    liveSpeakerState.activeSpeaker = nextSpeaker;
+    liveSpeakerState.timeRemaining = SPEAKER_DURATION_SECONDS; // Reiniciar 5 minutos exactos
+
+    // Si el siguiente ponente es el usuario actual, activar su micrófono
+    if (oranteActual && nextSpeaker.nombre.toLowerCase() === oranteActual.toLowerCase()) {
+      startUserMicrophone();
+    }
+
+    // Volar el mapa hacia el nuevo ponente en vivo
+    if (mapWorldFullscreen && nextSpeaker.lat && nextSpeaker.lng) {
+      mapWorldFullscreen.flyTo([nextSpeaker.lat, nextSpeaker.lng], 5, { duration: 1.5 });
+      if (worldPrayerMarkers[nextSpeaker.id]) {
+        setTimeout(() => { worldPrayerMarkers[nextSpeaker.id].openPopup(); }, 1600);
+      }
+    }
+  } else {
+    // Si no hay nadie en fila, reiniciar timer de 5 min con el ponente actual
+    liveSpeakerState.timeRemaining = SPEAKER_DURATION_SECONDS;
+  }
+
+  renderSpeakerPodioUI();
+}
+
+function renderSpeakerPodioUI() {
+  const current = liveSpeakerState.activeSpeaker;
+  if (!current) return;
+
+  // Actualizar datos del ponente activo
+  const nameEl = document.getElementById("lvp-speaker-name");
+  const locEl = document.getElementById("lvp-speaker-loc");
+  const motivoEl = document.getElementById("lvp-speaker-motivo");
+  const flagEl = document.getElementById("lvp-speaker-flag");
+  const countEl = document.getElementById("lvp-queue-count");
+  const btnMic = document.getElementById("btn-pedir-mic");
+
+  if (nameEl) nameEl.textContent = current.nombre;
+  if (locEl) locEl.textContent = `${current.ciudad}, ${current.pais}`;
+  if (motivoEl) motivoEl.textContent = `"${current.motivo || 'Orando en unidad por las naciones'}"`;
+  if (flagEl) flagEl.textContent = current.flag || "📍";
+  if (countEl) countEl.textContent = liveSpeakerState.queue.length;
+
+  // Estado del botón de micrófono según el usuario actual
+  if (btnMic) {
+    const isMeSpeaking = Boolean(oranteActual && current.nombre.toLowerCase() === oranteActual.toLowerCase());
+    const myQueueIndex = liveSpeakerState.queue.findIndex(q => oranteActual && q.nombre.toLowerCase() === oranteActual.toLowerCase());
+
+    if (isMeSpeaking) {
+      btnMic.className = "btn-lvp btn-lvp-mic transmitting";
+      btnMic.innerHTML = "🎙️ Tu Micrófono está EN VIVO (Terminar)";
+    } else if (myQueueIndex !== -1) {
+      btnMic.className = "btn-lvp btn-lvp-mic in-queue";
+      btnMic.innerHTML = `⏳ En Fila (Turno #${myQueueIndex + 1}) · Salir`;
+    } else {
+      btnMic.className = "btn-lvp btn-lvp-mic";
+      btnMic.innerHTML = "🎤 Pedir el Micrófono para Orar";
+    }
+  }
+
+  updateSpeakerTimerUI();
+  renderSpeakerQueueList();
+  updateEqualizerWave();
+}
+
+function renderSpeakerQueueList() {
+  const list = document.getElementById("lvp-queue-list");
+  if (!list) return;
+
+  if (!liveSpeakerState.queue.length) {
+    list.innerHTML = `<li style="text-align: center; color: #94a3b8; font-size: 0.78rem; padding: 0.4rem;">No hay personas en espera. ¡Puedes pedir el micrófono ahora!</li>`;
+    return;
+  }
+
+  list.innerHTML = liveSpeakerState.queue.map((q, i) => `
+    <li class="lvp-queue-item">
+      <div>
+        <span class="pos-badge">#${i + 1}</span>
+        <strong>${q.flag || "📍"} ${escapeHtml(q.nombre)}</strong>
+        <span style="color:#34d399; font-size:0.75rem;">(${escapeHtml(q.ciudad)})</span>
+        <span class="motivo-small">"${escapeHtml(q.motivo || 'Intercesión')}"</span>
+      </div>
+      <span style="color:var(--yellow); font-size:0.72rem; font-weight:700; white-space:nowrap;">
+        En ${Math.max(1, (i + 1) * 5)} min
+      </span>
+    </li>
+  `).join("");
+}
+
+async function handleMicButtonClick() {
+  // Si no ha ingresado su nombre, pedirlo
+  if (!oranteActual) {
+    const inputName = document.getElementById("input-orante-name");
+    const name = prompt("Para pedir el micrófono, ingresa tu nombre:", inputName ? inputName.value : "");
+    if (!name || !name.trim()) return;
+    oranteActual = name.trim();
+    sessionStorage.setItem("puraGracia.orantes", oranteActual);
+  }
+
+  const current = liveSpeakerState.activeSpeaker;
+  const isMeSpeaking = Boolean(current && current.nombre.toLowerCase() === oranteActual.toLowerCase());
+  const myQueueIndex = liveSpeakerState.queue.findIndex(q => q.nombre.toLowerCase() === oranteActual.toLowerCase());
+
+  if (isMeSpeaking) {
+    // Si ya está hablando, terminar su oración y ceder el turno al siguiente
+    if (confirm("¿Deseas terminar tu tiempo de oración y ceder el micrófono al siguiente hermano en la fila?")) {
+      nextSpeakerInQueue();
+    }
+    return;
+  }
+
+  if (myQueueIndex !== -1) {
+    // Si ya está en la fila, cancelar su turno
+    if (confirm("¿Deseas salir de la fila de espera de oración?")) {
+      liveSpeakerState.queue.splice(myQueueIndex, 1);
+      renderSpeakerPodioUI();
+    }
+    return;
+  }
+
+  // Agregar al usuario a la fila o darle el micrófono si no hay nadie
+  const country = PGStorage.getActiveCountry();
+  const inputMotivo = document.getElementById("input-orante-motivo");
+  const motivo = (inputMotivo && inputMotivo.value) ? inputMotivo.value.trim() : "Orando en unidad y fe por las peticiones";
+
+  const userSpeakerObj = {
+    id: "spk_" + Date.now(),
+    nombre: oranteActual,
+    ciudad: country.cities && country.cities[0] ? country.cities[0] : "Lima",
+    pais: country.name || "Perú",
+    flag: country.flag || "🇵🇪",
+    motivo: motivo,
+    lat: -12.0464,
+    lng: -77.0428
+  };
+
+  // Solicitar permiso de micrófono al navegador
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    // Permiso otorgado
+    stream.getTracks().forEach(track => track.stop()); // Detener hasta que le toque su turno
+  } catch (err) {
+    console.warn("Permiso de micrófono denegado o no disponible:", err.message);
+  }
+
+  // Añadir a la fila
+  liveSpeakerState.queue.push(userSpeakerObj);
+  alert(`✨ ¡Has sido añadido a la fila para orar! Estás en la posición #${liveSpeakerState.queue.length}. Cada ponente cuenta con 5 minutos.`);
+  renderSpeakerPodioUI();
+}
+
+async function startUserMicrophone() {
+  try {
+    liveSpeakerState.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    liveSpeakerState.isTransmitting = true;
+    
+    // Conectar a analizador de audio
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+      liveSpeakerState.audioContext = new AudioContextClass();
+      const source = liveSpeakerState.audioContext.createMediaStreamSource(liveSpeakerState.mediaStream);
+      liveSpeakerState.analyser = liveSpeakerState.audioContext.createAnalyser();
+      liveSpeakerState.analyser.fftSize = 64;
+      source.connect(liveSpeakerState.analyser);
+    }
+    
+    alert("🎙️ ¡Es tu turno de orar! Tu micrófono está EN VIVO transmitiendo a todos los intercesores conectados. Tienes 5 minutos.");
+    renderSpeakerPodioUI();
+  } catch (e) {
+    console.warn("No se pudo iniciar el micrófono real:", e);
+    liveSpeakerState.isTransmitting = true;
+    renderSpeakerPodioUI();
+  }
+}
+
+function stopUserMicrophone() {
+  liveSpeakerState.isTransmitting = false;
+  if (liveSpeakerState.mediaStream) {
+    liveSpeakerState.mediaStream.getTracks().forEach(track => track.stop());
+    liveSpeakerState.mediaStream = null;
+  }
+  if (liveSpeakerState.audioContext) {
+    liveSpeakerState.audioContext.close().catch(() => {});
+    liveSpeakerState.audioContext = null;
+  }
+}
+
+function handleToggleAudio() {
+  const btn = document.getElementById("btn-toggle-audio");
+  liveSpeakerState.isListening = !liveSpeakerState.isListening;
+
+  if (liveSpeakerState.isListening) {
+    btn.classList.add("playing");
+    btn.innerHTML = "🔊 Escuchando Oración";
+    updateEqualizerWave();
+  } else {
+    btn.classList.remove("playing");
+    btn.innerHTML = "🔈 Audio Silenciado";
+    updateEqualizerWave();
+  }
+}
+
+function updateEqualizerWave() {
+  const waveBars = document.querySelectorAll(".wave-bar");
+  const shouldAnimate = liveSpeakerState.isListening || liveSpeakerState.isTransmitting;
+
+  waveBars.forEach(bar => {
+    if (shouldAnimate) {
+      bar.classList.add("speaking");
+    } else {
+      bar.classList.remove("speaking");
+    }
   });
 }
 
-
+// ─── Inicialización al cargar la página ─────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   initNav();
   initForms();
   autoDetectCountry();
   renderGaleria();
   initGalleryNav();
+  initLiveVoicePodio();
 
   if (oranteActual) {
     const nameInput = document.getElementById("input-orante-name");

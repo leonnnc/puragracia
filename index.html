@@ -386,6 +386,80 @@
         <!-- Canvas del Mapa Mundial Fullscreen -->
         <div id="mapa-mundial-fullscreen" class="fullscreen-map-canvas" role="region" aria-label="Plano completo de la tierra con intercesores en vivo"></div>
 
+        <!-- ========================================================
+             PODIO FLOTANTE: MICRÓFONO EN VIVO & TRANSMISIÓN DE ORACIÓN (5 MIN)
+             ======================================================== -->
+        <div class="live-voice-podio" id="live-voice-podio">
+          <div class="lvp-header">
+            <div class="lvp-status-tag" id="lvp-status-tag">
+              <span class="lvp-pulse-dot"></span>
+              <strong id="lvp-status-text">EN VIVO AL AIRE</strong>
+            </div>
+
+            <!-- Cronómetro de 5 minutos -->
+            <div class="lvp-timer-badge" id="lvp-timer-badge" title="Tiempo restante del orador actual (máximo 5 minutos)">
+              ⏱️ <span id="lvp-timer-display">05:00</span>
+            </div>
+          </div>
+
+          <!-- Información del Ponente Activo -->
+          <div class="lvp-speaker-info">
+            <div class="lvp-speaker-avatar" id="lvp-speaker-avatar">
+              <span id="lvp-speaker-flag">🇨🇴</span>
+              <div class="lvp-avatar-glow"></div>
+            </div>
+            <div class="lvp-speaker-details">
+              <strong id="lvp-speaker-name">Pastor David</strong>
+              <span id="lvp-speaker-loc" class="lvp-speaker-loc">Bogotá, Colombia</span>
+              <p id="lvp-speaker-motivo" class="lvp-speaker-motivo">"Clamor por avivamiento espiritual y restauración de familias"</p>
+            </div>
+          </div>
+
+          <!-- Ecualizador de Onda de Voz Animado -->
+          <div class="lvp-wave-container" id="lvp-wave-container">
+            <span class="wave-bar wb1"></span>
+            <span class="wave-bar wb2"></span>
+            <span class="wave-bar wb3"></span>
+            <span class="wave-bar wb4"></span>
+            <span class="wave-bar wb5"></span>
+            <span class="wave-bar wb6"></span>
+            <span class="wave-bar wb7"></span>
+            <span class="wave-bar wb8"></span>
+          </div>
+
+          <!-- Barra de Progreso del Tiempo (5 minutos) -->
+          <div class="lvp-progress-track">
+            <div class="lvp-progress-fill" id="lvp-progress-fill" style="width: 100%;"></div>
+          </div>
+
+          <!-- Botones de Acción del Micrófono -->
+          <div class="lvp-actions">
+            <!-- Botón para pedir micrófono / hablar -->
+            <button type="button" class="btn-lvp btn-lvp-mic" id="btn-pedir-mic">
+              🎤 Pedir el Micrófono para Orar
+            </button>
+
+            <!-- Botón para escuchar audio -->
+            <button type="button" class="btn-lvp btn-lvp-audio" id="btn-toggle-audio">
+              🔊 Escuchar Oración
+            </button>
+
+            <!-- Botón para ver la fila de ponentes -->
+            <button type="button" class="btn-lvp btn-lvp-queue" id="btn-ver-cola">
+              👥 Fila (<span id="lvp-queue-count">2</span>)
+            </button>
+          </div>
+
+          <!-- Panel Desplegable de la Cola de Espera (5 min por ponente) -->
+          <div class="lvp-queue-dropdown" id="lvp-queue-dropdown" hidden>
+            <div class="lvp-queue-header">
+              <strong>👥 Fila de Espera de Oración</strong>
+              <small>5 min por ponente</small>
+            </div>
+            <ul class="lvp-queue-list" id="lvp-queue-list"></ul>
+          </div>
+        </div>
+
         <!-- Ticker inferior de orantes conectados con sus solicitudes -->
         <div class="mf-bottom-ticker">
           <div class="mf-ticker-label">⚡ En oración ahora:</div>
