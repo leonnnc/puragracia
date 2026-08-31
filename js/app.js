@@ -317,43 +317,6 @@ function renderFullscreenOrantesMarkers() {
   });
 }
 
-  orantes.forEach((o) => {
-    if (!o.lat || !o.lng) return;
-
-    // Marcador pulsante en el plano de la tierra
-    const pulseIcon = L.divIcon({
-      className: "pulse-prayer-marker",
-      iconSize: [42, 42],
-      iconAnchor: [21, 21],
-      popupAnchor: [0, -22],
-      html: `
-        <div class="pulse-glow"></div>
-        <div class="pulse-pin">🙏</div>
-      `
-    });
-
-    const marker = L.marker([o.lat, o.lng], { icon: pulseIcon }).addTo(mapWorldFullscreen);
-    
-    marker.bindPopup(`
-      <div style="font-family: Outfit, sans-serif; min-width: 220px; padding: 4px;">
-        <strong style="font-size: 1.15rem; display:block; color:#1c2422; margin-bottom: 2px;">
-          🙏 ${escapeHtml(o.nombre)}
-        </strong>
-        <div style="color:#2f6f62; font-weight:700; font-size:0.9rem; margin-bottom: 6px;">
-          ${o.flag || "📍"} ${escapeHtml(o.ciudad)}, ${escapeHtml(o.pais)}
-        </div>
-        <div style="font-size: 0.88rem; background:#fffaf0; padding: 8px 10px; border-radius: 8px; border:1px solid #e2d8c3; margin-bottom: 8px;">
-          <strong style="display:block; color:#7b1f18; font-size:0.75rem; text-transform:uppercase; margin-bottom:3px;">Solicitud de Oración:</strong>
-          "${escapeHtml(o.motivo || 'Orando por salud, paz y bendición')}"
-        </div>
-        <div style="font-size: 0.75rem; color:#718096; text-align:right;">Conectado ${escapeHtml(o.time || 'en vivo')}</div>
-      </div>
-    `);
-
-    worldPrayerMarkers[o.id] = marker;
-  });
-}
-
 function renderFullscreenLiveStream() {
   const streamContainer = document.getElementById("lista-orantes-stream");
   if (!streamContainer) return;
