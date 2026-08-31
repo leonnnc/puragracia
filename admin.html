@@ -6,19 +6,19 @@
   <title>CPanel de Administración · Pura Gracia</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/admin.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>" />
 </head>
 <body>
 
   <!-- 1. VISTA DE LOGIN -->
-  <div id="view-login" class="auth-wrapper">
-    <div class="auth-card">
-      <div class="auth-header">
-        <div class="logo-mark">🙏</div>
-        <h1>Pura Gracia · CPanel</h1>
-        <p>Acceso administrativo por país y global</p>
+  <div id="view-login" class="login-wrapper">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-icon">🙏</div>
+        <h1>Pura Gracia CPanel</h1>
+        <p>Acceso administrativo y pastoral</p>
       </div>
 
       <form id="form-login">
@@ -32,19 +32,18 @@
           <input type="password" id="login-password" class="admin-input" required placeholder="••••••••" />
         </div>
 
-        <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%;">
+        <div id="login-error" class="login-error-msg" style="display: none;"></div>
+
+        <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; margin-top: 0.5rem;">
           Ingresar al Panel
         </button>
 
-        <div class="auth-demo-box">
-          <strong>⚡ Accesos Rápidos de Prueba (Haz clic para autocompletar):</strong>
-          <div class="demo-pills">
-            <button type="button" class="demo-pill" data-email="admin@puragracia.org" data-pass="admin123">👑 SuperAdmin Global</button>
-            <button type="button" class="demo-pill" data-email="colombia@puragracia.org" data-pass="admin123">🇨🇴 Admin Colombia</button>
-            <button type="button" class="demo-pill" data-email="peru@puragracia.org" data-pass="admin123">🇵🇪 Admin Perú</button>
-            <button type="button" class="demo-pill" data-email="mexico@puragracia.org" data-pass="admin123">🇲🇽 Admin México</button>
-            <button type="button" class="demo-pill" data-email="argentina@puragracia.org" data-pass="admin123">🇦🇷 Admin Argentina</button>
-            <button type="button" class="demo-pill" data-email="usa@puragracia.org" data-pass="admin123">🌎 Admin USA</button>
+        <div class="login-presets">
+          <p style="font-size: 0.8rem; color: var(--admin-muted); margin: 0 0 0.5rem;">Accesos rápidos de prueba:</p>
+          <div class="preset-buttons">
+            <button type="button" class="btn-preset" data-email="admin@puragracia.org" data-pass="admin123">👑 SuperAdmin Global</button>
+            <button type="button" class="btn-preset" data-email="peru@puragracia.org" data-pass="admin123">🇵🇪 Admin Perú</button>
+            <button type="button" class="btn-preset" data-email="colombia@puragracia.org" data-pass="admin123">🇨🇴 Admin Colombia</button>
           </div>
         </div>
       </form>
@@ -63,25 +62,26 @@
         </div>
       </a>
 
+      <!-- Pestañas del CPanel en el nuevo orden solicitado -->
       <ul class="nav-tabs">
         <li>
-          <button class="nav-tab-btn active" data-tab="tab-paises">
-            <span>🌐</span> 1. Países & Sedes
-          </button>
-        </li>
-        <li>
-          <button class="nav-tab-btn" data-tab="tab-donaciones">
-            <span>💳</span> 2. Cuentas Donación
+          <button class="nav-tab-btn active" data-tab="tab-admins">
+            <span>👥</span> 1. Administradores
           </button>
         </li>
         <li>
           <button class="nav-tab-btn" data-tab="tab-peticiones">
-            <span>📜</span> 3. Peticiones & Oración
+            <span>📜</span> 2. Peticiones de Oración
           </button>
         </li>
         <li>
-          <button class="nav-tab-btn" data-tab="tab-admins">
-            <span>👥</span> 4. Administradores
+          <button class="nav-tab-btn" data-tab="tab-paises">
+            <span>🌐</span> 3. Países & Sedes
+          </button>
+        </li>
+        <li>
+          <button class="nav-tab-btn" data-tab="tab-donaciones">
+            <span>💳</span> 4. Cuentas Donación
           </button>
         </li>
       </ul>
@@ -113,8 +113,116 @@
       <!-- Container of Tabs -->
       <div class="admin-content">
 
-        <!-- TAB 1: PAISES Y CIUDADES (OPCIÓN 1) -->
-        <section id="tab-paises" class="tab-panel active">
+        <!-- ========================================================
+             1. TAB: ADMINISTRADORES (PRIMERO)
+             ======================================================== -->
+        <section id="tab-admins" class="tab-panel active">
+          <div class="section-header">
+            <div>
+              <h2>Gestión de Administradores</h2>
+              <p>Cuentas con acceso al CPanel por cada país o con rol general.</p>
+            </div>
+          </div>
+
+          <div class="admin-grid two-col">
+            <div class="admin-card">
+              <h3><span>➕</span> Crear Nuevo Administrador</h3>
+              <form id="form-create-admin">
+                <div class="form-group">
+                  <label class="admin-label">Nombre del Administrador</label>
+                  <input type="text" id="admin-new-name" class="admin-input" required placeholder="Líder de Oración" />
+                </div>
+                <div class="form-group">
+                  <label class="admin-label">Correo Electrónico</label>
+                  <input type="email" id="admin-new-email" class="admin-input" required placeholder="lider@puragracia.org" />
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="admin-label">País Asignado</label>
+                    <select id="admin-new-country" class="admin-select">
+                      <option value="GLOBAL">👑 Global (Todos los países)</option>
+                      <option value="CO">🇨🇴 Colombia</option>
+                      <option value="PE">🇵🇪 Perú</option>
+                      <option value="MX">🇲🇽 México</option>
+                      <option value="AR">🇦🇷 Argentina</option>
+                      <option value="US">🌎 Internacional / USA</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="admin-label">Contraseña</label>
+                    <input type="password" id="admin-new-pass" class="admin-input" required placeholder="••••••••" />
+                  </div>
+                </div>
+                <button type="submit" class="btn-admin btn-admin-primary">Crear Administrador</button>
+              </form>
+            </div>
+
+            <div class="admin-card">
+              <h3><span>👥</span> Administradores Registrados</h3>
+              <div class="admin-table-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Email</th>
+                      <th>País</th>
+                      <th>Rol</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admins-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================
+             2. TAB: PETICIONES DE ORACIÓN (SEGUNDO)
+             ======================================================== -->
+        <section id="tab-peticiones" class="tab-panel">
+          <div class="section-header">
+            <div>
+              <h2>Moderación de Peticiones y Oración</h2>
+              <p>Revisa todas las peticiones recibidas, responde por WhatsApp o modera notas.</p>
+            </div>
+            <div style="display: flex; gap: 0.8rem;">
+              <select id="filter-petition-category" class="admin-select" style="min-width: 140px;">
+                <option value="ALL">Todas las Categorías</option>
+                <option value="Salud">Salud</option>
+                <option value="Familia">Familia</option>
+                <option value="Trabajo">Trabajo</option>
+                <option value="Gratitud">Gratitud</option>
+                <option value="Paz">Paz</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>País</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Petición</th>
+                    <th>Contacto</th>
+                    <th>Oraciones</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="petitions-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================
+             3. TAB: PAÍSES Y SEDES (TERCERO)
+             ======================================================== -->
+        <section id="tab-paises" class="tab-panel">
           <div class="section-header">
             <div>
               <h2>Gestión de Países, Sedes y Reuniones</h2>
@@ -143,22 +251,24 @@
                     <input type="text" id="cp-country-name" class="admin-input" required />
                   </div>
                   <div class="form-group">
-                    <label class="admin-label">Moneda (Código y Símbolo)</label>
-                    <div style="display: flex; gap: 0.5rem;">
-                      <input type="text" id="cp-currency-code" class="admin-input" placeholder="COP" required style="width: 50%;" />
-                      <input type="text" id="cp-currency-symbol" class="admin-input" placeholder="$" required style="width: 50%;" />
-                    </div>
+                    <label class="admin-label">Código Moneda (ISO)</label>
+                    <input type="text" id="cp-currency-code" class="admin-input" placeholder="Ej: COP, PEN, MXN" required />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="admin-label">Símbolo Moneda</label>
+                    <input type="text" id="cp-currency-symbol" class="admin-input" placeholder="Ej: $, S/." required />
+                  </div>
+                  <div class="form-group">
+                    <label class="admin-label">WhatsApp Pastoral (con código país)</label>
+                    <input type="text" id="cp-whatsapp" class="admin-input" placeholder="Ej: 573001234567" required />
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label class="admin-label">WhatsApp Oficial de la Iglesia (con indicativo)</label>
-                  <input type="text" id="cp-whatsapp" class="admin-input" placeholder="573001112233" required />
-                  <small style="color: var(--admin-muted); font-size: 0.8rem;">Ej: 57 para Colombia, 51 para Perú, 52 para México, 54 para Argentina.</small>
-                </div>
-
-                <div class="form-group">
-                  <label class="admin-label">Ciudades y Sedes Registradas (separadas por comas)</label>
+                  <label class="admin-label">Ciudades Principales (separadas por coma)</label>
                   <input type="text" id="cp-cities" class="admin-input" placeholder="Bogotá, Medellín, Cali" required />
                 </div>
 
@@ -166,18 +276,18 @@
               </form>
             </div>
 
-            <!-- Agregar Reunión / Evento -->
+            <!-- Programar Nueva Reunión -->
             <div class="admin-card">
-              <h3><span>📅</span> Programar Nueva Reunión Local</h3>
+              <h3><span>📅</span> Programar Reunión de Oración</h3>
               <form id="form-add-meeting">
                 <div class="form-row">
                   <div class="form-group">
                     <label class="admin-label">Ciudad</label>
-                    <select id="meeting-city" class="admin-select" required></select>
+                    <select id="meeting-city" class="admin-select"></select>
                   </div>
                   <div class="form-group">
-                    <label class="admin-label">Título de la Reunión</label>
-                    <input type="text" id="meeting-title" class="admin-input" placeholder="Oración en el parque" required />
+                    <label class="admin-label">Título del Encuentro</label>
+                    <input type="text" id="meeting-title" class="admin-input" placeholder="Ej: Clamor en el parque" required />
                   </div>
                 </div>
 
@@ -193,39 +303,39 @@
                 </div>
 
                 <div class="form-group">
-                  <label class="admin-label">Lugar / Dirección Exacta</label>
-                  <input type="text" id="meeting-place" class="admin-input" placeholder="Parque de los Novios, Bogotá" required />
+                  <label class="admin-label">Dirección / Lugar</label>
+                  <input type="text" id="meeting-place" class="admin-input" placeholder="Parque principal o Salón comunal" required />
                 </div>
 
                 <div class="form-row">
                   <div class="form-group">
-                    <label class="admin-label">Latitud (Mapa)</label>
+                    <label class="admin-label">Latitud (GPS)</label>
                     <input type="number" step="any" id="meeting-lat" class="admin-input" placeholder="4.6686" required />
                   </div>
                   <div class="form-group">
-                    <label class="admin-label">Longitud (Mapa)</label>
+                    <label class="admin-label">Longitud (GPS)</label>
                     <input type="number" step="any" id="meeting-lng" class="admin-input" placeholder="-74.0640" required />
                   </div>
                 </div>
 
-                <button type="submit" class="btn-admin btn-admin-success">Agregar Reunión al Mapa</button>
+                <button type="submit" class="btn-admin btn-admin-success">Publicar en el Mapa</button>
               </form>
             </div>
           </div>
 
           <!-- Listado de Reuniones -->
           <div class="admin-card" style="margin-top: 1.5rem;">
-            <h3><span>📋</span> Reuniones Programadas para este País</h3>
+            <h3><span>📍</span> Reuniones Programadas para este País</h3>
             <div class="admin-table-wrap">
-              <table class="admin-table" id="table-meetings">
+              <table class="admin-table">
                 <thead>
                   <tr>
-                    <th>Ciudad</th>
                     <th>Título</th>
+                    <th>Ciudad</th>
                     <th>Fecha & Hora</th>
                     <th>Lugar</th>
                     <th>Coordenadas</th>
-                    <th>Acciones</th>
+                    <th>Acción</th>
                   </tr>
                 </thead>
                 <tbody id="meetings-tbody"></tbody>
@@ -234,7 +344,9 @@
           </div>
         </section>
 
-        <!-- TAB 2: CUENTAS DE DONACION (OPCIÓN 2) -->
+        <!-- ========================================================
+             4. TAB: CUENTAS DE DONACIÓN (CUARTO)
+             ======================================================== -->
         <section id="tab-donaciones" class="tab-panel">
           <div class="section-header">
             <div>
@@ -292,108 +404,6 @@
                     </tr>
                   </thead>
                   <tbody id="payment-methods-tbody"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- TAB 4: PETICIONES Y MODERACIÓN (OPCIÓN 4) -->
-        <section id="tab-peticiones" class="tab-panel">
-          <div class="section-header">
-            <div>
-              <h2>Moderación de Peticiones y Oración</h2>
-              <p>Revisa todas las peticiones recibidas, responde por WhatsApp o modera notas.</p>
-            </div>
-            <div style="display: flex; gap: 0.8rem;">
-              <select id="filter-petition-category" class="admin-select" style="min-width: 140px;">
-                <option value="ALL">Todas las Categorías</option>
-                <option value="Salud">Salud</option>
-                <option value="Familia">Familia</option>
-                <option value="Trabajo">Trabajo</option>
-                <option value="Gratitud">Gratitud</option>
-                <option value="Paz">Paz</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="admin-card">
-            <div class="admin-table-wrap">
-              <table class="admin-table">
-                <thead>
-                  <tr>
-                    <th>Fecha</th>
-                    <th>País</th>
-                    <th>Nombre</th>
-                    <th>Categoría</th>
-                    <th>Petición</th>
-                    <th>Contacto</th>
-                    <th>Oraciones</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody id="petitions-tbody"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- TAB 5: ADMINISTRADORES (OPCIÓN 5) -->
-        <section id="tab-admins" class="tab-panel">
-          <div class="section-header">
-            <div>
-              <h2>Gestión de Administradores</h2>
-              <p>Cuentas con acceso al CPanel por cada país o con rol general.</p>
-            </div>
-          </div>
-
-          <div class="admin-grid two-col">
-            <div class="admin-card">
-              <h3><span>➕</span> Crear Nuevo Administrador</h3>
-              <form id="form-create-admin">
-                <div class="form-group">
-                  <label class="admin-label">Nombre del Administrador</label>
-                  <input type="text" id="admin-new-name" class="admin-input" required placeholder="Líder de Oración" />
-                </div>
-                <div class="form-group">
-                  <label class="admin-label">Correo Electrónico</label>
-                  <input type="email" id="admin-new-email" class="admin-input" required placeholder="lider@puragracia.org" />
-                </div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label class="admin-label">País Asignado</label>
-                    <select id="admin-new-country" class="admin-select">
-                      <option value="GLOBAL">👑 Global (Todos los países)</option>
-                      <option value="CO">🇨🇴 Colombia</option>
-                      <option value="PE">🇵🇪 Perú</option>
-                      <option value="MX">🇲🇽 México</option>
-                      <option value="AR">🇦🇷 Argentina</option>
-                      <option value="US">🌎 Internacional / USA</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label class="admin-label">Contraseña</label>
-                    <input type="password" id="admin-new-pass" class="admin-input" required placeholder="••••••••" />
-                  </div>
-                </div>
-                <button type="submit" class="btn-admin btn-admin-primary">Crear Administrador</button>
-              </form>
-            </div>
-
-            <div class="admin-card">
-              <h3><span>👥</span> Administradores Registrados</h3>
-              <div class="admin-table-wrap">
-                <table class="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Nombre</th>
-                      <th>Email</th>
-                      <th>País</th>
-                      <th>Rol</th>
-                      <th>Acción</th>
-                    </tr>
-                  </thead>
-                  <tbody id="admins-tbody"></tbody>
                 </table>
               </div>
             </div>
