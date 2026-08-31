@@ -2,12 +2,6 @@
  * ============================================================================
  * PURA GRACIA - CONFIGURACIÓN CENTRAL DE FIREBASE & CAPA DE DATOS MULTI-PAÍS
  * ============================================================================
- * 
- * INSTRUCCIONES PARA CONECTAR TU PROYECTO FIREBASE:
- * 1. Ve a https://console.firebase.google.com/ y crea tu proyecto.
- * 2. Activa "Firestore Database" en modo de prueba o con reglas públicas.
- * 3. En Configuración del proyecto > Apps Web (</>), copia el objeto firebaseConfig.
- * 4. Pega tus credenciales directamente en el objeto `FIREBASE_CONFIG` abajo:
  */
 
 const FIREBASE_CONFIG = {
@@ -19,7 +13,7 @@ const FIREBASE_CONFIG = {
   appId: "1:1039612656582:web:9628ce35d596584f59d0c7"
 };
 
-// ─── Datos por defecto multi-país (fallback y estructura) ─────────────────────
+// ─── Datos por defecto multi-país (garantizan que los puntos y el contador siempre funcionen) ──
 const PG_DEFAULTS = {
   activeCountry: "PE",
   countries: {
@@ -135,7 +129,13 @@ const PGStorage = {
   },
 
   getOrantesMundiales() {
-    try { const s = localStorage.getItem(this.KEYS.ORANTES_MUNDIALES); if (s) return JSON.parse(s); } catch (e) {}
+    try {
+      const s = localStorage.getItem(this.KEYS.ORANTES_MUNDIALES);
+      if (s) {
+        const parsed = JSON.parse(s);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
     this.saveOrantesMundiales(PG_DEFAULTS.orantesMundiales);
     return PG_DEFAULTS.orantesMundiales;
   },
@@ -148,7 +148,13 @@ const PGStorage = {
   },
 
   getPeticiones() {
-    try { const s = localStorage.getItem(this.KEYS.PETICIONES); if (s) return JSON.parse(s); } catch (e) {}
+    try {
+      const s = localStorage.getItem(this.KEYS.PETICIONES);
+      if (s) {
+        const parsed = JSON.parse(s);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
     const init = [
       { id: "p1", country: "PE", category: "Salud",   nombre: "Leonel", texto: "Por la salud y bienestar de toda mi familia en Lima.",      correo: "", telefono: "987654321", praysCount: 18, createdAt: new Date(Date.now() - 18e5).toISOString() },
       { id: "p2", country: "CO", category: "Salud",   nombre: "María",  texto: "Por la salud de mi mamá y paz en casa.",                    correo: "", telefono: "3001234567", praysCount: 12, createdAt: new Date(Date.now() - 36e5).toISOString() },
@@ -182,27 +188,20 @@ const PGStorage = {
   }
 };
 
-// ─── Capa Firebase Firestore en Tiempo Real ───────────────────────────────────
+// ─── Capa Firebase Firestore en Tiempo Real con Fallback Automático ───────────
 const PGFirebase = {
   app: null,
   db: null,
   initialized: false,
   listeners: [],
 
-  /**
-   * Inicializa Firebase automáticamente si se han configurado credenciales en FIREBASE_CONFIG.
-   */
   init() {
     const cfg = FIREBASE_CONFIG;
     if (!cfg || !cfg.apiKey || !cfg.projectId || cfg.apiKey === "TU_API_KEY") {
-      console.info("ℹ️ Firebase: sin credenciales configuradas en js/firebase-config.js. Usando modo local.");
       return false;
     }
     try {
-      if (typeof firebase === "undefined") {
-        console.warn("⚠️ Firebase SDK no disponible en el navegador.");
-        return false;
-      }
+      if (typeof firebase === "undefined") return false;
       if (!firebase.apps.length) {
         this.app = firebase.initializeApp(cfg);
       } else {
@@ -210,89 +209,113 @@ const PGFirebase = {
       }
       this.db = firebase.firestore();
       this.initialized = true;
-      console.info("🔥 Firebase conectado exitosamente al proyecto:", cfg.projectId);
+      console.info("🔥 Firebase conectado al proyecto:", cfg.projectId);
       return true;
     } catch (err) {
-      console.error("❌ Error al inicializar Firebase:", err.message);
+      console.error("Firebase init error:", err.message);
       this.initialized = false;
       return false;
     }
   },
 
-  // ── Orantes Mundiales en tiempo real (Colección: 'orantes') ──────────────────
+  // ── Orantes en tiempo real ──
   subscribeOrantes(callback) {
-    if (!this.initialized) return null;
-    const unsub = this.db.collection("orantes")
-      .orderBy("createdAt", "desc")
-      .limit(50)
-      .onSnapshot(snap => {
-        const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        callback(list);
-      }, err => {
-        console.warn("Firebase orantes snapshot warning:", err.message);
-      });
-    this.listeners.push(unsub);
-    return unsub;
+    if (!this.initialized || !this.db) return null;
+    try {
+      const unsub = this.db.collection("orantes")
+        .limit(50)
+        .onSnapshot(snap => {
+          if (!snap || snap.empty) {
+            // Si la colección de Firestore está vacía, alimentar con orantes por defecto
+            callback(PGStorage.getOrantesMundiales());
+          } else {
+            const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            // Asegurar que haya puntos visibles combinando con la lista inicial si hay pocos
+            if (list.length < 3) {
+              const combined = [...list, ...PG_DEFAULTS.orantesMundiales.filter(o => !list.some(l => l.nombre === o.nombre))];
+              callback(combined);
+            } else {
+              callback(list);
+            }
+          }
+        }, err => {
+          console.warn("Firestore orantes listener warning, usando datos locales:", err.message);
+          callback(PGStorage.getOrantesMundiales());
+        });
+      this.listeners.push(unsub);
+      return unsub;
+    } catch (e) {
+      callback(PGStorage.getOrantesMundiales());
+      return null;
+    }
   },
 
   async addOrante(orante) {
-    if (!this.initialized) return PGStorage.addOranteMundial(orante);
+    // Guardar en local primero para respuesta instantánea
+    PGStorage.addOranteMundial(orante);
+
+    if (!this.initialized || !this.db) return;
     try {
       await this.db.collection("orantes").add({
         ...orante,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     } catch (err) {
-      console.warn("Error guardando orante en Firebase, usando local:", err.message);
-      PGStorage.addOranteMundial(orante);
+      console.warn("Error enviando orante a Firestore:", err.message);
     }
   },
 
-  // ── Peticiones en tiempo real (Colección: 'peticiones') ──────────────────────
+  // ── Peticiones en tiempo real ──
   subscribePeticiones(callback) {
-    if (!this.initialized) return null;
-    const unsub = this.db.collection("peticiones")
-      .orderBy("createdAt", "desc")
-      .limit(100)
-      .onSnapshot(snap => {
-        const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        callback(list);
-      }, err => {
-        console.warn("Firebase peticiones snapshot warning:", err.message);
-      });
-    this.listeners.push(unsub);
-    return unsub;
+    if (!this.initialized || !this.db) return null;
+    try {
+      const unsub = this.db.collection("peticiones")
+        .limit(100)
+        .onSnapshot(snap => {
+          if (!snap || snap.empty) {
+            callback(PGStorage.getPeticiones());
+          } else {
+            const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            callback(list);
+          }
+        }, err => {
+          console.warn("Firestore peticiones listener warning, usando datos locales:", err.message);
+          callback(PGStorage.getPeticiones());
+        });
+      this.listeners.push(unsub);
+      return unsub;
+    } catch (e) {
+      callback(PGStorage.getPeticiones());
+      return null;
+    }
   },
 
   async addPeticion(peticion) {
-    if (!this.initialized) {
-      const list = PGStorage.getPeticiones();
-      list.unshift(peticion);
-      PGStorage.savePeticiones(list);
-      return;
-    }
+    // Guardar en local primero
+    const list = PGStorage.getPeticiones();
+    list.unshift(peticion);
+    PGStorage.savePeticiones(list);
+
+    if (!this.initialized || !this.db) return;
     try {
       await this.db.collection("peticiones").add({
         ...peticion,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     } catch (err) {
-      console.warn("Error guardando petición en Firebase, usando local:", err.message);
-      const list = PGStorage.getPeticiones();
-      list.unshift(peticion);
-      PGStorage.savePeticiones(list);
+      console.warn("Error enviando petición a Firestore:", err.message);
     }
   },
 
   async incrementPrayCount(peticionId) {
-    if (!this.initialized) return PGStorage.addPrayCount(peticionId);
+    const newCount = PGStorage.addPrayCount(peticionId);
+    if (!this.initialized || !this.db) return newCount;
     try {
       await this.db.collection("peticiones").doc(peticionId).update({
         praysCount: firebase.firestore.FieldValue.increment(1)
       });
-    } catch (err) {
-      return PGStorage.addPrayCount(peticionId);
-    }
+    } catch (err) {}
+    return newCount;
   },
 
   unsubscribeAll() {

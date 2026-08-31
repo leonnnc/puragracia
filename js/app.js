@@ -106,11 +106,35 @@ let worldPrayerMarkers = {};
 let _peticionesCache = null;
 let _orantesCache = null;
 
-/** Obtiene peticiones: Firestore si hay Firebase, localStorage si no */
-function getPeticionesData() { return _peticionesCache || PGStorage.getPeticiones(); }
-/** Obtiene orantes: Firestore si hay Firebase, localStorage si no */
-function getOrantesData() { return _orantesCache || PGStorage.getOrantesMundiales(); }
+/** Obtiene peticiones garantizando que siempre haya datos en demo o en la nube */
+function getPeticionesData() {
+  if (_peticionesCache && Array.isArray(_peticionesCache) && _peticionesCache.length > 0) {
+    return _peticionesCache;
+  }
+  return PGStorage.getPeticiones();
+}
 
+/** Obtiene orantes garantizando que siempre haya puntos en el mapa mundial */
+function getOrantesData() {
+  if (_orantesCache && Array.isArray(_orantesCache) && _orantesCache.length > 0) {
+    return _orantesCache;
+  }
+  return PGStorage.getOrantesMundiales();
+}
+
+function updateAllCounters() {
+  const orantes = getOrantesData();
+  const peticiones = getPeticionesData();
+
+  const countEl = document.getElementById("orantes-activos-count");
+  if (countEl) countEl.textContent = orantes.length;
+
+  const mfCount = document.getElementById("mf-live-count");
+  if (mfCount) mfCount.textContent = orantes.length;
+
+  const totalNotas = document.getElementById("total-notas");
+  if (totalNotas) totalNotas.textContent = peticiones.length;
+}
 
 // ========================================================
 // 1. DETECCIÓN AUTOMÁTICA DE PAÍS
@@ -184,8 +208,7 @@ function openWorldPrayerFullscreen(currentOrante = null) {
   modal.hidden = false;
   document.body.style.overflow = "hidden"; // Evitar scroll de fondo
 
-  const orantes = getOrantesData();
-  document.getElementById("mf-live-count").textContent = orantes.length;
+  updateAllCounters();
 
   if (currentOrante) {
     document.getElementById("mf-user-name").textContent = `🙏 ${currentOrante.nombre}`;
@@ -211,10 +234,9 @@ function openWorldPrayerFullscreen(currentOrante = null) {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 18,
       }).addTo(mapWorldFullscreen);
-    } else {
-      mapWorldFullscreen.invalidateSize();
     }
 
+    mapWorldFullscreen.invalidateSize();
     renderFullscreenOrantesMarkers();
     renderFullscreenLiveStream();
 
@@ -230,6 +252,13 @@ function openWorldPrayerFullscreen(currentOrante = null) {
       mapWorldFullscreen.setView([20, 0], 2);
     }
   }, 100);
+
+  // Segundo pase para asegurar renderizado en todas las pantallas
+  setTimeout(() => {
+    if (mapWorldFullscreen) {
+      mapWorldFullscreen.invalidateSize();
+    }
+  }, 400);
 }
 
 function closeWorldPrayerFullscreen() {
@@ -246,8 +275,47 @@ function renderFullscreenOrantesMarkers() {
   worldPrayerMarkers = {};
 
   const orantes = getOrantesData();
-  document.getElementById("orantes-activos-count").textContent = orantes.length;
-  document.getElementById("mf-live-count").textContent = orantes.length;
+  updateAllCounters();
+
+  orantes.forEach((o) => {
+    if (!o.lat || !o.lng) return;
+
+    // Marcador pulsante en el plano de la tierra
+    const pulseIcon = L.divIcon({
+      className: "pulse-prayer-marker",
+      iconSize: [42, 42],
+      iconAnchor: [21, 21],
+      popupAnchor: [0, -22],
+      html: `
+        <div class="pulse-glow"></div>
+        <div class="pulse-pin">${o.flag || "🙏"}</div>
+      `
+    });
+
+    const marker = L.marker([o.lat, o.lng], { icon: pulseIcon }).addTo(mapWorldFullscreen);
+    
+    marker.bindPopup(`
+      <div style="font-family: Outfit, sans-serif; min-width: 220px; padding: 4px;">
+        <strong style="font-size: 1.15rem; display:block; color:#1c2422; margin-bottom: 2px;">
+          🙏 ${escapeHtml(o.nombre)}
+        </strong>
+        <div style="color:#2f6f62; font-weight:700; font-size:0.9rem; margin-bottom: 6px;">
+          ${o.flag || "📍"} ${escapeHtml(o.ciudad)}, ${escapeHtml(o.pais)}
+        </div>
+        <div style="font-size: 0.88rem; background:#fffaf0; padding: 8px 10px; border-radius: 8px; border:1px solid #e2d8c3; margin-bottom: 8px;">
+          <strong style="display:block; color:#7b1f18; font-size:0.75rem; text-transform:uppercase; margin-bottom:3px;">Solicitud de Oración:</strong>
+          "${escapeHtml(o.motivo || 'Orando por salud, paz y bendición')}"
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.75rem; color:#718096;">
+          <span>Conectado ${escapeHtml(o.time || 'en vivo')}</span>
+          <button type="button" style="background:#10b981; color:#fff; border:0; border-radius:4px; padding:3px 8px; font-weight:700; cursor:pointer;" onclick="alert('✨ ¡Te has unido en oración por ${escapeHtml(o.nombre)}!');">🙏 Orar</button>
+        </div>
+      </div>
+    `);
+
+    worldPrayerMarkers[o.id] = marker;
+  });
+}
 
   orantes.forEach((o) => {
     if (!o.lat || !o.lng) return;
@@ -1065,6 +1133,11 @@ document.addEventListener("DOMContentLoaded", () => {
   initGalleryNav();
   initLiveVoicePodio();
 
+  // Renderizar datos locales de inmediato (garantiza contadores y pizarra sin demoras)
+  updateAllCounters();
+  renderPizarra();
+  renderHoy();
+
   if (oranteActual) {
     const nameInput = document.getElementById("input-orante-name");
     if (nameInput) nameInput.value = oranteActual;
@@ -1077,6 +1150,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Peticiones en tiempo real
     PGFirebase.subscribePeticiones((list) => {
       _peticionesCache = list;
+      updateAllCounters();
       renderPizarra();
       renderHoy();
     });
@@ -1084,11 +1158,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Orantes mundiales en tiempo real
     PGFirebase.subscribeOrantes((list) => {
       _orantesCache = list;
-      // Actualizar contador visible
-      const countEl = document.getElementById("orantes-activos-count");
-      if (countEl) countEl.textContent = list.length;
-      const mfCount = document.getElementById("mf-live-count");
-      if (mfCount) mfCount.textContent = list.length;
+      updateAllCounters();
       // Si el mapa fullscreen está abierto, refrescar marcadores
       if (mapWorldFullscreen) {
         renderFullscreenOrantesMarkers();
@@ -1097,10 +1167,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   } else {
-    // Sin Firebase: cargar datos locales normalmente
-    console.info("📱 Modo offline: usando localStorage.");
-    renderPizarra();
-    renderHoy();
+    console.info("📱 Modo local activo: usando almacenamiento local.");
   }
 });
 
