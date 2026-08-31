@@ -102,6 +102,16 @@ let mapMeetingsMarkers = [];
 let mapWorldFullscreen = null;
 let worldPrayerMarkers = {};
 
+// Cache de datos en tiempo real (Firebase) o local
+let _peticionesCache = null;
+let _orantesCache = null;
+
+/** Obtiene peticiones: Firestore si hay Firebase, localStorage si no */
+function getPeticionesData() { return _peticionesCache || PGStorage.getPeticiones(); }
+/** Obtiene orantes: Firestore si hay Firebase, localStorage si no */
+function getOrantesData() { return _orantesCache || PGStorage.getOrantesMundiales(); }
+
+
 // ========================================================
 // 1. DETECCIÓN AUTOMÁTICA DE PAÍS
 // ========================================================
@@ -174,7 +184,7 @@ function openWorldPrayerFullscreen(currentOrante = null) {
   modal.hidden = false;
   document.body.style.overflow = "hidden"; // Evitar scroll de fondo
 
-  const orantes = PGStorage.getOrantesMundiales();
+  const orantes = getOrantesData();
   document.getElementById("mf-live-count").textContent = orantes.length;
 
   if (currentOrante) {
@@ -235,7 +245,7 @@ function renderFullscreenOrantesMarkers() {
   Object.values(worldPrayerMarkers).forEach(m => m.remove());
   worldPrayerMarkers = {};
 
-  const orantes = PGStorage.getOrantesMundiales();
+  const orantes = getOrantesData();
   document.getElementById("orantes-activos-count").textContent = orantes.length;
   document.getElementById("mf-live-count").textContent = orantes.length;
 
@@ -280,7 +290,7 @@ function renderFullscreenLiveStream() {
   const streamContainer = document.getElementById("lista-orantes-stream");
   if (!streamContainer) return;
 
-  const orantes = PGStorage.getOrantesMundiales();
+  const orantes = getOrantesData();
   streamContainer.innerHTML = orantes.map(o => `
     <div class="stream-orante-card" data-id="${o.id}">
       <strong>${o.flag || "📍"} ${escapeHtml(o.nombre)}</strong>
@@ -306,7 +316,7 @@ function renderFullscreenLiveStream() {
 // RENDERIZADO DE LA PIZARRA DE NOTAS
 function renderPizarra() {
   const board = document.getElementById("pizarra");
-  const peticiones = PGStorage.getPeticiones();
+  const peticiones = getPeticionesData();
   
   let filtered = [...peticiones].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   if (activeFilterCategory !== "ALL") {
@@ -341,9 +351,10 @@ function renderPizarra() {
       `;
 
       const prayBtn = el.querySelector(".btn-pray-join");
-      prayBtn.addEventListener("click", () => {
-        const newCount = PGStorage.addPrayCount(p.id);
-        prayBtn.querySelector(".pray-count").textContent = newCount;
+      prayBtn.addEventListener("click", async () => {
+        const newCount = await PGFirebase.incrementPrayCount(p.id);
+        const countSpan = prayBtn.querySelector(".pray-count");
+        if (countSpan && newCount) countSpan.textContent = newCount;
         prayBtn.style.transform = "scale(1.2)";
         setTimeout(() => { prayBtn.style.transform = "scale(1)"; }, 200);
       });
@@ -355,7 +366,7 @@ function renderPizarra() {
 
 // PETICIONES DE HOY
 function peticionesDeHoy() {
-  const peticiones = PGStorage.getPeticiones();
+  const peticiones = getPeticionesData();
   return peticiones.filter((p) => (p.createdAt || "").slice(0, 10) === hoyISO());
 }
 
@@ -592,7 +603,7 @@ function renderPaymentMethodContent(method) {
 // INICIALIZACIÓN DE FORMULARIOS Y EVENTOS
 function initForms() {
   // Petición Submit
-  document.getElementById("form-peticion").addEventListener("submit", (e) => {
+  document.getElementById("form-peticion").addEventListener("submit", async (e) => {
     e.preventDefault();
     const data = new FormData(e.target);
     const nombre = String(data.get("nombre") || "").trim();
@@ -604,23 +615,26 @@ function initForms() {
 
     if (!nombre || !texto) return;
 
-    const list = PGStorage.getPeticiones();
-    list.unshift({
+    const nuevaPeticion = {
       id: uid(),
       country: activeCountry,
-      category,
-      nombre,
-      texto,
-      correo,
-      telefono,
+      category, nombre, texto, correo, telefono,
       praysCount: 1,
       createdAt: new Date().toISOString(),
-    });
+    };
 
-    PGStorage.savePeticiones(list);
+    // Guardar en Firebase (si está activo) o localStorage
+    await PGFirebase.addPeticion(nuevaPeticion);
+
     e.target.reset();
-    renderPizarra();
-    renderHoy();
+
+    // Si no hay Firebase activo, refrescar manualmente desde localStorage
+    if (!PGFirebase.initialized) {
+      renderPizarra();
+      renderHoy();
+    }
+    // Si hay Firebase, la suscripción actualizará automáticamente
+
     document.getElementById("peticiones").scrollIntoView({ behavior: "smooth" });
   });
 
@@ -654,17 +668,15 @@ function initForms() {
 
     const nuevoOrante = {
       id: "o_" + Date.now(),
-      nombre,
-      ciudad,
-      pais,
-      motivo,
+      nombre, ciudad, pais, motivo,
       flag: foundCoords.flag || "📍",
-      lat: foundCoords.lat + (Math.random() * 0.08 - 0.04), // Jitter para no solapar marcadores exactos
+      lat: foundCoords.lat + (Math.random() * 0.08 - 0.04),
       lng: foundCoords.lng + (Math.random() * 0.08 - 0.04),
       time: "Ahora mismo"
     };
 
-    PGStorage.addOranteMundial(nuevoOrante);
+    // Guardar en Firebase (si está activo) o localStorage
+    PGFirebase.addOrante(nuevoOrante);
 
     // ABRIR PANTALLA 2 (MODAL FULLSCREEN DEL PLANO DE LA TIERRA)
     openWorldPrayerFullscreen(nuevoOrante);
@@ -737,16 +749,50 @@ function initGalleryNav() {
   });
 }
 
+
 document.addEventListener("DOMContentLoaded", () => {
   initNav();
   initForms();
   autoDetectCountry();
-  renderPizarra();
-  renderHoy();
   renderGaleria();
   initGalleryNav();
 
   if (oranteActual) {
-    document.getElementById("input-orante-name").value = oranteActual;
+    const nameInput = document.getElementById("input-orante-name");
+    if (nameInput) nameInput.value = oranteActual;
+  }
+
+  // ── Activar suscripciones Firebase en tiempo real si está disponible ────────
+  if (window.PGFirebase && PGFirebase.initialized) {
+    console.info("🔥 Firebase activo: suscribiendo peticiones y orantes en tiempo real.");
+
+    // Peticiones en tiempo real
+    PGFirebase.subscribePeticiones((list) => {
+      _peticionesCache = list;
+      renderPizarra();
+      renderHoy();
+    });
+
+    // Orantes mundiales en tiempo real
+    PGFirebase.subscribeOrantes((list) => {
+      _orantesCache = list;
+      // Actualizar contador visible
+      const countEl = document.getElementById("orantes-activos-count");
+      if (countEl) countEl.textContent = list.length;
+      const mfCount = document.getElementById("mf-live-count");
+      if (mfCount) mfCount.textContent = list.length;
+      // Si el mapa fullscreen está abierto, refrescar marcadores
+      if (mapWorldFullscreen) {
+        renderFullscreenOrantesMarkers();
+        renderFullscreenLiveStream();
+      }
+    });
+
+  } else {
+    // Sin Firebase: cargar datos locales normalmente
+    console.info("📱 Modo offline: usando localStorage.");
+    renderPizarra();
+    renderHoy();
   }
 });
+

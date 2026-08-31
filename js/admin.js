@@ -310,7 +310,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  document.getElementById("form-firebase-config").addEventListener("submit", (e) => {
+  document.getElementById("form-firebase-config").addEventListener("submit", async (e) => {
     e.preventDefault();
     const config = {
       enabled: document.getElementById("fb-enabled").checked,
@@ -323,11 +323,22 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     PGStorage.saveFirebaseConfig(config);
+
+    if (config.enabled && window.PGFirebase) {
+      const initialized = PGFirebase.init();
+      if (initialized) {
+        showToast("Configuración guardada y Firebase conectado para toda la web ✅", "success");
+      } else {
+        showToast("Configuración guardada en modo local", "info");
+      }
+    } else {
+      showToast("Configuración guardada en modo local (localStorage)", "info");
+    }
+
     updateFirebaseStatus(config);
-    showToast("Configuración de Firebase guardada", "success");
   });
 
-  document.getElementById("btn-test-firebase").addEventListener("click", () => {
+  document.getElementById("btn-test-firebase").addEventListener("click", async () => {
     const apiKey = document.getElementById("fb-api-key").value.trim();
     const projectId = document.getElementById("fb-project-id").value.trim();
 
@@ -337,9 +348,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     showToast("Probando conexión con Firebase Firestore...", "info");
-    setTimeout(() => {
-      showToast("¡Prueba de conexión exitosa con Firebase!", "success");
-    }, 1000);
+    
+    // Guardar temporalmente y probar
+    const tempConfig = {
+      enabled: true,
+      apiKey,
+      authDomain: document.getElementById("fb-auth-domain").value.trim(),
+      projectId,
+      storageBucket: document.getElementById("fb-storage-bucket").value.trim(),
+      messagingSenderId: document.getElementById("fb-messaging-id").value.trim(),
+      appId: document.getElementById("fb-app-id").value.trim()
+    };
+    PGStorage.saveFirebaseConfig(tempConfig);
+
+    if (window.PGFirebase) {
+      const initOk = PGFirebase.init();
+      if (initOk) {
+        const testRes = await PGFirebase.testConnection();
+        if (testRes.ok) {
+          showToast("¡Prueba de conexión exitosa con Firebase Firestore! ✅", "success");
+          updateFirebaseStatus(tempConfig);
+          return;
+        }
+      }
+    }
+
+    showToast("No se pudo conectar a Firebase. Revisa el projectId y apiKey.", "error");
   });
 
   // MODERACIÓN DE PETICIONES (OPCION 4)
