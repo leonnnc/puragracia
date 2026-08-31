@@ -1,15 +1,25 @@
 /**
- * Pura Gracia - Capa de Configuración Firebase y Almacenamiento Multi-País
- *
- * Cómo funciona:
- *  - Si las credenciales de Firebase están guardadas en localStorage, se
- *    inicializa Firebase automáticamente y TODA la app usa Firestore en
- *    tiempo real (peticiones, orantes mundiales, reuniones).
- *  - Sin credenciales, la app funciona 100% offline con localStorage.
- *  - El Admin CPanel guarda las credenciales → se activan para toda la web.
+ * ============================================================================
+ * PURA GRACIA - CONFIGURACIÓN CENTRAL DE FIREBASE & CAPA DE DATOS MULTI-PAÍS
+ * ============================================================================
+ * 
+ * INSTRUCCIONES PARA CONECTAR TU PROYECTO FIREBASE:
+ * 1. Ve a https://console.firebase.google.com/ y crea tu proyecto.
+ * 2. Activa "Firestore Database" en modo de prueba o con reglas públicas.
+ * 3. En Configuración del proyecto > Apps Web (</>), copia el objeto firebaseConfig.
+ * 4. Pega tus credenciales directamente en el objeto `FIREBASE_CONFIG` abajo:
  */
 
-// ─── Datos por defecto multi-país ─────────────────────────────────────────────
+const FIREBASE_CONFIG = {
+  apiKey: "",             // Ej: "AIzaSy..."
+  authDomain: "",         // Ej: "tu-proyecto.firebaseapp.com"
+  projectId: "",          // Ej: "tu-proyecto-id"
+  storageBucket: "",      // Ej: "tu-proyecto.appspot.com"
+  messagingSenderId: "",  // Ej: "1234567890"
+  appId: ""               // Ej: "1:1234567890:web:abcdef..."
+};
+
+// ─── Datos por defecto multi-país (fallback y estructura) ─────────────────────
 const PG_DEFAULTS = {
   activeCountry: "PE",
   countries: {
@@ -17,7 +27,7 @@ const PG_DEFAULTS = {
       code: "PE", name: "Perú", flag: "🇵🇪", currency: "PEN", currencySymbol: "S/.",
       whatsapp: "51987654321", defaultAmounts: [20, 50, 100], defaultAmountStep: 10, minAmount: 5,
       paymentMethods: [
-        { id: "yape",  name: "Yape",      icon: "🟣", account: "987 654 321",                      holder: "Pura Gracia Perú",             instructions: "Yapea al número o escáneael QR en la app." },
+        { id: "yape",  name: "Yape",      icon: "🟣", account: "987 654 321",                      holder: "Pura Gracia Perú",             instructions: "Yapea al número o escanea el QR en la app." },
         { id: "plin",  name: "Plin",      icon: "🔵", account: "987 654 321",                      holder: "Pura Gracia Perú",             instructions: "Transfiere por Plin (BBVA, Interbank o Scotiabank)." },
         { id: "bcp",   name: "BCP Soles", icon: "🏦", account: "193-98765432-0-12 (CCI: 0021930098765432012)", holder: "Asociación Pura Gracia", instructions: "Transferencia BCP o interbancaria en Soles." }
       ],
@@ -95,13 +105,7 @@ const PG_DEFAULTS = {
     { id: "adm_co",     email: "colombia@puragracia.org", name: "Administrador Colombia",          country: "CO",     password: "admin123", role: "country_admin" },
     { id: "adm_mx",     email: "mexico@puragracia.org",   name: "Administrador México",            country: "MX",     password: "admin123", role: "country_admin" },
     { id: "adm_ar",     email: "argentina@puragracia.org",name: "Administrador Argentina",         country: "AR",     password: "admin123", role: "country_admin" }
-  ],
-
-  firebase: {
-    enabled: false,
-    apiKey: "", authDomain: "", projectId: "",
-    storageBucket: "", messagingSenderId: "", appId: ""
-  }
+  ]
 };
 
 // ─── Almacenamiento Local (localStorage) ──────────────────────────────────────
@@ -112,8 +116,7 @@ const PGStorage = {
     PETICIONES:       "puraGracia.peticiones",
     ORANTES_MUNDIALES:"puraGracia.orantesMundiales",
     ADMINS:           "puraGracia.admins",
-    ADMIN_SESSION:    "puraGracia.adminSession",
-    FIREBASE_CONFIG:  "puraGracia.firebaseConfig"
+    ADMIN_SESSION:    "puraGracia.adminSession"
   },
 
   getCountries() {
@@ -176,16 +179,10 @@ const PGStorage = {
   setAdminSession(admin) {
     if (!admin) { sessionStorage.removeItem(this.KEYS.ADMIN_SESSION); }
     else { sessionStorage.setItem(this.KEYS.ADMIN_SESSION, JSON.stringify(admin)); }
-  },
-
-  getFirebaseConfig() {
-    try { const s = localStorage.getItem(this.KEYS.FIREBASE_CONFIG); if (s) return JSON.parse(s); } catch (e) {}
-    return PG_DEFAULTS.firebase;
-  },
-  saveFirebaseConfig(cfg) { localStorage.setItem(this.KEYS.FIREBASE_CONFIG, JSON.stringify(cfg)); }
+  }
 };
 
-// ─── Capa Firebase (se activa automáticamente si hay credenciales) ─────────────
+// ─── Capa Firebase Firestore en Tiempo Real ───────────────────────────────────
 const PGFirebase = {
   app: null,
   db: null,
@@ -193,63 +190,36 @@ const PGFirebase = {
   listeners: [],
 
   /**
-   * Intenta inicializar Firebase con la configuración guardada.
-   * Se llama automáticamente al cargar cualquier página.
-   * Si no hay credenciales válidas, no hace nada (fallback a localStorage).
+   * Inicializa Firebase automáticamente si se han configurado credenciales en FIREBASE_CONFIG.
    */
   init() {
-    const cfg = PGStorage.getFirebaseConfig();
-    if (!cfg || !cfg.enabled || !cfg.apiKey || !cfg.projectId) {
-      console.info("Firebase: sin credenciales configuradas. Usando localStorage.");
+    const cfg = FIREBASE_CONFIG;
+    if (!cfg || !cfg.apiKey || !cfg.projectId || cfg.apiKey === "TU_API_KEY") {
+      console.info("ℹ️ Firebase: sin credenciales configuradas en js/firebase-config.js. Usando modo local.");
       return false;
     }
     try {
-      // Evitar doble inicialización
       if (typeof firebase === "undefined") {
-        console.warn("Firebase SDK no cargado todavía.");
+        console.warn("⚠️ Firebase SDK no disponible en el navegador.");
         return false;
       }
       if (!firebase.apps.length) {
-        this.app = firebase.initializeApp({
-          apiKey:            cfg.apiKey,
-          authDomain:        cfg.authDomain,
-          projectId:         cfg.projectId,
-          storageBucket:     cfg.storageBucket,
-          messagingSenderId: cfg.messagingSenderId,
-          appId:             cfg.appId
-        });
+        this.app = firebase.initializeApp(cfg);
       } else {
         this.app = firebase.apps[0];
       }
       this.db = firebase.firestore();
       this.initialized = true;
-      console.info("✅ Firebase conectado al proyecto:", cfg.projectId);
+      console.info("🔥 Firebase conectado exitosamente al proyecto:", cfg.projectId);
       return true;
     } catch (err) {
-      console.error("Firebase: error al inicializar →", err.message);
+      console.error("❌ Error al inicializar Firebase:", err.message);
       this.initialized = false;
       return false;
     }
   },
 
-  /** Prueba la conexión intentando leer un documento de prueba */
-  async testConnection() {
-    if (!this.initialized || !this.db) return { ok: false, msg: "Firebase no inicializado." };
-    try {
-      await this.db.collection("_test_").doc("ping").set({ ts: Date.now() });
-      await this.db.collection("_test_").doc("ping").delete();
-      return { ok: true, msg: "Conexión exitosa con Firestore ✅" };
-    } catch (err) {
-      return { ok: false, msg: "Error: " + err.message };
-    }
-  },
-
-  // ── Orantes Mundiales en tiempo real ────────────────────────────────────────
-  /**
-   * Suscribe a la colección `orantes` en Firestore.
-   * @param {function} callback - recibe el array de orantes actualizado
-   * @returns función para cancelar la suscripción
-   */
+  // ── Orantes Mundiales en tiempo real (Colección: 'orantes') ──────────────────
   subscribeOrantes(callback) {
     if (!this.initialized) return null;
     const unsub = this.db.collection("orantes")
@@ -259,7 +229,7 @@ const PGFirebase = {
         const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         callback(list);
       }, err => {
-        console.warn("Firebase orantes snapshot error:", err.message);
+        console.warn("Firebase orantes snapshot warning:", err.message);
       });
     this.listeners.push(unsub);
     return unsub;
@@ -273,12 +243,12 @@ const PGFirebase = {
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     } catch (err) {
-      console.warn("Firebase addOrante fallback localStorage:", err.message);
+      console.warn("Error guardando orante en Firebase, usando local:", err.message);
       PGStorage.addOranteMundial(orante);
     }
   },
 
-  // ── Peticiones de Oración en tiempo real ────────────────────────────────────
+  // ── Peticiones en tiempo real (Colección: 'peticiones') ──────────────────────
   subscribePeticiones(callback) {
     if (!this.initialized) return null;
     const unsub = this.db.collection("peticiones")
@@ -288,7 +258,7 @@ const PGFirebase = {
         const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         callback(list);
       }, err => {
-        console.warn("Firebase peticiones snapshot error:", err.message);
+        console.warn("Firebase peticiones snapshot warning:", err.message);
       });
     this.listeners.push(unsub);
     return unsub;
@@ -307,7 +277,7 @@ const PGFirebase = {
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     } catch (err) {
-      console.warn("Firebase addPeticion fallback localStorage:", err.message);
+      console.warn("Error guardando petición en Firebase, usando local:", err.message);
       const list = PGStorage.getPeticiones();
       list.unshift(peticion);
       PGStorage.savePeticiones(list);
@@ -325,19 +295,17 @@ const PGFirebase = {
     }
   },
 
-  // ── Cleanup ─────────────────────────────────────────────────────────────────
   unsubscribeAll() {
     this.listeners.forEach(fn => { try { fn(); } catch (e) {} });
     this.listeners = [];
   }
 };
 
-// ─── Inicializar Firebase automáticamente al cargar cualquier página ───────────
+// Auto-inicializar al cargar
 (function autoInit() {
   if (typeof firebase !== "undefined") {
     PGFirebase.init();
   } else {
-    // SDK aún no cargado → esperar al DOMContentLoaded
     document.addEventListener("DOMContentLoaded", () => {
       if (typeof firebase !== "undefined") PGFirebase.init();
     });
@@ -345,6 +313,7 @@ const PGFirebase = {
 })();
 
 // Exportar al ámbito global
-window.PG_DEFAULTS = PG_DEFAULTS;
-window.PGStorage   = PGStorage;
-window.PGFirebase  = PGFirebase;
+window.FIREBASE_CONFIG = FIREBASE_CONFIG;
+window.PG_DEFAULTS     = PG_DEFAULTS;
+window.PGStorage       = PGStorage;
+window.PGFirebase      = PGFirebase;

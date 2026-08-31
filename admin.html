@@ -66,27 +66,22 @@
       <ul class="nav-tabs">
         <li>
           <button class="nav-tab-btn active" data-tab="tab-paises">
-            <span>🌐</span> 1. Países & Ciudades
-          </button>
-        </li>
-        <li>
-          <button class="nav-tab-btn" data-tab="tab-firebase">
-            <span>🔥</span> 2. Config Firebase
+            <span>🌐</span> 1. Países & Sedes
           </button>
         </li>
         <li>
           <button class="nav-tab-btn" data-tab="tab-donaciones">
-            <span>💳</span> 3. Cuentas Donación
+            <span>💳</span> 2. Cuentas Donación
           </button>
         </li>
         <li>
           <button class="nav-tab-btn" data-tab="tab-peticiones">
-            <span>📜</span> 4. Peticiones & Oración
+            <span>📜</span> 3. Peticiones & Oración
           </button>
         </li>
         <li>
           <button class="nav-tab-btn" data-tab="tab-admins">
-            <span>👥</span> 5. Administradores
+            <span>👥</span> 4. Administradores
           </button>
         </li>
       </ul>
@@ -239,78 +234,7 @@
           </div>
         </section>
 
-        <!-- TAB 2: CONFIGURACIÓN FIREBASE (OPCIÓN 2) -->
-        <section id="tab-firebase" class="tab-panel">
-          <div class="section-header">
-            <div>
-              <h2>Configuración de Firebase Firestore</h2>
-              <p>Conecta una base de datos en la nube para sincronizar peticiones y reuniones en tiempo real entre todos los países.</p>
-            </div>
-          </div>
-
-          <div class="status-indicator" id="firebase-status-box">
-            <span class="status-dot local" id="firebase-status-dot"></span>
-            <div>
-              <strong id="firebase-status-title">Modo Local Activo (localStorage)</strong>
-              <div style="font-size: 0.82rem; color: var(--admin-muted);" id="firebase-status-desc">
-                Los datos se guardan en el navegador de prueba. Activa Firebase abajo para sincronización en la nube.
-              </div>
-            </div>
-          </div>
-
-          <div class="admin-card" style="max-width: 800px;">
-            <h3><span>🔥</span> Credenciales del Proyecto Firebase</h3>
-            <form id="form-firebase-config">
-              <div class="form-group" style="margin-bottom: 1.5rem;">
-                <label class="switch-label">
-                  <input type="checkbox" id="fb-enabled" class="switch-input" />
-                  <span class="switch-track"></span>
-                  <strong>Habilitar Conexión en la Nube con Firebase Firestore</strong>
-                </label>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="admin-label">apiKey</label>
-                  <input type="text" id="fb-api-key" class="admin-input" placeholder="AIzaSyA..." />
-                </div>
-                <div class="form-group">
-                  <label class="admin-label">authDomain</label>
-                  <input type="text" id="fb-auth-domain" class="admin-input" placeholder="tu-app.firebaseapp.com" />
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="admin-label">projectId</label>
-                  <input type="text" id="fb-project-id" class="admin-input" placeholder="tu-proyecto-id" />
-                </div>
-                <div class="form-group">
-                  <label class="admin-label">storageBucket</label>
-                  <input type="text" id="fb-storage-bucket" class="admin-input" placeholder="tu-app.appspot.com" />
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="admin-label">messagingSenderId</label>
-                  <input type="text" id="fb-messaging-id" class="admin-input" placeholder="1234567890" />
-                </div>
-                <div class="form-group">
-                  <label class="admin-label">appId</label>
-                  <input type="text" id="fb-app-id" class="admin-input" placeholder="1:1234567890:web:abcdef" />
-                </div>
-              </div>
-
-              <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                <button type="submit" class="btn-admin btn-admin-primary">Guardar Configuración</button>
-                <button type="button" class="btn-admin btn-admin-ghost" id="btn-test-firebase">Probar Conexión</button>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        <!-- TAB 3: CUENTAS DE DONACION (OPCIÓN 3) -->
+        <!-- TAB 2: CUENTAS DE DONACION (OPCIÓN 2) -->
         <section id="tab-donaciones" class="tab-panel">
           <div class="section-header">
             <div>

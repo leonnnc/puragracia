@@ -114,7 +114,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     refreshCountryData();
-    initFirebaseTab();
     refreshPetitions();
     refreshAdminsTable();
   }
@@ -280,103 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
     refreshCountryData();
   });
 
-  // FIREBASE CONFIG TAB (OPCION 2)
-  function initFirebaseTab() {
-    const config = PGStorage.getFirebaseConfig();
-    document.getElementById("fb-enabled").checked = Boolean(config.enabled);
-    document.getElementById("fb-api-key").value = config.apiKey || "";
-    document.getElementById("fb-auth-domain").value = config.authDomain || "";
-    document.getElementById("fb-project-id").value = config.projectId || "";
-    document.getElementById("fb-storage-bucket").value = config.storageBucket || "";
-    document.getElementById("fb-messaging-id").value = config.messagingSenderId || "";
-    document.getElementById("fb-app-id").value = config.appId || "";
-
-    updateFirebaseStatus(config);
-  }
-
-  function updateFirebaseStatus(config) {
-    const dot = document.getElementById("firebase-status-dot");
-    const title = document.getElementById("firebase-status-title");
-    const desc = document.getElementById("firebase-status-desc");
-
-    if (config.enabled && config.projectId) {
-      dot.className = "status-dot online";
-      title.textContent = `Firebase Conectado (${config.projectId})`;
-      desc.textContent = "La aplicación está sincronizando datos con Firestore en tiempo real.";
-    } else {
-      dot.className = "status-dot local";
-      title.textContent = "Modo Local Activo (localStorage)";
-      desc.textContent = "Almacenamiento en navegador activo. Puedes ingresar tus credenciales y habilitar Firebase.";
-    }
-  }
-
-  document.getElementById("form-firebase-config").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const config = {
-      enabled: document.getElementById("fb-enabled").checked,
-      apiKey: document.getElementById("fb-api-key").value.trim(),
-      authDomain: document.getElementById("fb-auth-domain").value.trim(),
-      projectId: document.getElementById("fb-project-id").value.trim(),
-      storageBucket: document.getElementById("fb-storage-bucket").value.trim(),
-      messagingSenderId: document.getElementById("fb-messaging-id").value.trim(),
-      appId: document.getElementById("fb-app-id").value.trim()
-    };
-
-    PGStorage.saveFirebaseConfig(config);
-
-    if (config.enabled && window.PGFirebase) {
-      const initialized = PGFirebase.init();
-      if (initialized) {
-        showToast("Configuración guardada y Firebase conectado para toda la web ✅", "success");
-      } else {
-        showToast("Configuración guardada en modo local", "info");
-      }
-    } else {
-      showToast("Configuración guardada en modo local (localStorage)", "info");
-    }
-
-    updateFirebaseStatus(config);
-  });
-
-  document.getElementById("btn-test-firebase").addEventListener("click", async () => {
-    const apiKey = document.getElementById("fb-api-key").value.trim();
-    const projectId = document.getElementById("fb-project-id").value.trim();
-
-    if (!projectId || !apiKey) {
-      showToast("Por favor ingresa al menos el apiKey y projectId para probar", "error");
-      return;
-    }
-
-    showToast("Probando conexión con Firebase Firestore...", "info");
-    
-    // Guardar temporalmente y probar
-    const tempConfig = {
-      enabled: true,
-      apiKey,
-      authDomain: document.getElementById("fb-auth-domain").value.trim(),
-      projectId,
-      storageBucket: document.getElementById("fb-storage-bucket").value.trim(),
-      messagingSenderId: document.getElementById("fb-messaging-id").value.trim(),
-      appId: document.getElementById("fb-app-id").value.trim()
-    };
-    PGStorage.saveFirebaseConfig(tempConfig);
-
-    if (window.PGFirebase) {
-      const initOk = PGFirebase.init();
-      if (initOk) {
-        const testRes = await PGFirebase.testConnection();
-        if (testRes.ok) {
-          showToast("¡Prueba de conexión exitosa con Firebase Firestore! ✅", "success");
-          updateFirebaseStatus(tempConfig);
-          return;
-        }
-      }
-    }
-
-    showToast("No se pudo conectar a Firebase. Revisa el projectId y apiKey.", "error");
-  });
-
-  // MODERACIÓN DE PETICIONES (OPCION 4)
+  // MODERACIÓN DE PETICIONES (OPCION 3)
   function refreshPetitions() {
     const list = PGStorage.getPeticiones();
     const filterCat = document.getElementById("filter-petition-category").value;
