@@ -481,6 +481,7 @@ function enviarReflexion() {
 // GALERÍA
 function renderGaleria() {
   const galeria = document.getElementById("galeria");
+  if (!galeria) return;
   galeria.replaceChildren(
     ...FOTOS.map((f) => {
       const fig = document.createElement("figure");
@@ -490,6 +491,30 @@ function renderGaleria() {
     })
   );
 }
+
+// NAVEGACIÓN DE GALERÍA (flechas prev/next)
+function initGalleryNav() {
+  const galeria = document.getElementById("galeria");
+  const prevBtn = document.querySelector(".gallery-nav.prev");
+  const nextBtn = document.querySelector(".gallery-nav.next");
+  if (!galeria || !prevBtn || !nextBtn) return;
+
+  let currentIndex = 0;
+
+  function goTo(index) {
+    const fotos = galeria.querySelectorAll(".foto");
+    if (!fotos.length) return;
+    currentIndex = ((index % fotos.length) + fotos.length) % fotos.length;
+    galeria.scrollTo({ left: fotos[currentIndex].offsetLeft, behavior: "smooth" });
+  }
+
+  prevBtn.addEventListener("click", () => goTo(currentIndex - 1));
+  nextBtn.addEventListener("click", () => goTo(currentIndex + 1));
+
+  // Auto-avance cada 5 segundos
+  setInterval(() => goTo(currentIndex + 1), 5000);
+}
+
 
 // MAPA DE REUNIONES LOCALES
 function updateMeetingsAndMap() {
