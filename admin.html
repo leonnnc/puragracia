@@ -177,7 +177,7 @@
               <h2>Moderación de Peticiones y Oración</h2>
               <p>Revisa todas las peticiones recibidas, responde por WhatsApp o modera notas.</p>
             </div>
-            <div style="display: flex; gap: 0.8rem;">
+            <div style="display: flex; gap: 0.8rem; align-items: center;">
               <select id="filter-petition-category" class="admin-select" style="min-width: 140px;">
                 <option value="ALL">Todas las Categorías</option>
                 <option value="Salud">Salud</option>
@@ -186,6 +186,9 @@
                 <option value="Gratitud">Gratitud</option>
                 <option value="Paz">Paz</option>
               </select>
+              <button type="button" id="btn-purge-petitions" class="btn-admin btn-admin-danger btn-admin-sm" title="Eliminar todas las peticiones de prueba acumuladas">
+                🗑️ Limpiar Todo
+              </button>
             </div>
           </div>
 

@@ -335,6 +335,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("filter-petition-category").addEventListener("change", refreshPetitions);
 
+  // Botón para purgar todas las peticiones acumuladas
+  const btnPurgePet = document.getElementById("btn-purge-petitions");
+  if (btnPurgePet) {
+    btnPurgePet.addEventListener("click", async () => {
+      if (confirm("¿Estás seguro de que deseas eliminar TODAS las peticiones registradas para dejar la pizarra completamente limpia?")) {
+        PGStorage.savePeticiones([]);
+        if (window.PGFirebase && PGFirebase.initialized && PGFirebase.db) {
+          try {
+            const snap = await PGFirebase.db.collection("peticiones").get();
+            const batch = PGFirebase.db.batch();
+            snap.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+          } catch (e) {
+            console.warn("Error limpiando Firestore:", e);
+          }
+        }
+        showToast("Todas las peticiones han sido eliminadas correctamente", "success");
+        refreshPetitions();
+      }
+    });
+  }
+
   // TABLA DE ADMINS (OPCION 5)
   function refreshAdminsTable() {
     const admins = PGStorage.getAdmins();

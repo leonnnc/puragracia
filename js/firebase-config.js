@@ -123,9 +123,7 @@ const PGStorage = {
       const s = localStorage.getItem(this.KEYS.ORANTES_MUNDIALES);
       if (s) {
         const parsed = JSON.parse(s);
-        if (Array.isArray(parsed)) {
-          return parsed.filter(o => o && o.id && !/^o[1-9]$/.test(o.id));
-        }
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) {}
     return [];
@@ -143,9 +141,7 @@ const PGStorage = {
       const s = localStorage.getItem(this.KEYS.PETICIONES);
       if (s) {
         const parsed = JSON.parse(s);
-        if (Array.isArray(parsed)) {
-          return parsed.filter(p => p && p.id && !/^p[1-9]$/.test(p.id));
-        }
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) {}
     return [];
@@ -175,6 +171,21 @@ const PGStorage = {
   }
 };
 
+// ─── PURGA AUTOMÁTICA ÚNICA DE DATOS DE PRUEBA PREVIOS EN LOCALSTORAGE ─────────
+(function purgeLegacyTestData() {
+  const PROD_RESET_KEY = "puraGracia.production_fresh_v3";
+  try {
+    if (!localStorage.getItem(PROD_RESET_KEY)) {
+      localStorage.removeItem("puraGracia.peticiones");
+      localStorage.removeItem("puraGracia.orantesMundiales");
+      localStorage.removeItem("puraGracia.orantes");
+      sessionStorage.removeItem("puraGracia.orantes");
+      localStorage.setItem(PROD_RESET_KEY, "true");
+      console.info("🧹 Purgados datos de prueba previos para producción limpia.");
+    }
+  } catch (e) {}
+})();
+
 // ─── Capa Firebase Firestore en Tiempo Real con Fallback Automático ───────────
 const PGFirebase = {
   app: null,
@@ -197,11 +208,56 @@ const PGFirebase = {
       this.db = firebase.firestore();
       this.initialized = true;
       console.info("🔥 Firebase conectado al proyecto:", cfg.projectId);
+
+      // Si es el primer arranque en producción, purgar documentos de prueba antiguos de Firestore
+      this.purgeFirestoreTestDocs();
+
       return true;
     } catch (err) {
       console.error("Firebase init error:", err.message);
       this.initialized = false;
       return false;
+    }
+  },
+
+  /** Elimina de Firestore los documentos de prueba antiguos acumulados durante desarrollo */
+  async purgeFirestoreTestDocs() {
+    if (!this.initialized || !this.db) return;
+    const PURGE_FS_KEY = "puraGracia.firestore_purged_v3";
+    try {
+      if (localStorage.getItem(PURGE_FS_KEY)) return;
+
+      // Purgar orantes de prueba
+      const orantesSnap = await this.db.collection("orantes").get();
+      const batch = this.db.batch();
+      let count = 0;
+
+      orantesSnap.forEach(doc => {
+        const d = doc.data();
+        // Eliminar si es prueba o id legacy
+        if (doc.id.startsWith("o_") || doc.id.startsWith("o") || (d.nombre && /leonardo|test|prueba|pastor david|maria|carlos/i.test(d.nombre))) {
+          batch.delete(doc.ref);
+          count++;
+        }
+      });
+
+      // Purgar peticiones de prueba antiguas
+      const peticionesSnap = await this.db.collection("peticiones").get();
+      peticionesSnap.forEach(doc => {
+        const d = doc.data();
+        if (doc.id.startsWith("p_") || doc.id.startsWith("p") || (d.nombre && /leonardo|maria|andrés|lucia|lucía|camilo|elena|sofia|sofía/i.test(d.nombre))) {
+          batch.delete(doc.ref);
+          count++;
+        }
+      });
+
+      if (count > 0) {
+        await batch.commit();
+        console.info(`🧹 Purgados ${count} documentos de prueba en Firestore.`);
+      }
+      localStorage.setItem(PURGE_FS_KEY, "true");
+    } catch (e) {
+      console.warn("Firestore purge warning:", e.message);
     }
   },
 
@@ -231,7 +287,6 @@ const PGFirebase = {
   },
 
   async addOrante(orante) {
-    // Guardar en local primero para respuesta instantánea
     PGStorage.addOranteMundial(orante);
 
     if (!this.initialized || !this.db) return;
@@ -271,7 +326,6 @@ const PGFirebase = {
   },
 
   async addPeticion(peticion) {
-    // Guardar en local primero
     const list = PGStorage.getPeticiones();
     list.unshift(peticion);
     PGStorage.savePeticiones(list);
@@ -318,5 +372,8 @@ const PGFirebase = {
 // Exportar al ámbito global
 window.FIREBASE_CONFIG = FIREBASE_CONFIG;
 window.PG_DEFAULTS     = PG_DEFAULTS;
+window.PGStorage       = PGStorage;
+window.PGFirebase      = PGFirebase;
+
 window.PGStorage       = PGStorage;
 window.PGFirebase      = PGFirebase;
