@@ -122,6 +122,28 @@ function getOrantesData() {
   return PGStorage.getOrantesMundiales();
 }
 
+/** Renderiza el panel de intercesores conectados visible en la sección principal de oración */
+function renderConnectedPanel() {
+  const grid = document.getElementById("connected-grid");
+  const countEl = document.getElementById("connected-count");
+  if (!grid) return;
+
+  const orantes = getOrantesData();
+  if (countEl) countEl.textContent = orantes.length;
+
+  grid.innerHTML = orantes.map((o, i) => `
+    <div class="connected-card" style="animation-delay:${i * 0.05}s;">
+      <div class="connected-card-flag">${o.flag || "🙏"}</div>
+      <div class="connected-card-info">
+        <div class="connected-card-name">🙏 ${escapeHtml(o.nombre)}</div>
+        <div class="connected-card-location">${escapeHtml(o.ciudad)}, ${escapeHtml(o.pais)}</div>
+        <div class="connected-card-motivo">"${escapeHtml(o.motivo || 'En oración')}"</div>
+        <div class="connected-card-time">⏱ ${escapeHtml(o.time || 'Conectado en vivo')}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
 function updateAllCounters() {
   const orantes = getOrantesData();
   const peticiones = getPeticionesData();
@@ -134,6 +156,9 @@ function updateAllCounters() {
 
   const totalNotas = document.getElementById("total-notas");
   if (totalNotas) totalNotas.textContent = peticiones.length;
+
+  // Actualizar panel de conectados visible en la sección principal
+  renderConnectedPanel();
 }
 
 // ========================================================
@@ -344,7 +369,9 @@ function renderFullscreenLiveStream() {
   });
 }
 
+
 // RENDERIZADO DE LA PIZARRA DE NOTAS
+
 function renderPizarra() {
   const board = document.getElementById("pizarra");
   const peticiones = getPeticionesData();
