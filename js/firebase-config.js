@@ -123,7 +123,9 @@ const PGStorage = {
       const s = localStorage.getItem(this.KEYS.ORANTES_MUNDIALES);
       if (s) {
         const parsed = JSON.parse(s);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed)) {
+          return parsed.filter(o => o && o.id && !/^o[1-9]$/.test(o.id));
+        }
       }
     } catch (e) {}
     return [];
@@ -141,7 +143,9 @@ const PGStorage = {
       const s = localStorage.getItem(this.KEYS.PETICIONES);
       if (s) {
         const parsed = JSON.parse(s);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed)) {
+          return parsed.filter(p => p && p.id && !/^p[1-9]$/.test(p.id));
+        }
       }
     } catch (e) {}
     return [];
