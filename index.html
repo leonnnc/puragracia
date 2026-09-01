@@ -84,12 +84,71 @@
       <!-- FORMULARIO DE PETICIÓN -->
       <section id="escribir" class="section form-section">
         <div class="container split">
-          <div>
+          <div class="petition-info-col">
             <p class="eyebrow">Déjanos tu petición</p>
             <h2>Escríbenos lo que pesa en tu corazón</h2>
             <p class="muted">
               Tu petición se publica en la pizarra comunitaria para que intercesores de todo el mundo oren por ti. Si deseas una respuesta pastoral, déjanos tu WhatsApp.
             </p>
+
+            <!-- Categorías rápidas para seleccionar -->
+            <div class="quick-category-picker">
+              <span class="qcp-label">Toca una categoría para seleccionarla en el formulario:</span>
+              <div class="qcp-chips" id="quick-category-chips">
+                <button type="button" class="qcp-chip" data-cat="Salud">🏥 Salud</button>
+                <button type="button" class="qcp-chip" data-cat="Familia">👨‍👩‍👧 Familia</button>
+                <button type="button" class="qcp-chip" data-cat="Trabajo">💼 Trabajo</button>
+                <button type="button" class="qcp-chip" data-cat="Gratitud">✨ Gratitud</button>
+                <button type="button" class="qcp-chip" data-cat="Paz">🕊️ Paz</button>
+              </div>
+            </div>
+
+            <!-- Beneficios / Qué sucede al enviar tu petición -->
+            <div class="petition-perks-grid">
+              <div class="perk-card">
+                <span class="perk-icon">🌐</span>
+                <div>
+                  <strong>Red Global Activa</strong>
+                  <p>Hermanos e intercesores en más de 8 países clamarán en unidad por tu motivo.</p>
+                </div>
+              </div>
+              <div class="perk-card">
+                <span class="perk-icon">💬</span>
+                <div>
+                  <strong>Respuesta Pastoral</strong>
+                  <p>Si dejas tu WhatsApp, nuestro equipo pastoral te escribirá una reflexión y oración guiada.</p>
+                </div>
+              </div>
+              <div class="perk-card">
+                <span class="perk-icon">🔒</span>
+                <div>
+                  <strong>Seguro y Respetuoso</strong>
+                  <p>Puedes usar solo tu primer nombre o compartir tu petición con total confianza.</p>
+                </div>
+              </div>
+              <div class="perk-card">
+                <span class="perk-icon">🕊️</span>
+                <div>
+                  <strong>100% Gratuito</strong>
+                  <p>El ministerio de intercesión es un servicio de fe y gracia para toda la comunidad.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cita bíblica de esperanza -->
+            <div class="bible-promise-card">
+              <div class="bible-quote-icon">❝</div>
+              <p class="bible-text">
+                "Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias."
+              </p>
+              <span class="bible-ref">Filipenses 4:6</span>
+            </div>
+
+            <!-- Enlaces directos -->
+            <div class="petition-links-row">
+              <a href="#peticiones" class="btn btn-small btn-ghost">📜 Ver notas en la Pizarra</a>
+              <a href="#oracion" class="btn btn-small btn-ghost">🌍 Altar Mundial en Vivo</a>
+            </div>
           </div>
           <form id="form-peticion" class="card form-card">
             <div class="form-row-2">
