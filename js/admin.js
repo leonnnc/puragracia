@@ -62,15 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // DEMO PILLS PARA LOGIN RAPIDO
-  document.querySelectorAll(".demo-pill").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.getElementById("login-email").value = btn.dataset.email;
-      document.getElementById("login-password").value = btn.dataset.pass;
-      formLogin.dispatchEvent(new Event("submit"));
-    });
-  });
-
   // LOGOUT
   btnLogout.addEventListener("click", () => {
     PGStorage.setAdminSession(null);

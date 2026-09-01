@@ -131,6 +131,16 @@ function renderConnectedPanel() {
   const orantes = getOrantesData();
   if (countEl) countEl.textContent = orantes.length;
 
+  if (!orantes.length) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 2rem 1rem; color: #a0aec0; font-size: 0.9rem;">
+        <span style="font-size: 1.6rem; display: block; margin-bottom: 0.4rem;">🙏</span>
+        Aún no hay intercesores en la lista de hoy. ¡Sé el primero en unirte al Altar Mundial completando el formulario de arriba!
+      </div>
+    `;
+    return;
+  }
+
   grid.innerHTML = orantes.map((o, i) => `
     <div class="connected-card" style="animation-delay:${i * 0.05}s;">
       <div class="connected-card-flag">${o.flag || "🙏"}</div>
@@ -143,6 +153,7 @@ function renderConnectedPanel() {
     </div>
   `).join("");
 }
+
 
 function updateAllCounters() {
   const orantes = getOrantesData();
@@ -347,6 +358,15 @@ function renderFullscreenLiveStream() {
   if (!streamContainer) return;
 
   const orantes = getOrantesData();
+  if (!orantes.length) {
+    streamContainer.innerHTML = `
+      <div style="padding: 0.5rem 1rem; color: #94a3b8; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🕊️</span> <span>Sala de oración abierta. Al unirte al Altar Mundial, tu petición se mostrará aquí en vivo.</span>
+      </div>
+    `;
+    return;
+  }
+
   streamContainer.innerHTML = orantes.map(o => `
     <div class="stream-orante-card" data-id="${o.id}">
       <strong>${o.flag || "📍"} ${escapeHtml(o.nombre)}</strong>
@@ -354,6 +374,7 @@ function renderFullscreenLiveStream() {
       <span class="motivo-preview">· "${escapeHtml(o.motivo || 'En oración')}"</span>
     </div>
   `).join("");
+
 
   streamContainer.querySelectorAll(".stream-orante-card").forEach(card => {
     card.addEventListener("click", () => {
@@ -847,22 +868,9 @@ function initNav() {
 const SPEAKER_DURATION_SECONDS = 300; // 5 minutos exactos por ponente (300 seg)
 
 let liveSpeakerState = {
-  activeSpeaker: {
-    id: "spk_1",
-    nombre: "Pastor David",
-    ciudad: "Bogotá",
-    pais: "Colombia",
-    flag: "🇨🇴",
-    motivo: "Por avivamiento espiritual, fortaleza en la juventud y restauración de familias",
-    lat: 4.7110,
-    lng: -74.0721
-  },
-  queue: [
-    { id: "q1", nombre: "María Isabel", ciudad: "Medellín", pais: "Colombia", flag: "🇨🇴", motivo: "Por provisión en los emprendimientos y salud para mi madre", lat: 6.2442, lng: -75.5812 },
-    { id: "q2", nombre: "Carlos Mendoza", ciudad: "Arequipa", pais: "Perú", flag: "🇵🇪", motivo: "Por restauración en los matrimonios de mi congregación", lat: -16.4090, lng: -71.5375 },
-    { id: "q3", nombre: "Fernanda R.", ciudad: "Ciudad de México", pais: "México", flag: "🇲🇽", motivo: "Pidiendo protección divina y paz en las familias", lat: 19.4326, lng: -99.1332 }
-  ],
-  timeRemaining: 275, // Segundos restantes del ponente actual
+  activeSpeaker: null, // Producción: Podio libre hasta que un intercesor pida el micrófono
+  queue: [],           // Cola limpia
+  timeRemaining: 0,
   timerInterval: null,
   isListening: false,
   isTransmitting: false,
@@ -897,11 +905,11 @@ function initLiveVoicePodio() {
   });
 
   renderSpeakerPodioUI();
-  startSpeakerTimer();
 }
 
 function startSpeakerTimer() {
   if (liveSpeakerState.timerInterval) clearInterval(liveSpeakerState.timerInterval);
+  if (!liveSpeakerState.activeSpeaker) return;
 
   liveSpeakerState.timerInterval = setInterval(() => {
     if (liveSpeakerState.timeRemaining > 0) {
@@ -919,10 +927,14 @@ function updateSpeakerTimerUI() {
   const progressFill = document.getElementById("lvp-progress-fill");
 
   if (timerDisplay) {
-    timerDisplay.textContent = formatTimerSeconds(liveSpeakerState.timeRemaining);
+    timerDisplay.textContent = liveSpeakerState.activeSpeaker ? formatTimerSeconds(liveSpeakerState.timeRemaining) : "--:--";
   }
 
   if (progressFill) {
+    if (!liveSpeakerState.activeSpeaker) {
+      progressFill.style.width = "0%";
+      return;
+    }
     const percentage = (liveSpeakerState.timeRemaining / SPEAKER_DURATION_SECONDS) * 100;
     progressFill.style.width = `${Math.max(0, percentage)}%`;
 
@@ -959,9 +971,15 @@ function nextSpeakerInQueue() {
         setTimeout(() => { worldPrayerMarkers[nextSpeaker.id].openPopup(); }, 1600);
       }
     }
+    startSpeakerTimer();
   } else {
-    // Si no hay nadie en fila, reiniciar timer de 5 min con el ponente actual
-    liveSpeakerState.timeRemaining = SPEAKER_DURATION_SECONDS;
+    // Si no hay nadie en fila, liberar podio
+    liveSpeakerState.activeSpeaker = null;
+    liveSpeakerState.timeRemaining = 0;
+    if (liveSpeakerState.timerInterval) {
+      clearInterval(liveSpeakerState.timerInterval);
+      liveSpeakerState.timerInterval = null;
+    }
   }
 
   renderSpeakerPodioUI();
@@ -969,9 +987,8 @@ function nextSpeakerInQueue() {
 
 function renderSpeakerPodioUI() {
   const current = liveSpeakerState.activeSpeaker;
-  if (!current) return;
 
-  // Actualizar datos del ponente activo
+  // Elementos UI del podio
   const nameEl = document.getElementById("lvp-speaker-name");
   const locEl = document.getElementById("lvp-speaker-loc");
   const motivoEl = document.getElementById("lvp-speaker-motivo");
@@ -979,6 +996,31 @@ function renderSpeakerPodioUI() {
   const countEl = document.getElementById("lvp-queue-count");
   const btnMic = document.getElementById("btn-pedir-mic");
 
+  if (!current) {
+    if (nameEl) nameEl.textContent = "Podio Libre";
+    if (locEl) locEl.textContent = "Sala de Oración Global";
+    if (motivoEl) motivoEl.textContent = '"El micrófono está disponible. Pide tu turno para orar."';
+    if (flagEl) flagEl.textContent = "🎙️";
+    if (countEl) countEl.textContent = liveSpeakerState.queue.length;
+
+    if (btnMic) {
+      const myQueueIndex = liveSpeakerState.queue.findIndex(q => oranteActual && q.nombre.toLowerCase() === oranteActual.toLowerCase());
+      if (myQueueIndex !== -1) {
+        btnMic.className = "btn-lvp btn-lvp-mic in-queue";
+        btnMic.innerHTML = `⏳ En Fila (Turno #${myQueueIndex + 1}) · Salir`;
+      } else {
+        btnMic.className = "btn-lvp btn-lvp-mic";
+        btnMic.innerHTML = "🎤 Pedir el Micrófono para Orar";
+      }
+    }
+
+    updateSpeakerTimerUI();
+    renderSpeakerQueueList();
+    updateEqualizerWave();
+    return;
+  }
+
+  // Si hay un orador activo
   if (nameEl) nameEl.textContent = current.nombre;
   if (locEl) locEl.textContent = `${current.ciudad}, ${current.pais}`;
   if (motivoEl) motivoEl.textContent = `"${current.motivo || 'Orando en unidad por las naciones'}"`;
@@ -1062,7 +1104,7 @@ async function handleMicButtonClick() {
     return;
   }
 
-  // Agregar al usuario a la fila o darle el micrófono si no hay nadie
+  // Preparar objeto de ponente del usuario
   const country = PGStorage.getActiveCountry();
   const inputMotivo = document.getElementById("input-orante-motivo");
   const motivo = (inputMotivo && inputMotivo.value) ? inputMotivo.value.trim() : "Orando en unidad y fe por las peticiones";
@@ -1081,17 +1123,27 @@ async function handleMicButtonClick() {
   // Solicitar permiso de micrófono al navegador
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    // Permiso otorgado
-    stream.getTracks().forEach(track => track.stop()); // Detener hasta que le toque su turno
+    stream.getTracks().forEach(track => track.stop());
   } catch (err) {
     console.warn("Permiso de micrófono denegado o no disponible:", err.message);
   }
 
-  // Añadir a la fila
+  // Si no hay nadie en el podio ni en la fila, tomar el podio inmediatamente
+  if (!liveSpeakerState.activeSpeaker && liveSpeakerState.queue.length === 0) {
+    liveSpeakerState.activeSpeaker = userSpeakerObj;
+    liveSpeakerState.timeRemaining = SPEAKER_DURATION_SECONDS;
+    startUserMicrophone();
+    startSpeakerTimer();
+    renderSpeakerPodioUI();
+    return;
+  }
+
+  // De lo contrario, añadir a la fila
   liveSpeakerState.queue.push(userSpeakerObj);
   alert(`✨ ¡Has sido añadido a la fila para orar! Estás en la posición #${liveSpeakerState.queue.length}. Cada ponente cuenta con 5 minutos.`);
   renderSpeakerPodioUI();
 }
+
 
 async function startUserMicrophone() {
   try {

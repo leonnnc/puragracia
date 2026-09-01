@@ -81,17 +81,7 @@ const PG_DEFAULTS = {
     }
   },
 
-  orantesMundiales: [
-    { id: "o1", nombre: "Leonel C.",      ciudad: "Lima",              pais: "Perú",      flag: "🇵🇪", motivo: "Por sanidad de mi familia, sabiduría y paz en el hogar",                      lat: -12.0464, lng: -77.0428, time: "Hace 2 min" },
-    { id: "o2", nombre: "Pastor David",   ciudad: "Bogotá",            pais: "Colombia",  flag: "🇨🇴", motivo: "Por avivamiento espiritual y fortaleza en la juventud",                       lat:   4.7110, lng: -74.0721, time: "Hace 5 min" },
-    { id: "o3", nombre: "María Isabel",   ciudad: "Medellín",          pais: "Colombia",  flag: "🇨🇴", motivo: "Por provisión en los emprendimientos y salud para mi madre",                  lat:   6.2442, lng: -75.5812, time: "Hace 8 min" },
-    { id: "o4", nombre: "Carlos Mendoza", ciudad: "Arequipa",          pais: "Perú",      flag: "🇵🇪", motivo: "Por restauración en los matrimonios de mi congregación",                      lat: -16.4090, lng: -71.5375, time: "Hace 10 min" },
-    { id: "o5", nombre: "Fernanda R.",    ciudad: "Ciudad de México",  pais: "México",    flag: "🇲🇽", motivo: "Pidiendo protección divina y paz en mi país",                                 lat:  19.4326, lng: -99.1332, time: "Hace 12 min" },
-    { id: "o6", nombre: "Mateo & Familia",ciudad: "Buenos Aires",      pais: "Argentina", flag: "🇦🇷", motivo: "Gratitud por nuevas oportunidades laborales",                                 lat: -34.6037, lng: -58.3816, time: "Hace 15 min" },
-    { id: "o7", nombre: "Jennifer S.",    ciudad: "Miami",             pais: "EE.UU.",    flag: "🇺🇸", motivo: "Por sanidad de un amigo en tratamiento médico",                               lat:  25.7617, lng: -80.1918, time: "Hace 20 min" },
-    { id: "o8", nombre: "Andrés V.",      ciudad: "Trujillo",          pais: "Perú",      flag: "🇵🇪", motivo: "Por dirección en mis estudios y proyectos",                                   lat:  -8.1116, lng: -79.0287, time: "Hace 25 min" },
-    { id: "o9", nombre: "Lucas M.",       ciudad: "Madrid",            pais: "España",    flag: "🇪🇸", motivo: "Unidad y amor fraternal entre creyentes",                                     lat:  40.4168, lng:  -3.7038, time: "Hace 30 min" }
-  ],
+  orantesMundiales: [],
 
   admins: [
     { id: "adm_global", email: "admin@puragracia.org",    name: "Pastor / Administrador General", country: "GLOBAL", password: "admin123", role: "superadmin" },
@@ -133,11 +123,10 @@ const PGStorage = {
       const s = localStorage.getItem(this.KEYS.ORANTES_MUNDIALES);
       if (s) {
         const parsed = JSON.parse(s);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) {}
-    this.saveOrantesMundiales(PG_DEFAULTS.orantesMundiales);
-    return PG_DEFAULTS.orantesMundiales;
+    return [];
   },
   saveOrantesMundiales(list) { localStorage.setItem(this.KEYS.ORANTES_MUNDIALES, JSON.stringify(list)); },
   addOranteMundial(o) {
@@ -152,16 +141,10 @@ const PGStorage = {
       const s = localStorage.getItem(this.KEYS.PETICIONES);
       if (s) {
         const parsed = JSON.parse(s);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) {}
-    const init = [
-      { id: "p1", country: "PE", category: "Salud",   nombre: "Leonel", texto: "Por la salud y bienestar de toda mi familia en Lima.",      correo: "", telefono: "987654321", praysCount: 18, createdAt: new Date(Date.now() - 18e5).toISOString() },
-      { id: "p2", country: "CO", category: "Salud",   nombre: "María",  texto: "Por la salud de mi mamá y paz en casa.",                    correo: "", telefono: "3001234567", praysCount: 12, createdAt: new Date(Date.now() - 36e5).toISOString() },
-      { id: "p3", country: "PE", category: "Trabajo", nombre: "Andrés", texto: "Trabajo estable y sabiduría para emprender.",               correo: "", telefono: "987654321", praysCount: 8,  createdAt: new Date(Date.now() - 72e5).toISOString() }
-    ];
-    this.savePeticiones(init);
-    return init;
+    return [];
   },
   savePeticiones(list) { localStorage.setItem(this.KEYS.PETICIONES, JSON.stringify(list)); },
   addPrayCount(id) {
@@ -223,20 +206,13 @@ const PGFirebase = {
     if (!this.initialized || !this.db) return null;
     try {
       const unsub = this.db.collection("orantes")
-        .limit(50)
+        .limit(100)
         .onSnapshot(snap => {
           if (!snap || snap.empty) {
-            // Si la colección de Firestore está vacía, alimentar con orantes por defecto
             callback(PGStorage.getOrantesMundiales());
           } else {
             const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            // Asegurar que haya puntos visibles combinando con la lista inicial si hay pocos
-            if (list.length < 3) {
-              const combined = [...list, ...PG_DEFAULTS.orantesMundiales.filter(o => !list.some(l => l.nombre === o.nombre))];
-              callback(combined);
-            } else {
-              callback(list);
-            }
+            callback(list);
           }
         }, err => {
           console.warn("Firestore orantes listener warning, usando datos locales:", err.message);
