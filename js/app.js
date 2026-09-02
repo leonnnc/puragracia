@@ -1297,6 +1297,121 @@ function updateEqualizerWave() {
   });
 }
 
+// ========================================================
+// EFECTO DINÁMICO DE POST-ITS CAYENDO EN LA PORTADA
+// ========================================================
+const PRAYER_TOPICS_POOL = [
+  { emoji: "🏥", text: "Salud y Sanidad", category: "Salud" },
+  { emoji: "👨‍👩‍👧", text: "Familia y Hogar", category: "Familia" },
+  { emoji: "💼", text: "Trabajo y Finanzas", category: "Trabajo" },
+  { emoji: "✨", text: "Acción de Gracias", category: "Gratitud" },
+  { emoji: "🕊️", text: "Paz y Consuelo", category: "Paz" },
+  { emoji: "🎓", text: "Sabiduría y Estudios", category: "Trabajo" },
+  { emoji: "💍", text: "Matrimonio Bendecido", category: "Familia" },
+  { emoji: "🛡️", text: "Protección en Viajes", category: "Paz" },
+  { emoji: "👶", text: "Por nuestros Hijos", category: "Familia" },
+  { emoji: "❤️", text: "Sanidad del Corazón", category: "Paz" },
+  { emoji: "🌿", text: "Crecimiento Espiritual", category: "Gratitud" },
+  { emoji: "🚪", text: "Nuevas Oportunidades", category: "Trabajo" },
+  { emoji: "👵", text: "Nuestros Abuelitos", category: "Salud" },
+  { emoji: "🤝", text: "Reconciliación y Perdón", category: "Familia" },
+  { emoji: "🍞", text: "Provisión Diaria", category: "Trabajo" },
+  { emoji: "🌈", text: "Esperanza y Fe", category: "Gratitud" }
+];
+
+const POSTIT_COLORS = ["c-yellow", "c-pink", "c-peach", "c-green", "c-cyan", "c-purple"];
+
+const POSTIT_SLOTS = [
+  { id: "slot-0", top: "15px",  left: "8%",   rot: "-7deg", zIndex: 3 },
+  { id: "slot-1", top: "8px",   right: "8%",  rot: "6deg",  zIndex: 4 },
+  { id: "slot-2", top: "150px", left: "4%",   rot: "4deg",  zIndex: 2 },
+  { id: "slot-3", top: "160px", right: "6%",  rot: "-5deg", zIndex: 5 },
+  { id: "slot-4", top: "90px",  left: "34%",  rot: "-2deg", zIndex: 6 }
+];
+
+let currentTopicIndex = 0;
+
+function createPostItElement(topic, slot, colorClass) {
+  const note = document.createElement("div");
+  note.className = `mini-note ${colorClass}`;
+  note.id = slot.id;
+  note.style.top = slot.top;
+  if (slot.left) note.style.left = slot.left;
+  if (slot.right) note.style.right = slot.right;
+  note.style.setProperty("--rot", slot.rot);
+  note.style.zIndex = slot.zIndex;
+  note.title = `Toca para pedir oración por: ${topic.text}`;
+
+  note.innerHTML = `
+    <span class="pin-dot"></span>
+    <span class="postit-emoji">${topic.emoji}</span>
+    <span class="postit-title">${escapeHtml(topic.text)}</span>
+    <span class="postit-hint">Toca para orar</span>
+  `;
+
+  note.addEventListener("click", () => {
+    const select = document.querySelector('select[name="category"]');
+    if (select) {
+      select.value = topic.category;
+    }
+    const formSection = document.getElementById("escribir");
+    if (formSection) {
+      formSection.scrollIntoView({ behavior: "smooth" });
+      const textarea = document.querySelector('textarea[name="texto"]');
+      if (textarea) {
+        textarea.placeholder = `Escribe tu petición sobre ${topic.text}...`;
+        setTimeout(() => textarea.focus(), 600);
+      }
+    }
+  });
+
+  return note;
+}
+
+function initFallingPostIts() {
+  const container = document.getElementById("hero-board-grid");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  // Caída inicial escalonada
+  POSTIT_SLOTS.forEach((slot, i) => {
+    const topic = PRAYER_TOPICS_POOL[i % PRAYER_TOPICS_POOL.length];
+    const color = POSTIT_COLORS[i % POSTIT_COLORS.length];
+    currentTopicIndex = (i + 1) % PRAYER_TOPICS_POOL.length;
+
+    setTimeout(() => {
+      const note = createPostItElement(topic, slot, color);
+      container.appendChild(note);
+    }, i * 220);
+  });
+
+  // Ciclo periódico: cae una nueva nota cada 3 segundos
+  let currentSlotIndex = 0;
+  setInterval(() => {
+    const slot = POSTIT_SLOTS[currentSlotIndex];
+    const topic = PRAYER_TOPICS_POOL[currentTopicIndex];
+    const color = POSTIT_COLORS[(currentTopicIndex + currentSlotIndex) % POSTIT_COLORS.length];
+
+    currentTopicIndex = (currentTopicIndex + 1) % PRAYER_TOPICS_POOL.length;
+    currentSlotIndex = (currentSlotIndex + 1) % POSTIT_SLOTS.length;
+
+    const oldNote = document.getElementById(slot.id);
+    if (oldNote) {
+      oldNote.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+      oldNote.style.opacity = "0";
+      oldNote.style.transform = "scale(0.8) translateY(20px)";
+      setTimeout(() => oldNote.remove(), 300);
+    }
+
+    setTimeout(() => {
+      const newNote = createPostItElement(topic, slot, color);
+      container.appendChild(newNote);
+    }, 320);
+
+  }, 3200);
+}
+
 // ─── Inicialización al cargar la página ─────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   initNav();
@@ -1305,6 +1420,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderGaleria();
   initGalleryNav();
   initLiveVoicePodio();
+  initFallingPostIts();
 
   // Registrar visita de la página en la nube
   if (window.PGFirebase && PGFirebase.recordPageVisit) {
@@ -1349,11 +1465,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   } else {
     console.info("📱 Modo local activo: usando almacenamiento local.");
-    // En modo local también renderizar el panel
     _orantesCache = PGStorage.getOrantesMundiales();
     _peticionesCache = PGStorage.getPeticiones();
     renderConnectedPanel();
   }
 });
+
 
 
