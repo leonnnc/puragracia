@@ -743,23 +743,6 @@ function initForms() {
     document.getElementById("peticiones").scrollIntoView({ behavior: "smooth" });
   });
 
-  // Selector rápido de categoría en la columna izquierda
-  document.querySelectorAll(".qcp-chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      document.querySelectorAll(".qcp-chip").forEach((c) => c.classList.remove("active"));
-      chip.classList.add("active");
-      const cat = chip.dataset.cat;
-      const select = document.querySelector('select[name="category"]');
-      if (select) {
-        select.value = cat;
-        select.dispatchEvent(new Event("change"));
-      }
-      const textarea = document.querySelector('textarea[name="texto"]');
-      if (textarea) {
-        textarea.focus();
-      }
-    });
-  });
 
   // Filtros de categoría en la pizarra
   document.querySelectorAll(".filter-chip").forEach((btn) => {

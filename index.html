@@ -59,98 +59,69 @@
     <main id="contenido">
       <section id="inicio" class="hero">
         <div class="hero-glow" aria-hidden="true"></div>
-        <div class="container hero-grid">
-          <div class="hero-copy">
-            <p class="eyebrow" id="hero-country-badge">Red de Oración Comunitaria</p>
+        <div class="container">
+
+          <!-- Encabezado principal -->
+          <div class="hero-center">
+            <p class="eyebrow" id="hero-country-badge">Red de Oración Comunitaria · Internacional</p>
             <h1>Pura Gracia</h1>
             <p class="lema">
-              Si tú también tienes una petición, escríbenos. Queremos conocerte y
-              orar por ti.
+              Una comunidad de fe donde cada petición es recibida con amor, oración y acompañamiento pastoral. Si tienes una necesidad, no estás solo.
             </p>
             <div class="hero-actions">
-              <a class="btn btn-primary" href="#escribir">Deja tu petición</a>
-              <a class="btn btn-ghost" href="#oracion">🌍 Altar Mundial de Oración</a>
+              <a class="btn btn-primary" href="#escribir">🙏 Deja tu petición de oración</a>
+              <a class="btn btn-ghost" href="#oracion">🌍 Unirme al Altar Mundial en Vivo</a>
             </div>
           </div>
-          <aside class="hero-board" aria-hidden="true">
-            <div class="mini-note n1">Salud y paz</div>
-            <div class="mini-note n2">Familia</div>
-            <div class="mini-note n3">Trabajo</div>
-            <div class="mini-note n4">Gratitud</div>
-          </aside>
+
+          <!-- Tarjetas de qué es Pura Gracia -->
+          <div class="hero-features-grid">
+            <div class="hero-feature-card">
+              <span class="hfc-icon">🌐</span>
+              <strong>Red Global de Intercesión</strong>
+              <p>Intercesores en más de 8 países oran en unidad por cada petición que llega a la pizarra, en tiempo real.</p>
+            </div>
+            <div class="hero-feature-card">
+              <span class="hfc-icon">🎙️</span>
+              <strong>Altar Mundial en Vivo</strong>
+              <p>Únete al mapa de oración mundial. Enciende tu punto, toma el micrófono y ora junto a creyentes de todas las naciones.</p>
+            </div>
+            <div class="hero-feature-card">
+              <span class="hfc-icon">💬</span>
+              <strong>Respuesta Pastoral</strong>
+              <p>Si dejas tu WhatsApp, nuestro equipo pastoral te escribirá personalmente con una reflexión y una oración guiada.</p>
+            </div>
+            <div class="hero-feature-card">
+              <span class="hfc-icon">🔒</span>
+              <strong>Confidencial y Gratuito</strong>
+              <p>Puedes compartir solo tu primer nombre. El ministerio de intercesión es un servicio de fe y gracia, 100% gratuito.</p>
+            </div>
+          </div>
+
+          <!-- Versículo de respaldo -->
+          <div class="hero-verse">
+            <span class="hero-verse-icon">❝</span>
+            <p>"Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias."</p>
+            <cite>Filipenses 4:6</cite>
+          </div>
+
         </div>
       </section>
 
-      <!-- FORMULARIO DE PETICIÓN -->
+
+      <!-- FORMULARIO DE PETICIÓN (única sección de petición) -->
       <section id="escribir" class="section form-section">
-        <div class="container split">
-          <div class="petition-info-col">
+        <div class="container petition-centered">
+
+          <!-- Encabezado de la sección -->
+          <div class="petition-header">
             <p class="eyebrow">Déjanos tu petición</p>
             <h2>Escríbenos lo que pesa en tu corazón</h2>
-            <p class="muted">
-              Tu petición se publica en la pizarra comunitaria para que intercesores de todo el mundo oren por ti. Si deseas una respuesta pastoral, déjanos tu WhatsApp.
-            </p>
-
-            <!-- Categorías rápidas para seleccionar -->
-            <div class="quick-category-picker">
-              <span class="qcp-label">Toca una categoría para seleccionarla en el formulario:</span>
-              <div class="qcp-chips" id="quick-category-chips">
-                <button type="button" class="qcp-chip" data-cat="Salud">🏥 Salud</button>
-                <button type="button" class="qcp-chip" data-cat="Familia">👨‍👩‍👧 Familia</button>
-                <button type="button" class="qcp-chip" data-cat="Trabajo">💼 Trabajo</button>
-                <button type="button" class="qcp-chip" data-cat="Gratitud">✨ Gratitud</button>
-                <button type="button" class="qcp-chip" data-cat="Paz">🕊️ Paz</button>
-              </div>
-            </div>
-
-            <!-- Beneficios / Qué sucede al enviar tu petición -->
-            <div class="petition-perks-grid">
-              <div class="perk-card">
-                <span class="perk-icon">🌐</span>
-                <div>
-                  <strong>Red Global Activa</strong>
-                  <p>Hermanos e intercesores en más de 8 países clamarán en unidad por tu motivo.</p>
-                </div>
-              </div>
-              <div class="perk-card">
-                <span class="perk-icon">💬</span>
-                <div>
-                  <strong>Respuesta Pastoral</strong>
-                  <p>Si dejas tu WhatsApp, nuestro equipo pastoral te escribirá una reflexión y oración guiada.</p>
-                </div>
-              </div>
-              <div class="perk-card">
-                <span class="perk-icon">🔒</span>
-                <div>
-                  <strong>Seguro y Respetuoso</strong>
-                  <p>Puedes usar solo tu primer nombre o compartir tu petición con total confianza.</p>
-                </div>
-              </div>
-              <div class="perk-card">
-                <span class="perk-icon">🕊️</span>
-                <div>
-                  <strong>100% Gratuito</strong>
-                  <p>El ministerio de intercesión es un servicio de fe y gracia para toda la comunidad.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Cita bíblica de esperanza -->
-            <div class="bible-promise-card">
-              <div class="bible-quote-icon">❝</div>
-              <p class="bible-text">
-                "Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias."
-              </p>
-              <span class="bible-ref">Filipenses 4:6</span>
-            </div>
-
-            <!-- Enlaces directos -->
-            <div class="petition-links-row">
-              <a href="#peticiones" class="btn btn-small btn-ghost">📜 Ver notas en la Pizarra</a>
-              <a href="#oracion" class="btn btn-small btn-ghost">🌍 Altar Mundial en Vivo</a>
-            </div>
+            <p class="muted">Tu petición se publica en la pizarra comunitaria para que intercesores de todo el mundo oren por ti.<br>Si deseas una respuesta pastoral, déjanos tu WhatsApp.</p>
           </div>
-          <form id="form-peticion" class="card form-card">
+
+          <!-- Formulario único -->
+          <form id="form-peticion" class="card form-card petition-form-single">
             <div class="form-row-2">
               <label>
                 Tu nombre
@@ -196,10 +167,12 @@
               </label>
             </fieldset>
             <p class="form-hint">Si dejas tu WhatsApp, te escribiremos una reflexión personalizada después de orar.</p>
-            <button class="btn btn-primary" type="submit">Publicar en la pizarra</button>
+            <button class="btn btn-primary btn-full" type="submit">🙏 Publicar en la pizarra comunitaria</button>
           </form>
+
         </div>
       </section>
+
 
       <!-- LA PIZARRA DE NOTAS -->
       <section id="peticiones" class="section board-section">

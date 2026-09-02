@@ -193,29 +193,110 @@ a {
   margin: 6px 8px;
 }
 
-/* Hero */
+/* Hero – layout centrado */
 .hero {
   position: relative;
   overflow: hidden;
-  padding: 4.5rem 0 5rem;
+  padding: 5rem 0 6rem;
   background:
-    radial-gradient(circle at 80% 10%, rgba(244, 225, 75, 0.45), transparent 28%),
-    linear-gradient(180deg, #efe6d0 0%, var(--paper) 70%);
+    radial-gradient(circle at 75% 10%, rgba(244, 225, 75, 0.4), transparent 30%),
+    linear-gradient(180deg, #efe6d0 0%, var(--paper) 75%);
 }
 
-.hero-grid {
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 3rem;
-  align-items: center;
+/* Encabezado centrado del hero */
+.hero-center {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 3.5rem;
+}
+
+.hero-center .lema {
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin-top: 0.75rem;
+  line-height: 1.65;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.8rem;
-  margin-top: 1.6rem;
+  margin-top: 1.8rem;
+  justify-content: center;
 }
+
+/* Tarjetas de features */
+.hero-features-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.2rem;
+  margin-bottom: 3rem;
+}
+
+.hero-feature-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.4rem 1.2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hero-feature-card .hfc-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.hero-feature-card strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.hero-feature-card p {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Versículo hero */
+.hero-verse {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1.4rem 2rem;
+  border-left: 4px solid var(--yellow);
+  background: rgba(244,225,75,0.12);
+  border-radius: 0 12px 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.hero-verse-icon {
+  font-size: 1.8rem;
+  color: var(--yellow);
+  line-height: 1;
+}
+
+.hero-verse p {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--ink);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.hero-verse cite {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--green);
+  font-style: normal;
+}
+
 
 .btn {
   display: inline-flex;
@@ -251,30 +332,6 @@ a {
   background: rgba(28, 36, 34, 0.05);
 }
 
-.hero-board {
-  position: relative;
-  min-height: 280px;
-}
-
-.mini-note {
-  position: absolute;
-  width: 140px;
-  height: 140px;
-  background: var(--yellow);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
-  font-family: Caveat, cursive;
-  font-size: 1.5rem;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  padding: 0.8rem;
-}
-
-.mini-note.n1 { left: 8%; top: 8%; transform: rotate(-6deg); }
-.mini-note.n2 { right: 12%; top: 0; background: #f7c7d9; transform: rotate(7deg); }
-.mini-note.n3 { left: 28%; bottom: 6%; background: #f5b56a; transform: rotate(3deg); }
-.mini-note.n4 { right: 6%; bottom: 10%; background: #d8ef8a; transform: rotate(-4deg); }
-
 .section {
   padding: 4.5rem 0;
 }
@@ -285,13 +342,6 @@ a {
   align-items: flex-end;
   gap: 1rem;
   margin-bottom: 1.8rem;
-}
-
-.split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2.5rem;
-  align-items: start;
 }
 
 .card {
@@ -354,142 +404,39 @@ textarea {
 }
 
 /* ============================================================
-   COLUMNA INFORMATIVA Y OPCIONES DE PETICIÓN (LADO IZQUIERDO)
+   SECCIÓN DE PETICIÓN (LAYOUT CENTRADO Y LIMPIO)
    ============================================================ */
-.petition-info-col {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+.petition-centered {
+  max-width: 680px;
+  margin: 0 auto;
 }
 
-.quick-category-picker {
-  background: rgba(47, 111, 98, 0.07);
-  border: 1px solid rgba(47, 111, 98, 0.18);
-  border-radius: 14px;
-  padding: 0.85rem 1rem;
+.petition-header {
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
-.qcp-label {
-  display: block;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--teal);
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+.petition-header h2 {
+  margin: 0.3rem 0 0.6rem;
 }
 
-.qcp-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
+.petition-header .muted {
+  line-height: 1.5;
 }
 
-.qcp-chip {
-  background: #fff;
-  border: 1px solid rgba(47, 111, 98, 0.25);
-  color: var(--ink);
-  padding: 0.35rem 0.75rem;
-  border-radius: 99px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.qcp-chip:hover,
-.qcp-chip.active {
-  background: var(--teal);
-  color: #fff;
-  border-color: var(--teal);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(47, 111, 98, 0.2);
-}
-
-.petition-perks-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
-
-.perk-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  background: #fff;
-  border-radius: 12px;
-  padding: 0.8rem 0.9rem;
+.petition-form-single {
+  background: var(--cream);
   border: 1px solid rgba(28, 36, 34, 0.08);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
-.perk-icon {
-  font-size: 1.25rem;
-  line-height: 1;
-  flex-shrink: 0;
-  margin-top: 1px;
+.btn-full {
+  width: 100%;
+  justify-content: center;
+  font-size: 1rem;
+  padding: 0.95rem 1.4rem;
 }
 
-.perk-card strong {
-  display: block;
-  font-size: 0.84rem;
-  color: var(--ink);
-  margin-bottom: 0.15rem;
-}
-
-.perk-card p {
-  margin: 0;
-  font-size: 0.76rem;
-  color: #556561;
-  line-height: 1.35;
-}
-
-.bible-promise-card {
-  position: relative;
-  background: linear-gradient(135deg, #fffdf8 0%, #f7f1e3 100%);
-  border-left: 4px solid var(--yellow-deep);
-  border-radius: 12px;
-  padding: 0.9rem 1.1rem 0.85rem 1.2rem;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-}
-
-.bible-quote-icon {
-  position: absolute;
-  top: 4px;
-  right: 12px;
-  font-size: 2.2rem;
-  color: rgba(230, 200, 51, 0.28);
-  font-family: Georgia, serif;
-  line-height: 1;
-}
-
-.bible-text {
-  font-style: italic;
-  font-size: 0.86rem;
-  color: #2e3b38;
-  margin: 0 0 0.4rem;
-  line-height: 1.45;
-}
-
-.bible-ref {
-  display: block;
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: var(--teal);
-  text-align: right;
-}
-
-.petition-links-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-}
-
-@media (max-width: 680px) {
-  .petition-perks-grid {
-    grid-template-columns: 1fr;
-  }
-}
 
 
 /* Category Filters */
