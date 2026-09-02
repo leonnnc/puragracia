@@ -159,6 +159,7 @@ function renderConnectedPanel() {
 function updateAllCounters() {
   const orantes = getOrantesData();
   const peticiones = getPeticionesData();
+  const stats = PGStorage.getStats();
 
   const countEl = document.getElementById("orantes-activos-count");
   if (countEl) countEl.textContent = orantes.length;
@@ -169,9 +170,23 @@ function updateAllCounters() {
   const totalNotas = document.getElementById("total-notas");
   if (totalNotas) totalNotas.textContent = peticiones.length;
 
+  // Estadísticas y contadores en vivo del Hero
+  const statPageVisits = document.getElementById("stat-page-visits");
+  if (statPageVisits) statPageVisits.textContent = stats.pageVisits || 1;
+
+  const statActiveOrantes = document.getElementById("stat-active-orantes");
+  if (statActiveOrantes) statActiveOrantes.textContent = orantes.length;
+
+  const statTotalPeticiones = document.getElementById("stat-total-peticiones");
+  if (statTotalPeticiones) statTotalPeticiones.textContent = peticiones.length;
+
+  const statWorldVisits = document.getElementById("stat-world-visits");
+  if (statWorldVisits) statWorldVisits.textContent = stats.worldVisits || 0;
+
   // Actualizar panel de conectados visible en la sección principal
   renderConnectedPanel();
 }
+
 
 // ========================================================
 // 1. DETECCIÓN AUTOMÁTICA DE PAÍS
@@ -236,14 +251,137 @@ function applyDetectedCountry(code) {
 }
 
 // ========================================================
-// 2. MODAL FULLSCREEN - PLANO COMPLETO DE LA TIERRA
+// 2. MODAL FULLSCREEN - GLOBO TERRÁQUEO 3D EN VIVO
 // ========================================================
+let globe3DInstance = null;
+let currentGlobeTexture = "night";
+let isGlobeAutoRotate = true;
+
+const GLOBE_TEXTURES = {
+  night: {
+    globe: "https://unpkg.com/three-globe/example/img/earth-night.jpg",
+    bump: "https://unpkg.com/three-globe/example/img/earth-topology.png",
+    background: "https://unpkg.com/three-globe/example/img/night-sky.png"
+  },
+  satellite: {
+    globe: "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
+    bump: "https://unpkg.com/three-globe/example/img/earth-topology.png",
+    background: "https://unpkg.com/three-globe/example/img/night-sky.png"
+  }
+};
+
+function init3DGlobe(containerId, initialOrante = null) {
+  const elem = document.getElementById(containerId);
+  if (!elem) return;
+
+  if (globe3DInstance) {
+    const width = elem.clientWidth || window.innerWidth;
+    const height = elem.clientHeight || window.innerHeight;
+    globe3DInstance.width(width).height(height);
+    render3DGlobeData(initialOrante);
+    return;
+  }
+
+  if (typeof Globe === "undefined") {
+    console.warn("Globe.gl no disponible.");
+    return;
+  }
+
+  const width = elem.clientWidth || window.innerWidth;
+  const height = elem.clientHeight || window.innerHeight;
+
+  globe3DInstance = Globe()(elem)
+    .width(width)
+    .height(height)
+    .globeImageUrl(GLOBE_TEXTURES[currentGlobeTexture].globe)
+    .bumpImageUrl(GLOBE_TEXTURES[currentGlobeTexture].bump)
+    .backgroundImageUrl(GLOBE_TEXTURES[currentGlobeTexture].background)
+    .showAtmosphere(true)
+    .atmosphereColor("#38bdf8")
+    .atmosphereAltitude(0.22)
+    // Anillos de pulso
+    .ringsData([])
+    .ringColor(() => (t) => `rgba(52, 211, 153, ${Math.sqrt(1 - t)})`)
+    .ringMaxRadius(8)
+    .ringPropagationSpeed(2.2)
+    .ringRepeatPeriod(1200)
+    // Puntos luminosos 3D
+    .pointsData([])
+    .pointLat("lat")
+    .pointLng("lng")
+    .pointColor(() => "#34d399")
+    .pointAltitude(0.04)
+    .pointRadius(0.8)
+    // Pines HTML interactivos
+    .htmlElementsData([])
+    .htmlElement(d => {
+      const el = document.createElement("div");
+      el.className = "globe-pin-3d";
+      el.innerHTML = `
+        <span class="globe-pin-beacon"></span>
+        <span>${d.flag || "📍"} ${escapeHtml(d.nombre)}</span>
+      `;
+      el.title = `${d.nombre} (${d.ciudad}, ${d.pais})\n"${d.motivo || 'En oración'}"`;
+      el.onclick = (ev) => {
+        ev.stopPropagation();
+        if (globe3DInstance) {
+          globe3DInstance.pointOfView({ lat: d.lat, lng: d.lng, altitude: 0.6 }, 1400);
+        }
+      };
+      return el;
+    })
+    .htmlAltitude(0.04);
+
+  const controls = globe3DInstance.controls();
+  if (controls) {
+    controls.autoRotate = isGlobeAutoRotate;
+    controls.autoRotateSpeed = 0.65;
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.1;
+  }
+
+  window.addEventListener("resize", () => {
+    const modal = document.getElementById("modal-mapa-mundial");
+    if (globe3DInstance && elem && modal && !modal.hidden) {
+      globe3DInstance.width(elem.clientWidth || window.innerWidth);
+      globe3DInstance.height(elem.clientHeight || window.innerHeight);
+    }
+  });
+
+  render3DGlobeData(initialOrante);
+}
+
+function render3DGlobeData(flyToOrante = null) {
+  if (!globe3DInstance) return;
+
+  const orantes = getOrantesData().filter(o => o.lat && o.lng);
+
+  globe3DInstance.ringsData(orantes);
+  globe3DInstance.pointsData(orantes);
+  globe3DInstance.htmlElementsData(orantes);
+
+  if (flyToOrante && flyToOrante.lat && flyToOrante.lng) {
+    setTimeout(() => {
+      globe3DInstance.pointOfView({
+        lat: flyToOrante.lat,
+        lng: flyToOrante.lng,
+        altitude: 0.6
+      }, 1600);
+    }, 400);
+  }
+}
+
 function openWorldPrayerFullscreen(currentOrante = null) {
   const modal = document.getElementById("modal-mapa-mundial");
   if (!modal) return;
 
   modal.hidden = false;
-  document.body.style.overflow = "hidden"; // Evitar scroll de fondo
+  document.body.style.overflow = "hidden";
+
+  // Registrar acceso al altar 3D
+  if (window.PGFirebase && PGFirebase.recordWorldAccess) {
+    PGFirebase.recordWorldAccess();
+  }
 
   updateAllCounters();
 
@@ -254,48 +392,11 @@ function openWorldPrayerFullscreen(currentOrante = null) {
     document.getElementById("mf-user-name").textContent = `🙏 ${oranteActual}`;
   }
 
-  // Inicializar o redimensionar mapa Leaflet
+  // Inicializar Globo Terráqueo 3D
   setTimeout(() => {
-    if (typeof L === "undefined") return;
-
-    if (!mapWorldFullscreen) {
-      mapWorldFullscreen = L.map("mapa-mundial-fullscreen", {
-        scrollWheelZoom: true,
-        minZoom: 2,
-        maxZoom: 12,
-        worldCopyJump: true
-      }).setView([20, 0], 2);
-
-      // Tiles limpios de OpenStreetMap sin marcas de agua
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        maxZoom: 18,
-      }).addTo(mapWorldFullscreen);
-    }
-
-    mapWorldFullscreen.invalidateSize();
-    renderFullscreenOrantesMarkers();
+    init3DGlobe("mapa-mundial-fullscreen", currentOrante);
     renderFullscreenLiveStream();
-
-    // Si viene de registrarse, volar a su ubicación
-    if (currentOrante && currentOrante.lat && currentOrante.lng) {
-      mapWorldFullscreen.flyTo([currentOrante.lat, currentOrante.lng], 5, { duration: 1.5 });
-      setTimeout(() => {
-        if (worldPrayerMarkers[currentOrante.id]) {
-          worldPrayerMarkers[currentOrante.id].openPopup();
-        }
-      }, 1600);
-    } else {
-      mapWorldFullscreen.setView([20, 0], 2);
-    }
   }, 100);
-
-  // Segundo pase para asegurar renderizado en todas las pantallas
-  setTimeout(() => {
-    if (mapWorldFullscreen) {
-      mapWorldFullscreen.invalidateSize();
-    }
-  }, 400);
 }
 
 function closeWorldPrayerFullscreen() {
@@ -305,54 +406,9 @@ function closeWorldPrayerFullscreen() {
 }
 
 function renderFullscreenOrantesMarkers() {
-  if (!mapWorldFullscreen) return;
-
-  // Limpiar marcadores
-  Object.values(worldPrayerMarkers).forEach(m => m.remove());
-  worldPrayerMarkers = {};
-
-  const orantes = getOrantesData();
-  updateAllCounters();
-
-  orantes.forEach((o) => {
-    if (!o.lat || !o.lng) return;
-
-    // Marcador pulsante en el plano de la tierra
-    const pulseIcon = L.divIcon({
-      className: "pulse-prayer-marker",
-      iconSize: [42, 42],
-      iconAnchor: [21, 21],
-      popupAnchor: [0, -22],
-      html: `
-        <div class="pulse-glow"></div>
-        <div class="pulse-pin">${o.flag || "🙏"}</div>
-      `
-    });
-
-    const marker = L.marker([o.lat, o.lng], { icon: pulseIcon }).addTo(mapWorldFullscreen);
-    
-    marker.bindPopup(`
-      <div style="font-family: Outfit, sans-serif; min-width: 220px; padding: 4px;">
-        <strong style="font-size: 1.15rem; display:block; color:#1c2422; margin-bottom: 2px;">
-          🙏 ${escapeHtml(o.nombre)}
-        </strong>
-        <div style="color:#2f6f62; font-weight:700; font-size:0.9rem; margin-bottom: 6px;">
-          ${o.flag || "📍"} ${escapeHtml(o.ciudad)}, ${escapeHtml(o.pais)}
-        </div>
-        <div style="font-size: 0.88rem; background:#fffaf0; padding: 8px 10px; border-radius: 8px; border:1px solid #e2d8c3; margin-bottom: 8px;">
-          <strong style="display:block; color:#7b1f18; font-size:0.75rem; text-transform:uppercase; margin-bottom:3px;">Solicitud de Oración:</strong>
-          "${escapeHtml(o.motivo || 'Orando por salud, paz y bendición')}"
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.75rem; color:#718096;">
-          <span>Conectado ${escapeHtml(o.time || 'en vivo')}</span>
-          <button type="button" style="background:#10b981; color:#fff; border:0; border-radius:4px; padding:3px 8px; font-weight:700; cursor:pointer;" onclick="alert('✨ ¡Te has unido en oración por ${escapeHtml(o.nombre)}!');">🙏 Orar</button>
-        </div>
-      </div>
-    `);
-
-    worldPrayerMarkers[o.id] = marker;
-  });
+  render3DGlobeData();
 }
+
 
 function renderFullscreenLiveStream() {
   const streamContainer = document.getElementById("lista-orantes-stream");
@@ -802,6 +858,46 @@ function initForms() {
     });
   }
 
+  // ── Controles 3D del Globo Terráqueo ──
+  const btnGlobeRotate = document.getElementById("btn-globe-autorotate");
+  if (btnGlobeRotate) {
+    btnGlobeRotate.addEventListener("click", () => {
+      if (!globe3DInstance) return;
+      const controls = globe3DInstance.controls();
+      if (controls) {
+        isGlobeAutoRotate = !isGlobeAutoRotate;
+        controls.autoRotate = isGlobeAutoRotate;
+        btnGlobeRotate.classList.toggle("active", isGlobeAutoRotate);
+        btnGlobeRotate.innerHTML = isGlobeAutoRotate ? "🔄 Rotación 3D" : "⏸️ Pausado";
+      }
+    });
+  }
+
+  const btnGlobeRecenter = document.getElementById("btn-globe-recenter");
+  if (btnGlobeRecenter) {
+    btnGlobeRecenter.addEventListener("click", () => {
+      if (!globe3DInstance) return;
+      const orantes = getOrantesData();
+      const myOrante = orantes.find(o => o.nombre === oranteActual) || (orantes.length ? orantes[0] : null);
+      if (myOrante && myOrante.lat && myOrante.lng) {
+        globe3DInstance.pointOfView({ lat: myOrante.lat, lng: myOrante.lng, altitude: 0.6 }, 1400);
+      } else {
+        globe3DInstance.pointOfView({ lat: -12.0464, lng: -77.0428, altitude: 1.4 }, 1400);
+      }
+    });
+  }
+
+  const btnGlobeToggleView = document.getElementById("btn-globe-toggle-view");
+  if (btnGlobeToggleView) {
+    btnGlobeToggleView.addEventListener("click", () => {
+      if (!globe3DInstance) return;
+      currentGlobeTexture = currentGlobeTexture === "night" ? "satellite" : "night";
+      globe3DInstance.globeImageUrl(GLOBE_TEXTURES[currentGlobeTexture].globe);
+      btnGlobeToggleView.innerHTML = currentGlobeTexture === "night" ? "🌌 Vista Noche" : "🛰️ Vista Satélite";
+    });
+  }
+
+
   // Sincronizar input libre de monto para deseleccionar chips
   const customAmountInput = document.getElementById("donate-custom-amount");
   customAmountInput.addEventListener("input", () => {
@@ -1210,6 +1306,11 @@ document.addEventListener("DOMContentLoaded", () => {
   initGalleryNav();
   initLiveVoicePodio();
 
+  // Registrar visita de la página en la nube
+  if (window.PGFirebase && PGFirebase.recordPageVisit) {
+    PGFirebase.recordPageVisit();
+  }
+
   // Renderizar datos locales de inmediato (garantiza contadores y pizarra sin demoras)
   updateAllCounters();
   renderPizarra();
@@ -1222,7 +1323,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ── Activar suscripciones Firebase en tiempo real si está disponible ────────
   if (window.PGFirebase && PGFirebase.initialized) {
-    console.info("🔥 Firebase activo: suscribiendo peticiones y orantes en tiempo real.");
+    console.info("🔥 Firebase activo: suscribiendo peticiones, orantes y estadísticas en tiempo real.");
+
+    // Estadísticas globales en tiempo real
+    PGFirebase.subscribeStats(() => {
+      updateAllCounters();
+    });
 
     // Peticiones en tiempo real
     PGFirebase.subscribePeticiones((list) => {
@@ -1232,15 +1338,13 @@ document.addEventListener("DOMContentLoaded", () => {
       renderHoy();
     });
 
-    // Orantes mundiales en tiempo real → actualizar panel, contadores y mapa
+    // Orantes mundiales en tiempo real → actualizar panel, contadores y Globo 3D
     PGFirebase.subscribeOrantes((list) => {
       _orantesCache = list;
       updateAllCounters();
-      renderConnectedPanel();           // ← Panel de intercesores visibles en página principal
-      if (mapWorldFullscreen) {
-        renderFullscreenOrantesMarkers();
-        renderFullscreenLiveStream();
-      }
+      renderConnectedPanel();
+      render3DGlobeData();
+      renderFullscreenLiveStream();
     });
 
   } else {

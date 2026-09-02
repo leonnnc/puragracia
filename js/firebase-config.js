@@ -100,7 +100,29 @@ const PGStorage = {
     PETICIONES:       "puraGracia.peticiones",
     ORANTES_MUNDIALES:"puraGracia.orantesMundiales",
     ADMINS:           "puraGracia.admins",
-    ADMIN_SESSION:    "puraGracia.adminSession"
+    ADMIN_SESSION:    "puraGracia.adminSession",
+    STATS:            "puraGracia.stats"
+  },
+
+  getStats() {
+    try {
+      const s = localStorage.getItem(this.KEYS.STATS);
+      if (s) return JSON.parse(s);
+    } catch (e) {}
+    return { pageVisits: 1, worldVisits: 0, totalPrayers: 0 };
+  },
+  saveStats(st) { localStorage.setItem(this.KEYS.STATS, JSON.stringify(st)); },
+  incrementPageVisits() {
+    const st = this.getStats();
+    st.pageVisits = (st.pageVisits || 0) + 1;
+    this.saveStats(st);
+    return st.pageVisits;
+  },
+  incrementWorldVisits() {
+    const st = this.getStats();
+    st.worldVisits = (st.worldVisits || 0) + 1;
+    this.saveStats(st);
+    return st.worldVisits;
   },
 
   getCountries() {
@@ -312,6 +334,56 @@ const PGFirebase = {
       });
     } catch (err) {}
     return newCount;
+  },
+
+  // ── Estadísticas y Contadores Globales en Tiempo Real ──
+  subscribeStats(callback) {
+    if (!this.initialized || !this.db) {
+      callback(PGStorage.getStats());
+      return null;
+    }
+    try {
+      const unsub = this.db.collection("stats").doc("general")
+        .onSnapshot(doc => {
+          if (doc && doc.exists) {
+            const data = doc.data();
+            const combined = { ...PGStorage.getStats(), ...data };
+            PGStorage.saveStats(combined);
+            callback(combined);
+          } else {
+            callback(PGStorage.getStats());
+          }
+        }, () => {
+          callback(PGStorage.getStats());
+        });
+      this.listeners.push(unsub);
+      return unsub;
+    } catch (e) {
+      callback(PGStorage.getStats());
+      return null;
+    }
+  },
+
+  async recordPageVisit() {
+    PGStorage.incrementPageVisits();
+    if (!this.initialized || !this.db) return;
+    try {
+      await this.db.collection("stats").doc("general").set({
+        pageVisits: firebase.firestore.FieldValue.increment(1),
+        lastVisitAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    } catch (e) {}
+  },
+
+  async recordWorldAccess() {
+    PGStorage.incrementWorldVisits();
+    if (!this.initialized || !this.db) return;
+    try {
+      await this.db.collection("stats").doc("general").set({
+        worldVisits: firebase.firestore.FieldValue.increment(1),
+        lastWorldAccessAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    } catch (e) {}
   },
 
   unsubscribeAll() {

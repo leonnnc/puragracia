@@ -22,6 +22,9 @@
     />
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🙏</text></svg>" />
+    <!-- Three.js & Globe.gl para el Globo 3D del Altar Mundial -->
+    <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/globe.gl@2.32.0/dist/globe.gl.min.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -71,6 +74,38 @@
             <div class="hero-actions">
               <a class="btn btn-primary" href="#escribir">🙏 Deja tu petición de oración</a>
               <a class="btn btn-ghost" href="#oracion">🌍 Unirme al Altar Mundial en Vivo</a>
+            </div>
+          </div>
+
+          <!-- Barra de Estadísticas y Contadores en Vivo de la Red -->
+          <div class="hero-live-stats-bar">
+            <div class="stat-box">
+              <span class="stat-icon">👁️</span>
+              <div class="stat-info">
+                <strong id="stat-page-visits">1</strong>
+                <span>Visitas a la Web</span>
+              </div>
+            </div>
+            <div class="stat-box">
+              <span class="stat-icon">🔥</span>
+              <div class="stat-info">
+                <strong id="stat-active-orantes">0</strong>
+                <span>Intercesores Activos</span>
+              </div>
+            </div>
+            <div class="stat-box">
+              <span class="stat-icon">📜</span>
+              <div class="stat-info">
+                <strong id="stat-total-peticiones">0</strong>
+                <span>Peticiones Recibidas</span>
+              </div>
+            </div>
+            <div class="stat-box">
+              <span class="stat-icon">🌎</span>
+              <div class="stat-info">
+                <strong id="stat-world-visits">0</strong>
+                <span>Accesos al Altar 3D</span>
+              </div>
             </div>
           </div>
 
@@ -436,8 +471,21 @@
           </button>
         </header>
 
-        <!-- Canvas del Mapa Mundial Fullscreen -->
-        <div id="mapa-mundial-fullscreen" class="fullscreen-map-canvas" role="region" aria-label="Plano completo de la tierra con intercesores en vivo"></div>
+        <!-- Canvas del Mapa / Globo Mundial 3D Fullscreen -->
+        <div id="mapa-mundial-fullscreen" class="fullscreen-map-canvas globe-3d-container" role="region" aria-label="Globo terráqueo 3D interactivo con intercesores en vivo"></div>
+
+        <!-- Controles 3D Flotantes del Globo -->
+        <div class="globe-3d-controls" id="globe-3d-controls">
+          <button type="button" class="btn-globe-ctrl active" id="btn-globe-autorotate" title="Activar / Pausar rotación 3D automática">
+            🔄 Rotación 3D
+          </button>
+          <button type="button" class="btn-globe-ctrl" id="btn-globe-recenter" title="Centrar cámara en mi posición">
+            📍 Mi Punto
+          </button>
+          <button type="button" class="btn-globe-ctrl" id="btn-globe-toggle-view" title="Alternar Textura Noche / Satélite">
+            🌌 Vista Noche
+          </button>
+        </div>
 
         <!-- ========================================================
              PODIO FLOTANTE: MICRÓFONO EN VIVO & TRANSMISIÓN DE ORACIÓN (5 MIN)
