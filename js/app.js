@@ -685,35 +685,14 @@ function updateMeetingsAndMap() {
 // SECCIÓN DE DONACIONES DINÁMICAS
 function updateDonationsUI() {
   const country = PGStorage.getActiveCountry();
-  const symbol = country.currencySymbol || "$";
-  const currency = country.currency || "COP";
-  const amounts = country.defaultAmounts || [20, 50, 100];
-
-  document.getElementById("donate-amount-label").textContent = `Otro monto (${currency} ${symbol})`;
 
   const donateSelect = document.getElementById("donate-country-select");
   if (donateSelect) donateSelect.value = country.code;
 
-  const chipsContainer = document.getElementById("donate-chips-container");
-  chipsContainer.replaceChildren(
-    ...amounts.map((monto) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "chip";
-      btn.dataset.monto = monto;
-      btn.textContent = `${symbol} ${Number(monto).toLocaleString("es-CO")}`;
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
-        btn.classList.add("active");
-        document.getElementById("donate-custom-amount").value = monto;
-      });
-      return btn;
-    })
-  );
-
   const methods = country.paymentMethods || [];
   const tabsContainer = document.getElementById("pm-tabs-container");
   const contentBox = document.getElementById("pm-content-box");
+  if (!tabsContainer || !contentBox) return;
 
   if (!methods.length) {
     tabsContainer.innerHTML = "";
@@ -737,7 +716,15 @@ function updateDonationsUI() {
   );
 
   renderPaymentMethodContent(methods[0]);
+
+  // Actualizar link de WhatsApp del botón directo
+  const btnWaDirect = document.getElementById("btn-donate-wa-direct");
+  if (btnWaDirect && country.whatsapp) {
+    const text = `Hola, quisiera coordinar una ofrenda voluntaria para la comunidad Pura Gracia (${country.name}).`;
+    btnWaDirect.href = `https://wa.me/${country.whatsapp}?text=${encodeURIComponent(text)}`;
+  }
 }
+
 
 function renderPaymentMethodContent(method) {
   const contentBox = document.getElementById("pm-content-box");
@@ -897,26 +884,6 @@ function initForms() {
     });
   }
 
-
-  // Sincronizar input libre de monto para deseleccionar chips
-  const customAmountInput = document.getElementById("donate-custom-amount");
-  customAmountInput.addEventListener("input", () => {
-    document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
-  });
-
-  // Envío de donación por WhatsApp
-  document.getElementById("form-donar").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const country = PGStorage.getActiveCountry();
-    const data = new FormData(e.target);
-    const monto = data.get("monto") || "una ofrenda";
-    const mensaje = String(data.get("mensaje") || "").trim();
-    const symbol = country.currencySymbol || "$";
-    const currency = country.currency || "COP";
-    const text = `Hola, quiero enviar una ofrenda a Pura Gracia (${country.name}). Monto: ${symbol} ${monto} ${currency}. ${mensaje ? `Mensaje: "${mensaje}"` : ""}`.trim();
-    
-    window.open(`https://wa.me/${country.whatsapp}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
-  });
 
   // Selector de País en Donaciones
   const donateSelect = document.getElementById("donate-country-select");

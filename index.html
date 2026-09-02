@@ -54,7 +54,7 @@
           <a href="#oracion">Altar Mundial</a>
           <a href="#quienes-somos">Quiénes somos</a>
           <a href="#reuniones">Reuniones</a>
-          <a href="#donar" class="nav-cta">Donar</a>
+          <a href="#donar">Ofrendas</a>
         </nav>
       </div>
     </header>
@@ -322,61 +322,46 @@
         </div>
       </section>
 
-      <!-- DONACIONES DINÁMICAS MULTI-PAÍS -->
-      <section id="donar" class="section donate-section">
-        <div class="container split">
-          <div>
-            <p class="eyebrow">Sostén la obra</p>
-            <h2>Donaciones y Ofrendas</h2>
-            <p>
-              Tu ofrenda ayuda a mantener los tableros, materiales impresos y los espacios donde nos reunimos a orar en cada ciudad.
-            </p>
-            <p class="muted">
-              Cuentas bancarias locales detectadas automáticamente (Yape, Plin, Nequi, Daviplata, SPEI, Mercado Pago o Zelle).
-            </p>
-
-            <!-- Cuentas bancarias dinámicas -->
-            <div class="payment-methods-card" id="payment-methods-card">
-              <div class="pm-header">
-                <strong>💳 Métodos de Depósito Local:</strong>
+      <!-- OFRENDAS Y APOYO AL MINISTERIO (SECCIÓN SUTIL Y DISCRETA) -->
+      <section id="donar" class="section donate-section-subtle">
+        <div class="container">
+          <div class="donate-subtle-box">
+            <div class="donate-subtle-top">
+              <div class="donate-subtle-info">
+                <span class="donate-subtle-badge">Ofrendas voluntarias</span>
+                <h3>Apoyo al ministerio</h3>
+                <p class="muted">
+                  Nuestra comunidad de oración es un servicio de fe 100% gratuito. Si nace en tu corazón apoyar los materiales y sedes de encuentro, puedes realizar una ofrenda voluntaria:
+                </p>
               </div>
+              <div class="donate-country-mini">
+                <label for="donate-country-select" class="sr-only">País:</label>
+                <select id="donate-country-select" class="select-styled select-compact" aria-label="Seleccionar país para ofrendas">
+                  <option value="PE">🇵🇪 Perú (PEN)</option>
+                  <option value="CO">🇨🇴 Colombia (COP)</option>
+                  <option value="MX">🇲🇽 México (MXN)</option>
+                  <option value="AR">🇦🇷 Argentina (ARS)</option>
+                  <option value="US">🌎 Internacional (USD)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Cuentas bancarias dinámicas en formato compacto -->
+            <div class="donate-subtle-methods">
               <div class="pm-tabs" id="pm-tabs-container"></div>
               <div class="pm-content-box" id="pm-content-box"></div>
             </div>
+
+            <div class="donate-subtle-bottom">
+              <span class="donate-note-text">🤍 Cada ofrenda es administrada con transparencia y gratitud.</span>
+              <a href="#" id="btn-donate-wa-direct" class="btn-wa-subtle" target="_blank" rel="noopener">
+                💬 Informar o coordinar por WhatsApp
+              </a>
+            </div>
           </div>
-
-          <form id="form-donar" class="card form-card">
-            <!-- Selector de País de Donación -->
-            <label>
-              País de la Donación
-              <select id="donate-country-select" class="select-styled">
-                <option value="PE">🇵🇪 Perú (Soles PEN)</option>
-                <option value="CO">🇨🇴 Colombia (Pesos COP)</option>
-                <option value="MX">🇲🇽 México (Pesos MXN)</option>
-                <option value="AR">🇦🇷 Argentina (Pesos ARS)</option>
-                <option value="US">🌎 Internacional / USA (Dólares USD)</option>
-              </select>
-            </label>
-
-            <!-- Montos sugeridos dinámicos -->
-            <div class="amount-row" id="donate-chips-container" role="group" aria-label="Monto sugerido"></div>
-
-            <label>
-              <span id="donate-amount-label">Otro monto (PEN S/.)</span>
-              <input type="number" id="donate-custom-amount" name="monto" min="1" step="5" placeholder="Ej. 50" />
-            </label>
-
-            <label>
-              Mensaje o motivo de la ofrenda (opcional)
-              <input type="text" name="mensaje" maxlength="120" placeholder="Ej. Ofrenda de gratitud" />
-            </label>
-
-            <button class="btn btn-primary" type="submit" id="btn-donate-submit">
-              <span>📱</span> Donar y Confirmar por WhatsApp
-            </button>
-          </form>
         </div>
       </section>
+
     </main>
 
     <footer class="site-footer">
