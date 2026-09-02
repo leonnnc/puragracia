@@ -207,57 +207,12 @@ const PGFirebase = {
       }
       this.db = firebase.firestore();
       this.initialized = true;
-      console.info("🔥 Firebase conectado al proyecto:", cfg.projectId);
-
-      // Si es el primer arranque en producción, purgar documentos de prueba antiguos de Firestore
-      this.purgeFirestoreTestDocs();
-
+      console.info("🔥 Firebase conectado en tiempo real al proyecto:", cfg.projectId);
       return true;
     } catch (err) {
       console.error("Firebase init error:", err.message);
       this.initialized = false;
       return false;
-    }
-  },
-
-  /** Elimina de Firestore los documentos de prueba antiguos acumulados durante desarrollo */
-  async purgeFirestoreTestDocs() {
-    if (!this.initialized || !this.db) return;
-    const PURGE_FS_KEY = "puraGracia.firestore_purged_v3";
-    try {
-      if (localStorage.getItem(PURGE_FS_KEY)) return;
-
-      // Purgar orantes de prueba
-      const orantesSnap = await this.db.collection("orantes").get();
-      const batch = this.db.batch();
-      let count = 0;
-
-      orantesSnap.forEach(doc => {
-        const d = doc.data();
-        // Eliminar si es prueba o id legacy
-        if (doc.id.startsWith("o_") || doc.id.startsWith("o") || (d.nombre && /leonardo|test|prueba|pastor david|maria|carlos/i.test(d.nombre))) {
-          batch.delete(doc.ref);
-          count++;
-        }
-      });
-
-      // Purgar peticiones de prueba antiguas
-      const peticionesSnap = await this.db.collection("peticiones").get();
-      peticionesSnap.forEach(doc => {
-        const d = doc.data();
-        if (doc.id.startsWith("p_") || doc.id.startsWith("p") || (d.nombre && /leonardo|maria|andrés|lucia|lucía|camilo|elena|sofia|sofía/i.test(d.nombre))) {
-          batch.delete(doc.ref);
-          count++;
-        }
-      });
-
-      if (count > 0) {
-        await batch.commit();
-        console.info(`🧹 Purgados ${count} documentos de prueba en Firestore.`);
-      }
-      localStorage.setItem(PURGE_FS_KEY, "true");
-    } catch (e) {
-      console.warn("Firestore purge warning:", e.message);
     }
   },
 
@@ -269,10 +224,14 @@ const PGFirebase = {
         .limit(100)
         .onSnapshot(snap => {
           if (!snap || snap.empty) {
-            callback(PGStorage.getOrantesMundiales());
+            callback([]);
+            PGStorage.saveOrantesMundiales([]);
           } else {
             const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            // Ordenar por fecha más reciente
+            list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
             callback(list);
+            PGStorage.saveOrantesMundiales(list);
           }
         }, err => {
           console.warn("Firestore orantes listener warning, usando datos locales:", err.message);
@@ -291,14 +250,17 @@ const PGFirebase = {
 
     if (!this.initialized || !this.db) return;
     try {
-      await this.db.collection("orantes").add({
+      const docData = {
         ...orante,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+        createdAt: new Date().toISOString()
+      };
+      await this.db.collection("orantes").doc(orante.id).set(docData);
+      console.info("✅ Orante sincronizado en la nube Firestore:", orante.nombre);
     } catch (err) {
       console.warn("Error enviando orante a Firestore:", err.message);
     }
   },
+
 
   // ── Peticiones en tiempo real ──
   subscribePeticiones(callback) {

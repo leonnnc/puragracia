@@ -106,21 +106,22 @@ let worldPrayerMarkers = {};
 let _peticionesCache = null;
 let _orantesCache = null;
 
-/** Obtiene peticiones garantizando que siempre haya datos en demo o en la nube */
+/** Obtiene peticiones garantizando reactividad en tiempo real */
 function getPeticionesData() {
-  if (_peticionesCache && Array.isArray(_peticionesCache) && _peticionesCache.length > 0) {
+  if (Array.isArray(_peticionesCache)) {
     return _peticionesCache;
   }
   return PGStorage.getPeticiones();
 }
 
-/** Obtiene orantes garantizando que siempre haya puntos en el mapa mundial */
+/** Obtiene orantes garantizando reactividad en tiempo real */
 function getOrantesData() {
-  if (_orantesCache && Array.isArray(_orantesCache) && _orantesCache.length > 0) {
+  if (Array.isArray(_orantesCache)) {
     return _orantesCache;
   }
   return PGStorage.getOrantesMundiales();
 }
+
 
 /** Renderiza el panel de intercesores conectados visible en la sección principal de oración */
 function renderConnectedPanel() {
@@ -810,6 +811,14 @@ function initForms() {
     btnCerrarMapa.addEventListener("click", closeWorldPrayerFullscreen);
   }
 
+  // Botón directo para entrar a ver el mapa en tiempo real sin registro
+  const btnOpenDirect = document.getElementById("btn-open-room-direct");
+  if (btnOpenDirect) {
+    btnOpenDirect.addEventListener("click", () => {
+      openWorldPrayerFullscreen(null);
+    });
+  }
+
   // Sincronizar input libre de monto para deseleccionar chips
   const customAmountInput = document.getElementById("donate-custom-amount");
   customAmountInput.addEventListener("input", () => {
@@ -1240,11 +1249,11 @@ document.addEventListener("DOMContentLoaded", () => {
       renderHoy();
     });
 
-    // Orantes mundiales en tiempo real
+    // Orantes mundiales en tiempo real → actualizar panel, contadores y mapa
     PGFirebase.subscribeOrantes((list) => {
       _orantesCache = list;
       updateAllCounters();
-      // Si el mapa fullscreen está abierto, refrescar marcadores
+      renderConnectedPanel();           // ← Panel de intercesores visibles en página principal
       if (mapWorldFullscreen) {
         renderFullscreenOrantesMarkers();
         renderFullscreenLiveStream();
@@ -1253,6 +1262,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   } else {
     console.info("📱 Modo local activo: usando almacenamiento local.");
+    // En modo local también renderizar el panel
+    _orantesCache = PGStorage.getOrantesMundiales();
+    _peticionesCache = PGStorage.getPeticiones();
+    renderConnectedPanel();
   }
 });
+
 
