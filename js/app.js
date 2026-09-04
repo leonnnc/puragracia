@@ -1,12 +1,12 @@
-﻿/**
- * Pura Gracia - LÃ³gica del Sitio Web PÃºblico con Red de OraciÃ³n Mundial en 2 Pantallas / Modal Fullscreen
+/**
+ * Pura Gracia - Lógica del Sitio Web Público con Red de Oración Mundial en 2 Pantallas / Modal Fullscreen
  */
 
 const FOTOS = [
   {
     src: "https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=900&q=80",
-    alt: "Personas reunidas en cÃ­rculo de oraciÃ³n",
-    caption: "CÃ­rculo de oraciÃ³n comunitaria",
+    alt: "Personas reunidas en círculo de oración",
+    caption: "Círculo de oración comunitaria",
   },
   {
     src: "https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=900&q=80",
@@ -15,44 +15,44 @@ const FOTOS = [
   },
   {
     src: "https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=900&q=80",
-    alt: "Manos unidas en oraciÃ³n",
-    caption: "IntercesiÃ³n en el parque",
+    alt: "Manos unidas en oración",
+    caption: "Intercesión en el parque",
   },
   {
     src: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=900&q=80",
     alt: "Grupo compartiendo alrededor de una mesa",
-    caption: "CafÃ©, palabra y comuniÃ³n",
+    caption: "Café, palabra y comunión",
   },
 ];
 
 // Coordenadas mundiales aproximadas de ciudades principales
 const CITY_COORDS = {
-  "lima": { lat: -12.0464, lng: -77.0428, country: "PE", flag: "ðŸ‡µðŸ‡ª" },
-  "arequipa": { lat: -16.4090, lng: -71.5375, country: "PE", flag: "ðŸ‡µðŸ‡ª" },
-  "trujillo": { lat: -8.1116, lng: -79.0287, country: "PE", flag: "ðŸ‡µðŸ‡ª" },
-  "cusco": { lat: -13.5319, lng: -71.9675, country: "PE", flag: "ðŸ‡µðŸ‡ª" },
-  "bogotÃ¡": { lat: 4.7110, lng: -74.0721, country: "CO", flag: "ðŸ‡¨ðŸ‡´" },
-  "bogota": { lat: 4.7110, lng: -74.0721, country: "CO", flag: "ðŸ‡¨ðŸ‡´" },
-  "medellÃ­n": { lat: 6.2442, lng: -75.5812, country: "CO", flag: "ðŸ‡¨ðŸ‡´" },
-  "medellin": { lat: 6.2442, lng: -75.5812, country: "CO", flag: "ðŸ‡¨ðŸ‡´" },
-  "cali": { lat: 3.4516, lng: -76.5320, country: "CO", flag: "ðŸ‡¨ðŸ‡´" },
-  "barranquilla": { lat: 10.9685, lng: -74.7813, country: "CO", flag: "ðŸ‡¨ðŸ‡´" },
-  "ciudad de mÃ©xico": { lat: 19.4326, lng: -99.1332, country: "MX", flag: "ðŸ‡²ðŸ‡½" },
-  "cdmx": { lat: 19.4326, lng: -99.1332, country: "MX", flag: "ðŸ‡²ðŸ‡½" },
-  "mexico": { lat: 19.4326, lng: -99.1332, country: "MX", flag: "ðŸ‡²ðŸ‡½" },
-  "guadalajara": { lat: 20.6597, lng: -103.3496, country: "MX", flag: "ðŸ‡²ðŸ‡½" },
-  "monterrey": { lat: 25.6866, lng: -100.3161, country: "MX", flag: "ðŸ‡²ðŸ‡½" },
-  "buenos aires": { lat: -34.6037, lng: -58.3816, country: "AR", flag: "ðŸ‡¦ðŸ‡·" },
-  "cÃ³rdoba": { lat: -31.4201, lng: -64.1888, country: "AR", flag: "ðŸ‡¦ðŸ‡·" },
-  "cordoba": { lat: -31.4201, lng: -64.1888, country: "AR", flag: "ðŸ‡¦ðŸ‡·" },
-  "rosario": { lat: -32.9468, lng: -60.6393, country: "AR", flag: "ðŸ‡¦ðŸ‡·" },
-  "miami": { lat: 25.7617, lng: -80.1918, country: "US", flag: "ðŸ‡ºðŸ‡¸" },
-  "orlando": { lat: 28.5383, lng: -81.3792, country: "US", flag: "ðŸ‡ºðŸ‡¸" },
-  "houston": { lat: 29.7604, lng: -95.3698, country: "US", flag: "ðŸ‡ºðŸ‡¸" },
-  "madrid": { lat: 40.4168, lng: -3.7038, country: "ES", flag: "ðŸ‡ªðŸ‡¸" },
-  "barcelona": { lat: 41.3879, lng: 2.1699, country: "ES", flag: "ðŸ‡ªðŸ‡¸" },
-  "santiago": { lat: -33.4489, lng: -70.6693, country: "CL", flag: "ðŸ‡¨ðŸ‡±" },
-  "quito": { lat: -0.1807, lng: -78.4678, country: "EC", flag: "ðŸ‡ªðŸ‡¨" }
+  "lima": { lat: -12.0464, lng: -77.0428, country: "PE", flag: "🇵🇪" },
+  "arequipa": { lat: -16.4090, lng: -71.5375, country: "PE", flag: "🇵🇪" },
+  "trujillo": { lat: -8.1116, lng: -79.0287, country: "PE", flag: "🇵🇪" },
+  "cusco": { lat: -13.5319, lng: -71.9675, country: "PE", flag: "🇵🇪" },
+  "bogotá": { lat: 4.7110, lng: -74.0721, country: "CO", flag: "🇨🇴" },
+  "bogota": { lat: 4.7110, lng: -74.0721, country: "CO", flag: "🇨🇴" },
+  "medellín": { lat: 6.2442, lng: -75.5812, country: "CO", flag: "🇨🇴" },
+  "medellin": { lat: 6.2442, lng: -75.5812, country: "CO", flag: "🇨🇴" },
+  "cali": { lat: 3.4516, lng: -76.5320, country: "CO", flag: "🇨🇴" },
+  "barranquilla": { lat: 10.9685, lng: -74.7813, country: "CO", flag: "🇨🇴" },
+  "ciudad de méxico": { lat: 19.4326, lng: -99.1332, country: "MX", flag: "🇲🇽" },
+  "cdmx": { lat: 19.4326, lng: -99.1332, country: "MX", flag: "🇲🇽" },
+  "mexico": { lat: 19.4326, lng: -99.1332, country: "MX", flag: "🇲🇽" },
+  "guadalajara": { lat: 20.6597, lng: -103.3496, country: "MX", flag: "🇲🇽" },
+  "monterrey": { lat: 25.6866, lng: -100.3161, country: "MX", flag: "🇲🇽" },
+  "buenos aires": { lat: -34.6037, lng: -58.3816, country: "AR", flag: "🇦🇷" },
+  "córdoba": { lat: -31.4201, lng: -64.1888, country: "AR", flag: "🇦🇷" },
+  "cordoba": { lat: -31.4201, lng: -64.1888, country: "AR", flag: "🇦🇷" },
+  "rosario": { lat: -32.9468, lng: -60.6393, country: "AR", flag: "🇦🇷" },
+  "miami": { lat: 25.7617, lng: -80.1918, country: "US", flag: "🇺🇸" },
+  "orlando": { lat: 28.5383, lng: -81.3792, country: "US", flag: "🇺🇸" },
+  "houston": { lat: 29.7604, lng: -95.3698, country: "US", flag: "🇺🇸" },
+  "madrid": { lat: 40.4168, lng: -3.7038, country: "ES", flag: "🇪🇸" },
+  "barcelona": { lat: 41.3879, lng: 2.1699, country: "ES", flag: "🇪🇸" },
+  "santiago": { lat: -33.4489, lng: -70.6693, country: "CL", flag: "🇨🇱" },
+  "quito": { lat: -0.1807, lng: -78.4678, country: "EC", flag: "🇪🇨" }
 };
 
 function uid() {
@@ -123,7 +123,7 @@ function getOrantesData() {
 }
 
 
-/** Renderiza el panel de intercesores conectados visible en la secciÃ³n principal de oraciÃ³n */
+/** Renderiza el panel de intercesores conectados visible en la sección principal de oración */
 function renderConnectedPanel() {
   const grid = document.getElementById("connected-grid");
   const countEl = document.getElementById("connected-count");
@@ -135,8 +135,8 @@ function renderConnectedPanel() {
   if (!orantes.length) {
     grid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 2rem 1rem; color: #a0aec0; font-size: 0.9rem;">
-        <span style="font-size: 1.6rem; display: block; margin-bottom: 0.4rem;">ðŸ™</span>
-        AÃºn no hay intercesores en la lista de hoy. Â¡SÃ© el primero en unirte al Intercesión Mundial completando el formulario de arriba!
+        <span style="font-size: 1.6rem; display: block; margin-bottom: 0.4rem;">🙏</span>
+        Aún no hay intercesores en la lista de hoy. ¡Sé el primero en unirte a la Intercesión Mundial completando el formulario de arriba!
       </div>
     `;
     return;
@@ -144,12 +144,12 @@ function renderConnectedPanel() {
 
   grid.innerHTML = orantes.map((o, i) => `
     <div class="connected-card" style="animation-delay:${i * 0.05}s;">
-      <div class="connected-card-flag">${o.flag || "ðŸ™"}</div>
+      <div class="connected-card-flag">${o.flag || "🙏"}</div>
       <div class="connected-card-info">
-        <div class="connected-card-name">ðŸ™ ${escapeHtml(o.nombre)}</div>
+        <div class="connected-card-name">🙏 ${escapeHtml(o.nombre)}</div>
         <div class="connected-card-location">${escapeHtml(o.ciudad)}, ${escapeHtml(o.pais)}</div>
-        <div class="connected-card-motivo">"${escapeHtml(o.motivo || 'En oraciÃ³n')}"</div>
-        <div class="connected-card-time">â± ${escapeHtml(o.time || 'Conectado en vivo')}</div>
+        <div class="connected-card-motivo">"${escapeHtml(o.motivo || 'En oración')}"</div>
+        <div class="connected-card-time">⏱ ${escapeHtml(o.time || 'Conectado en vivo')}</div>
       </div>
     </div>
   `).join("");
@@ -170,7 +170,7 @@ function updateAllCounters() {
   const totalNotas = document.getElementById("total-notas");
   if (totalNotas) totalNotas.textContent = peticiones.length;
 
-  // EstadÃ­sticas y contadores en vivo del Hero
+  // Estadísticas y contadores en vivo del Hero
   const statPageVisits = document.getElementById("stat-page-visits");
   if (statPageVisits) statPageVisits.textContent = stats.pageVisits || 1;
 
@@ -183,13 +183,13 @@ function updateAllCounters() {
   const statWorldVisits = document.getElementById("stat-world-visits");
   if (statWorldVisits) statWorldVisits.textContent = stats.worldVisits || 0;
 
-  // Actualizar panel de conectados visible en la secciÃ³n principal
+  // Actualizar panel de conectados visible en la sección principal
   renderConnectedPanel();
 }
 
 
 // ========================================================
-// 1. DETECCIÃ“N AUTOMÃTICA DE PAÃS
+// 1. DETECCIÓN AUTOMÁTICA DE PAÍS
 // ========================================================
 function autoDetectCountry() {
   const savedCountry = PGStorage.getActiveCountryCode();
@@ -198,7 +198,7 @@ function autoDetectCountry() {
     return;
   }
 
-  let detected = "PE"; // Por defecto PerÃº
+  let detected = "PE"; // Por defecto Perú
 
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
@@ -223,7 +223,7 @@ function autoDetectCountry() {
 
   applyDetectedCountry(detected);
 
-  // VerificaciÃ³n rÃ¡pida en segundo plano por IP
+  // Verificación rápida en segundo plano por IP
   fetch("https://api.country.is/")
     .then(res => res.json())
     .then(data => {
@@ -251,7 +251,7 @@ function applyDetectedCountry(code) {
 }
 
 // ========================================================
-// 2. MODAL FULLSCREEN - GLOBO TERRÃQUEO 3D EN VIVO
+// 2. MODAL FULLSCREEN - GLOBO TERRÁQUEO 3D EN VIVO
 // ========================================================
 let globe3DInstance = null;
 let currentGlobeTexture = "night";
@@ -319,9 +319,9 @@ function init3DGlobe(containerId, initialOrante = null) {
       el.className = "globe-pin-3d";
       el.innerHTML = `
         <span class="globe-pin-beacon"></span>
-        <span>${d.flag || "ðŸ“"} ${escapeHtml(d.nombre)}</span>
+        <span>${d.flag || "📍"} ${escapeHtml(d.nombre)}</span>
       `;
-      el.title = `${d.nombre} (${d.ciudad}, ${d.pais})\n"${d.motivo || 'En oraciÃ³n'}"`;
+      el.title = `${d.nombre} (${d.ciudad}, ${d.pais})\n"${d.motivo || 'En oración'}"`;
       el.onclick = (ev) => {
         ev.stopPropagation();
         if (globe3DInstance) {
@@ -386,13 +386,13 @@ function openWorldPrayerFullscreen(currentOrante = null) {
   updateAllCounters();
 
   if (currentOrante) {
-    document.getElementById("mf-user-name").textContent = `ðŸ™ ${currentOrante.nombre}`;
+    document.getElementById("mf-user-name").textContent = `🙏 ${currentOrante.nombre}`;
     document.getElementById("mf-user-location").textContent = `Conectado desde ${currentOrante.ciudad}, ${currentOrante.pais}`;
   } else if (oranteActual) {
-    document.getElementById("mf-user-name").textContent = `ðŸ™ ${oranteActual}`;
+    document.getElementById("mf-user-name").textContent = `🙏 ${oranteActual}`;
   }
 
-  // Inicializar Globo TerrÃ¡queo 3D
+  // Inicializar Globo Terráqueo 3D
   setTimeout(() => {
     init3DGlobe("mapa-mundial-fullscreen", currentOrante);
     renderFullscreenLiveStream();
@@ -418,7 +418,7 @@ function renderFullscreenLiveStream() {
   if (!orantes.length) {
     streamContainer.innerHTML = `
       <div style="padding: 0.5rem 1rem; color: #94a3b8; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem;">
-        <span>ðŸ•Šï¸</span> <span>Sala de oraciÃ³n abierta. Al unirte al Intercesión Mundial, tu peticiÃ³n se mostrarÃ¡ aquÃ­ en vivo.</span>
+        <span>🕊️</span> <span>Sala de oración abierta. Al unirte a la Intercesión Mundial, tu petición se mostrará aquí en vivo.</span>
       </div>
     `;
     return;
@@ -426,9 +426,9 @@ function renderFullscreenLiveStream() {
 
   streamContainer.innerHTML = orantes.map(o => `
     <div class="stream-orante-card" data-id="${o.id}">
-      <strong>${o.flag || "ðŸ“"} ${escapeHtml(o.nombre)}</strong>
+      <strong>${o.flag || "📍"} ${escapeHtml(o.nombre)}</strong>
       <span style="color:#34d399; font-weight:600;">(${escapeHtml(o.ciudad)})</span>
-      <span class="motivo-preview">Â· "${escapeHtml(o.motivo || 'En oraciÃ³n')}"</span>
+      <span class="motivo-preview">· "${escapeHtml(o.motivo || 'En oración')}"</span>
     </div>
   `).join("");
 
@@ -462,7 +462,7 @@ function renderPizarra() {
   document.getElementById("total-notas").textContent = peticiones.length;
 
   if (!filtered.length) {
-    board.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #c5d6cf;">No hay notas en esta categorÃ­a todavÃ­a. Â¡SÃ© el primero en dejar una!</div>`;
+    board.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #c5d6cf;">No hay notas en esta categoría todavía. ¡Sé el primero en dejar una!</div>`;
     return;
   }
 
@@ -472,7 +472,7 @@ function renderPizarra() {
       el.className = "nota";
       el.setAttribute("role", "listitem");
       const time = new Date(p.createdAt || Date.now());
-      const flag = p.country === "PE" ? "ðŸ‡µðŸ‡ª" : p.country === "MX" ? "ðŸ‡²ðŸ‡½" : p.country === "AR" ? "ðŸ‡¦ðŸ‡·" : p.country === "US" ? "ðŸŒŽ" : "ðŸ‡¨ðŸ‡´";
+      const flag = p.country === "PE" ? "🇵🇪" : p.country === "MX" ? "🇲🇽" : p.country === "AR" ? "🇦🇷" : p.country === "US" ? "🌎" : "🇨🇴";
       
       el.innerHTML = `
         <div class="nota-badge">${flag} ${escapeHtml(p.category || "General")}</div>
@@ -480,8 +480,8 @@ function renderPizarra() {
         <p>${escapeHtml(p.texto)}</p>
         <div class="nota-footer">
           <time datetime="${p.createdAt}">${time.toLocaleDateString("es-CO")}</time>
-          <button type="button" class="btn-pray-join" data-id="${p.id}" title="Unirme a orar por esta peticiÃ³n">
-            <span>ðŸ™</span> <span class="pray-count">${p.praysCount || 0}</span>
+          <button type="button" class="btn-pray-join" data-id="${p.id}" title="Unirme a orar por esta petición">
+            <span>🙏</span> <span class="pray-count">${p.praysCount || 0}</span>
           </button>
         </div>
       `;
@@ -511,7 +511,7 @@ function renderHoy() {
   const today = peticionesDeHoy();
   
   if (!today.length) {
-    list.innerHTML = `<li class="peticion-hoy">AÃºn no hay peticiones nuevas hoy. Puedes unirte en oraciÃ³n por las notas de la pizarra comunitaria.</li>`;
+    list.innerHTML = `<li class="peticion-hoy">Aún no hay peticiones nuevas hoy. Puedes unirte en oración por las notas de la pizarra comunitaria.</li>`;
     return;
   }
 
@@ -535,21 +535,21 @@ function renderHoy() {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "btn btn-small btn-whatsapp";
-        btn.textContent = "Enviar reflexiÃ³n por WhatsApp";
+        btn.textContent = "Enviar reflexión por WhatsApp";
         btn.addEventListener("click", () => openReflexion(p, "whatsapp"));
         actions.appendChild(btn);
       }
       if (canMail) {
         const a = document.createElement("a");
         a.className = "btn btn-small btn-ghost";
-        a.href = `mailto:${encodeURIComponent(p.correo)}?subject=${encodeURIComponent("Oramos por ti â€” Pura Gracia")}&body=${encodeURIComponent(`Hola ${p.nombre}, oramos por tu peticiÃ³n.`)}`;
+        a.href = `mailto:${encodeURIComponent(p.correo)}?subject=${encodeURIComponent("Oramos por ti — Pura Gracia")}&body=${encodeURIComponent(`Hola ${p.nombre}, oramos por tu petición.`)}`;
         a.textContent = "Escribir al correo";
         actions.appendChild(a);
       }
       if (!canWa && !canMail) {
         const span = document.createElement("span");
         span.className = "muted";
-        span.textContent = "PeticiÃ³n anÃ³nima: ora en silencio.";
+        span.textContent = "Petición anónima: ora en silencio.";
         actions.appendChild(span);
       }
       return li;
@@ -557,13 +557,13 @@ function renderHoy() {
   );
 }
 
-// MODAL DE REFLEXIÃ“N
+// MODAL DE REFLEXIÓN
 function openReflexion(peticion, canal) {
   reflexionTarget = { ...peticion, canal };
   const modal = document.getElementById("modal-reflexion");
   document.getElementById("modal-destino").textContent = `Para ${peticion.nombre} (${peticion.telefono})`;
   document.getElementById("texto-reflexion").value =
-    `Hola ${peticion.nombre}, soy ${oranteActual || "un intercesor"} de la comunidad Pura Gracia. Oramos por tu peticiÃ³n: "${peticion.texto}". Que la paz y la gracia de Dios te acompaÃ±en hoy.`;
+    `Hola ${peticion.nombre}, soy ${oranteActual || "un intercesor"} de la comunidad Pura Gracia. Oramos por tu petición: "${peticion.texto}". Que la paz y la gracia de Dios te acompañen hoy.`;
   modal.hidden = false;
   document.getElementById("texto-reflexion").focus();
 }
@@ -583,7 +583,7 @@ function enviarReflexion() {
   closeModal();
 }
 
-// GALERÃA
+// GALERÍA
 function renderGaleria() {
   const galeria = document.getElementById("galeria");
   if (!galeria) return;
@@ -597,7 +597,7 @@ function renderGaleria() {
   );
 }
 
-// NAVEGACIÃ“N DE GALERÃA (flechas prev/next)
+// NAVEGACIÓN DE GALERÍA (flechas prev/next)
 function initGalleryNav() {
   const galeria = document.getElementById("galeria");
   const prevBtn = document.querySelector(".gallery-nav.prev");
@@ -626,8 +626,8 @@ function updateMeetingsAndMap() {
   const country = PGStorage.getActiveCountry();
   const reuniones = country.reuniones || [];
 
-  document.getElementById("reuniones-title").textContent = `Reuniones de oraciÃ³n Â· ${country.name}`;
-  document.getElementById("hero-country-badge").textContent = `Comunidad de oraciÃ³n Â· ${country.name}`;
+  document.getElementById("reuniones-title").textContent = `Reuniones de oración · ${country.name}`;
+  document.getElementById("hero-country-badge").textContent = `Comunidad de oración · ${country.name}`;
 
   const list = document.getElementById("lista-fechas");
   if (!reuniones.length) {
@@ -638,7 +638,7 @@ function updateMeetingsAndMap() {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "date-btn" + (index === 0 ? " active" : "");
-        btn.innerHTML = `<strong>${escapeHtml(r.titulo)}</strong><br><span style="font-size:0.85rem; color:var(--teal); font-weight:600;">${escapeHtml(r.city)}</span> Â· ${formatFecha(r.fecha)}<br><small style="color:var(--muted);">${escapeHtml(r.lugar)}</small>`;
+        btn.innerHTML = `<strong>${escapeHtml(r.titulo)}</strong><br><span style="font-size:0.85rem; color:var(--teal); font-weight:600;">${escapeHtml(r.city)}</span> · ${formatFecha(r.fecha)}<br><small style="color:var(--muted);">${escapeHtml(r.lugar)}</small>`;
         
         btn.addEventListener("click", () => {
           document.querySelectorAll(".date-btn").forEach((el) => el.classList.remove("active"));
@@ -669,7 +669,7 @@ function updateMeetingsAndMap() {
       reuniones.forEach((r) => {
         if (r.lat && r.lng) {
           const marker = L.marker([r.lat, r.lng]).addTo(mapMeetings);
-          marker.bindPopup(`<strong>${escapeHtml(r.titulo)}</strong><br>${escapeHtml(r.city)}<br>${formatFecha(r.fecha)} Â· ${escapeHtml(r.hora)}<br>${escapeHtml(r.lugar)}`);
+          marker.bindPopup(`<strong>${escapeHtml(r.titulo)}</strong><br>${escapeHtml(r.city)}<br>${formatFecha(r.fecha)} · ${escapeHtml(r.hora)}<br>${escapeHtml(r.lugar)}`);
           mapMeetingsMarkers.push(marker);
         }
       });
@@ -682,7 +682,7 @@ function updateMeetingsAndMap() {
   }
 }
 
-// SECCIÃ“N DE DONACIONES DINÃMICAS
+// SECCIÓN DE DONACIONES DINÁMICAS
 function updateDonationsUI() {
   const country = PGStorage.getActiveCountry();
 
@@ -696,7 +696,7 @@ function updateDonationsUI() {
 
   if (!methods.length) {
     tabsContainer.innerHTML = "";
-    contentBox.innerHTML = "<p class='muted'>ContÃ¡ctanos por WhatsApp para coordinar tu ofrenda.</p>";
+    contentBox.innerHTML = "<p class='muted'>Contáctanos por WhatsApp para coordinar tu ofrenda.</p>";
     return;
   }
 
@@ -705,7 +705,7 @@ function updateDonationsUI() {
       const tab = document.createElement("button");
       tab.type = "button";
       tab.className = "pm-tab" + (idx === 0 ? " active" : "");
-      tab.innerHTML = `${m.icon || "ðŸ’³"} ${escapeHtml(m.name)}`;
+      tab.innerHTML = `${m.icon || "💳"} ${escapeHtml(m.name)}`;
       tab.addEventListener("click", () => {
         document.querySelectorAll(".pm-tab").forEach(t => t.classList.remove("active"));
         tab.classList.add("active");
@@ -717,7 +717,7 @@ function updateDonationsUI() {
 
   renderPaymentMethodContent(methods[0]);
 
-  // Actualizar link de WhatsApp del botÃ³n directo
+  // Actualizar link de WhatsApp del botón directo
   const btnWaDirect = document.getElementById("btn-donate-wa-direct");
   if (btnWaDirect && country.whatsapp) {
     const text = `Hola, quisiera coordinar una ofrenda voluntaria para la comunidad Pura Gracia (${country.name}).`;
@@ -731,7 +731,7 @@ function renderPaymentMethodContent(method) {
   if (!method) return;
 
   contentBox.innerHTML = `
-    <strong>${method.icon || "ðŸ’³"} ${escapeHtml(method.name)}</strong>
+    <strong>${method.icon || "💳"} ${escapeHtml(method.name)}</strong>
     <p style="margin: 0.2rem 0; font-size: 0.9rem;">${escapeHtml(method.instructions || "")}</p>
     <div class="pm-account-row">
       <code>${escapeHtml(method.account)}</code>
@@ -742,15 +742,15 @@ function renderPaymentMethodContent(method) {
 
   document.getElementById("btn-copy-acc").addEventListener("click", (e) => {
     navigator.clipboard.writeText(method.account).then(() => {
-      e.target.textContent = "Â¡Copiado!";
+      e.target.textContent = "¡Copiado!";
       setTimeout(() => { e.target.textContent = "Copiar"; }, 2000);
     });
   });
 }
 
-// INICIALIZACIÃ“N DE FORMULARIOS Y EVENTOS
+// INICIALIZACIÓN DE FORMULARIOS Y EVENTOS
 function initForms() {
-  // PeticiÃ³n Submit
+  // Petición Submit
   document.getElementById("form-peticion").addEventListener("submit", async (e) => {
     e.preventDefault();
     const data = new FormData(e.target);
@@ -771,7 +771,7 @@ function initForms() {
       createdAt: new Date().toISOString(),
     };
 
-    // Guardar en Firebase (si estÃ¡ activo) o localStorage
+    // Guardar en Firebase (si está activo) o localStorage
     await PGFirebase.addPeticion(nuevaPeticion);
 
     e.target.reset();
@@ -781,13 +781,13 @@ function initForms() {
       renderPizarra();
       renderHoy();
     }
-    // Si hay Firebase, la suscripciÃ³n actualizarÃ¡ automÃ¡ticamente
+    // Si hay Firebase, la suscripción actualizará automáticamente
 
     document.getElementById("peticiones").scrollIntoView({ behavior: "smooth" });
   });
 
 
-  // Filtros de categorÃ­a en la pizarra
+  // Filtros de categoría en la pizarra
   document.querySelectorAll(".filter-chip").forEach((btn) => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".filter-chip").forEach((c) => c.classList.remove("active"));
@@ -797,13 +797,13 @@ function initForms() {
     });
   });
 
-  // Entrada a la Red y Plano Mundial de OraciÃ³n (PANTALLA 1 -> PANTALLA 2 FULLSCREEN)
+  // Entrada a la Red y Plano Mundial de Oración (PANTALLA 1 -> PANTALLA 2 FULLSCREEN)
   document.getElementById("form-sala").addEventListener("submit", (e) => {
     e.preventDefault();
     const data = new FormData(e.target);
     const nombre = String(data.get("orante") || "").trim();
     const ciudad = String(data.get("ciudad") || "Lima").trim();
-    const pais = String(data.get("pais") || "PerÃº").trim();
+    const pais = String(data.get("pais") || "Perú").trim();
     const motivo = String(data.get("motivo") || "Orando por paz y salud").trim();
 
     if (!nombre || !motivo) return;
@@ -813,31 +813,31 @@ function initForms() {
 
     // Buscar coordenadas o usar coordenadas por defecto de la ciudad
     const normalizedCity = ciudad.toLowerCase();
-    const foundCoords = CITY_COORDS[normalizedCity] || { lat: -12.0464, lng: -77.0428, country: "PE", flag: "ðŸ‡µðŸ‡ª" };
+    const foundCoords = CITY_COORDS[normalizedCity] || { lat: -12.0464, lng: -77.0428, country: "PE", flag: "🇵🇪" };
 
     const nuevoOrante = {
       id: "o_" + Date.now(),
       nombre, ciudad, pais, motivo,
-      flag: foundCoords.flag || "ðŸ“",
+      flag: foundCoords.flag || "📍",
       lat: foundCoords.lat + (Math.random() * 0.08 - 0.04),
       lng: foundCoords.lng + (Math.random() * 0.08 - 0.04),
       time: "Ahora mismo"
     };
 
-    // Guardar en Firebase (si estÃ¡ activo) o localStorage
+    // Guardar en Firebase (si está activo) o localStorage
     PGFirebase.addOrante(nuevoOrante);
 
     // ABRIR PANTALLA 2 (MODAL FULLSCREEN DEL PLANO DE LA TIERRA)
     openWorldPrayerFullscreen(nuevoOrante);
   });
 
-  // BotÃ³n para salir del plano mundial fullscreen
+  // Botón para salir del plano mundial fullscreen
   const btnCerrarMapa = document.getElementById("btn-cerrar-mapa-mundial");
   if (btnCerrarMapa) {
     btnCerrarMapa.addEventListener("click", closeWorldPrayerFullscreen);
   }
 
-  // BotÃ³n directo para entrar a ver el mapa en tiempo real sin registro
+  // Botón directo para entrar a ver el mapa en tiempo real sin registro
   const btnOpenDirect = document.getElementById("btn-open-room-direct");
   if (btnOpenDirect) {
     btnOpenDirect.addEventListener("click", () => {
@@ -845,7 +845,7 @@ function initForms() {
     });
   }
 
-  // â”€â”€ Controles 3D del Globo TerrÃ¡queo â”€â”€
+  // ── Controles 3D del Globo Terráqueo ──
   const btnGlobeRotate = document.getElementById("btn-globe-autorotate");
   if (btnGlobeRotate) {
     btnGlobeRotate.addEventListener("click", () => {
@@ -855,7 +855,7 @@ function initForms() {
         isGlobeAutoRotate = !isGlobeAutoRotate;
         controls.autoRotate = isGlobeAutoRotate;
         btnGlobeRotate.classList.toggle("active", isGlobeAutoRotate);
-        btnGlobeRotate.innerHTML = isGlobeAutoRotate ? "ðŸ”„ RotaciÃ³n 3D" : "â¸ï¸ Pausado";
+        btnGlobeRotate.innerHTML = isGlobeAutoRotate ? "🔄 Rotación 3D" : "⏸️ Pausado";
       }
     });
   }
@@ -880,12 +880,12 @@ function initForms() {
       if (!globe3DInstance) return;
       currentGlobeTexture = currentGlobeTexture === "night" ? "satellite" : "night";
       globe3DInstance.globeImageUrl(GLOBE_TEXTURES[currentGlobeTexture].globe);
-      btnGlobeToggleView.innerHTML = currentGlobeTexture === "night" ? "ðŸŒŒ Vista Noche" : "ðŸ›°ï¸ Vista SatÃ©lite";
+      btnGlobeToggleView.innerHTML = currentGlobeTexture === "night" ? "🌌 Vista Noche" : "🛰️ Vista Satélite";
     });
   }
 
 
-  // Selector de PaÃ­s en Donaciones
+  // Selector de País en Donaciones
   const donateSelect = document.getElementById("donate-country-select");
   if (donateSelect) {
     donateSelect.addEventListener("change", (e) => {
@@ -917,13 +917,13 @@ function initNav() {
 }
 
 // ============================================================================
-// 3. MOTOR DE PODIO DE VOZ EN VIVO, MICRÃ“FONO Y COLA DE 5 MINUTOS POR PONENTE
+// 3. MOTOR DE PODIO DE VOZ EN VIVO, MICRÓFONO Y COLA DE 5 MINUTOS POR PONENTE
 // ============================================================================
 
 const SPEAKER_DURATION_SECONDS = 300; // 5 minutos exactos por ponente (300 seg)
 
 let liveSpeakerState = {
-  activeSpeaker: null, // ProducciÃ³n: Podio libre hasta que un intercesor pida el micrÃ³fono
+  activeSpeaker: null, // Producción: Podio libre hasta que un intercesor pida el micrófono
   queue: [],           // Cola limpia
   timeRemaining: 0,
   timerInterval: null,
@@ -948,13 +948,13 @@ function initLiveVoicePodio() {
 
   if (!btnPedirMic) return;
 
-  // BotÃ³n: Pedir MicrÃ³fono / Transmitir / Cancelar fila
+  // Botón: Pedir Micrófono / Transmitir / Cancelar fila
   btnPedirMic.addEventListener("click", handleMicButtonClick);
 
-  // BotÃ³n: Escuchar audio
+  // Botón: Escuchar audio
   btnToggleAudio.addEventListener("click", handleToggleAudio);
 
-  // BotÃ³n: Ver / Ocultar Fila de Espera
+  // Botón: Ver / Ocultar Fila de Espera
   btnVerCola.addEventListener("click", () => {
     queueDropdown.hidden = !queueDropdown.hidden;
   });
@@ -971,7 +971,7 @@ function startSpeakerTimer() {
       liveSpeakerState.timeRemaining--;
       updateSpeakerTimerUI();
     } else {
-      // Tiempo agotado (5 minutos): Pasar automÃ¡ticamente al siguiente ponente
+      // Tiempo agotado (5 minutos): Pasar automáticamente al siguiente ponente
       nextSpeakerInQueue();
     }
   }, 1000);
@@ -1003,7 +1003,7 @@ function updateSpeakerTimerUI() {
 }
 
 function nextSpeakerInQueue() {
-  // Si el orador saliente era el usuario actual, detener su micrÃ³fono
+  // Si el orador saliente era el usuario actual, detener su micrófono
   if (liveSpeakerState.isTransmitting) {
     stopUserMicrophone();
   }
@@ -1014,7 +1014,7 @@ function nextSpeakerInQueue() {
     liveSpeakerState.activeSpeaker = nextSpeaker;
     liveSpeakerState.timeRemaining = SPEAKER_DURATION_SECONDS; // Reiniciar 5 minutos exactos
 
-    // Si el siguiente ponente es el usuario actual, activar su micrÃ³fono
+    // Si el siguiente ponente es el usuario actual, activar su micrófono
     if (oranteActual && nextSpeaker.nombre.toLowerCase() === oranteActual.toLowerCase()) {
       startUserMicrophone();
     }
@@ -1053,19 +1053,19 @@ function renderSpeakerPodioUI() {
 
   if (!current) {
     if (nameEl) nameEl.textContent = "Podio Libre";
-    if (locEl) locEl.textContent = "Sala de OraciÃ³n Global";
-    if (motivoEl) motivoEl.textContent = '"El micrÃ³fono estÃ¡ disponible. Pide tu turno para orar."';
-    if (flagEl) flagEl.textContent = "ðŸŽ™ï¸";
+    if (locEl) locEl.textContent = "Sala de Oración Global";
+    if (motivoEl) motivoEl.textContent = '"El micrófono está disponible. Pide tu turno para orar."';
+    if (flagEl) flagEl.textContent = "🎙️";
     if (countEl) countEl.textContent = liveSpeakerState.queue.length;
 
     if (btnMic) {
       const myQueueIndex = liveSpeakerState.queue.findIndex(q => oranteActual && q.nombre.toLowerCase() === oranteActual.toLowerCase());
       if (myQueueIndex !== -1) {
         btnMic.className = "btn-lvp btn-lvp-mic in-queue";
-        btnMic.innerHTML = `â³ En Fila (Turno #${myQueueIndex + 1}) Â· Salir`;
+        btnMic.innerHTML = `⏳ En Fila (Turno #${myQueueIndex + 1}) · Salir`;
       } else {
         btnMic.className = "btn-lvp btn-lvp-mic";
-        btnMic.innerHTML = "ðŸŽ¤ Pedir el MicrÃ³fono para Orar";
+        btnMic.innerHTML = "🎤 Pedir el Micrófono para Orar";
       }
     }
 
@@ -1079,23 +1079,23 @@ function renderSpeakerPodioUI() {
   if (nameEl) nameEl.textContent = current.nombre;
   if (locEl) locEl.textContent = `${current.ciudad}, ${current.pais}`;
   if (motivoEl) motivoEl.textContent = `"${current.motivo || 'Orando en unidad por las naciones'}"`;
-  if (flagEl) flagEl.textContent = current.flag || "ðŸ“";
+  if (flagEl) flagEl.textContent = current.flag || "📍";
   if (countEl) countEl.textContent = liveSpeakerState.queue.length;
 
-  // Estado del botÃ³n de micrÃ³fono segÃºn el usuario actual
+  // Estado del botón de micrófono según el usuario actual
   if (btnMic) {
     const isMeSpeaking = Boolean(oranteActual && current.nombre.toLowerCase() === oranteActual.toLowerCase());
     const myQueueIndex = liveSpeakerState.queue.findIndex(q => oranteActual && q.nombre.toLowerCase() === oranteActual.toLowerCase());
 
     if (isMeSpeaking) {
       btnMic.className = "btn-lvp btn-lvp-mic transmitting";
-      btnMic.innerHTML = "ðŸŽ™ï¸ Tu MicrÃ³fono estÃ¡ EN VIVO (Terminar)";
+      btnMic.innerHTML = "🎙️ Tu Micrófono está EN VIVO (Terminar)";
     } else if (myQueueIndex !== -1) {
       btnMic.className = "btn-lvp btn-lvp-mic in-queue";
-      btnMic.innerHTML = `â³ En Fila (Turno #${myQueueIndex + 1}) Â· Salir`;
+      btnMic.innerHTML = `⏳ En Fila (Turno #${myQueueIndex + 1}) · Salir`;
     } else {
       btnMic.className = "btn-lvp btn-lvp-mic";
-      btnMic.innerHTML = "ðŸŽ¤ Pedir el MicrÃ³fono para Orar";
+      btnMic.innerHTML = "🎤 Pedir el Micrófono para Orar";
     }
   }
 
@@ -1109,7 +1109,7 @@ function renderSpeakerQueueList() {
   if (!list) return;
 
   if (!liveSpeakerState.queue.length) {
-    list.innerHTML = `<li style="text-align: center; color: #94a3b8; font-size: 0.78rem; padding: 0.4rem;">No hay personas en espera. Â¡Puedes pedir el micrÃ³fono ahora!</li>`;
+    list.innerHTML = `<li style="text-align: center; color: #94a3b8; font-size: 0.78rem; padding: 0.4rem;">No hay personas en espera. ¡Puedes pedir el micrófono ahora!</li>`;
     return;
   }
 
@@ -1117,9 +1117,9 @@ function renderSpeakerQueueList() {
     <li class="lvp-queue-item">
       <div>
         <span class="pos-badge">#${i + 1}</span>
-        <strong>${q.flag || "ðŸ“"} ${escapeHtml(q.nombre)}</strong>
+        <strong>${q.flag || "📍"} ${escapeHtml(q.nombre)}</strong>
         <span style="color:#34d399; font-size:0.75rem;">(${escapeHtml(q.ciudad)})</span>
-        <span class="motivo-small">"${escapeHtml(q.motivo || 'IntercesiÃ³n')}"</span>
+        <span class="motivo-small">"${escapeHtml(q.motivo || 'Intercesión')}"</span>
       </div>
       <span style="color:var(--yellow); font-size:0.72rem; font-weight:700; white-space:nowrap;">
         En ${Math.max(1, (i + 1) * 5)} min
@@ -1132,7 +1132,7 @@ async function handleMicButtonClick() {
   // Si no ha ingresado su nombre, pedirlo
   if (!oranteActual) {
     const inputName = document.getElementById("input-orante-name");
-    const name = prompt("Para pedir el micrÃ³fono, ingresa tu nombre:", inputName ? inputName.value : "");
+    const name = prompt("Para pedir el micrófono, ingresa tu nombre:", inputName ? inputName.value : "");
     if (!name || !name.trim()) return;
     oranteActual = name.trim();
     sessionStorage.setItem("puraGracia.orantes", oranteActual);
@@ -1143,16 +1143,16 @@ async function handleMicButtonClick() {
   const myQueueIndex = liveSpeakerState.queue.findIndex(q => q.nombre.toLowerCase() === oranteActual.toLowerCase());
 
   if (isMeSpeaking) {
-    // Si ya estÃ¡ hablando, terminar su oraciÃ³n y ceder el turno al siguiente
-    if (confirm("Â¿Deseas terminar tu tiempo de oraciÃ³n y ceder el micrÃ³fono al siguiente hermano en la fila?")) {
+    // Si ya está hablando, terminar su oración y ceder el turno al siguiente
+    if (confirm("¿Deseas terminar tu tiempo de oración y ceder el micrófono al siguiente hermano en la fila?")) {
       nextSpeakerInQueue();
     }
     return;
   }
 
   if (myQueueIndex !== -1) {
-    // Si ya estÃ¡ en la fila, cancelar su turno
-    if (confirm("Â¿Deseas salir de la fila de espera de oraciÃ³n?")) {
+    // Si ya está en la fila, cancelar su turno
+    if (confirm("¿Deseas salir de la fila de espera de oración?")) {
       liveSpeakerState.queue.splice(myQueueIndex, 1);
       renderSpeakerPodioUI();
     }
@@ -1168,19 +1168,19 @@ async function handleMicButtonClick() {
     id: "spk_" + Date.now(),
     nombre: oranteActual,
     ciudad: country.cities && country.cities[0] ? country.cities[0] : "Lima",
-    pais: country.name || "PerÃº",
-    flag: country.flag || "ðŸ‡µðŸ‡ª",
+    pais: country.name || "Perú",
+    flag: country.flag || "🇵🇪",
     motivo: motivo,
     lat: -12.0464,
     lng: -77.0428
   };
 
-  // Solicitar permiso de micrÃ³fono al navegador
+  // Solicitar permiso de micrófono al navegador
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     stream.getTracks().forEach(track => track.stop());
   } catch (err) {
-    console.warn("Permiso de micrÃ³fono denegado o no disponible:", err.message);
+    console.warn("Permiso de micrófono denegado o no disponible:", err.message);
   }
 
   // Si no hay nadie en el podio ni en la fila, tomar el podio inmediatamente
@@ -1193,9 +1193,9 @@ async function handleMicButtonClick() {
     return;
   }
 
-  // De lo contrario, aÃ±adir a la fila
+  // De lo contrario, añadir a la fila
   liveSpeakerState.queue.push(userSpeakerObj);
-  alert(`âœ¨ Â¡Has sido aÃ±adido a la fila para orar! EstÃ¡s en la posiciÃ³n #${liveSpeakerState.queue.length}. Cada ponente cuenta con 5 minutos.`);
+  alert(`✨ ¡Has sido añadido a la fila para orar! Estás en la posición #${liveSpeakerState.queue.length}. Cada ponente cuenta con 5 minutos.`);
   renderSpeakerPodioUI();
 }
 
@@ -1215,10 +1215,10 @@ async function startUserMicrophone() {
       source.connect(liveSpeakerState.analyser);
     }
     
-    alert("ðŸŽ™ï¸ Â¡Es tu turno de orar! Tu micrÃ³fono estÃ¡ EN VIVO transmitiendo a todos los intercesores conectados. Tienes 5 minutos.");
+    alert("🎙️ ¡Es tu turno de orar! Tu micrófono está EN VIVO transmitiendo a todos los intercesores conectados. Tienes 5 minutos.");
     renderSpeakerPodioUI();
   } catch (e) {
-    console.warn("No se pudo iniciar el micrÃ³fono real:", e);
+    console.warn("No se pudo iniciar el micrófono real:", e);
     liveSpeakerState.isTransmitting = true;
     renderSpeakerPodioUI();
   }
@@ -1242,11 +1242,11 @@ function handleToggleAudio() {
 
   if (liveSpeakerState.isListening) {
     btn.classList.add("playing");
-    btn.innerHTML = "ðŸ”Š Escuchando OraciÃ³n";
+    btn.innerHTML = "🔊 Escuchando Oración";
     updateEqualizerWave();
   } else {
     btn.classList.remove("playing");
-    btn.innerHTML = "ðŸ”ˆ Audio Silenciado";
+    btn.innerHTML = "🔈 Audio Silenciado";
     updateEqualizerWave();
   }
 }
@@ -1265,25 +1265,25 @@ function updateEqualizerWave() {
 }
 
 // ========================================================
-// EFECTO DINÃMICO DE POST-ITS CAYENDO EN LA PORTADA
+// EFECTO DINÁMICO DE POST-ITS CAYENDO EN LA PORTADA
 // ========================================================
 const PRAYER_TOPICS_POOL = [
-  { emoji: "ðŸ¥", text: "Salud y Sanidad", category: "Salud" },
-  { emoji: "ðŸ‘¨â€ðŸ‘©â€ðŸ‘§", text: "Familia y Hogar", category: "Familia" },
-  { emoji: "ðŸ’¼", text: "Trabajo y Finanzas", category: "Trabajo" },
-  { emoji: "âœ¨", text: "AcciÃ³n de Gracias", category: "Gratitud" },
-  { emoji: "ðŸ•Šï¸", text: "Paz y Consuelo", category: "Paz" },
-  { emoji: "ðŸŽ“", text: "SabidurÃ­a y Estudios", category: "Trabajo" },
-  { emoji: "ðŸ’", text: "Matrimonio Bendecido", category: "Familia" },
-  { emoji: "ðŸ›¡ï¸", text: "ProtecciÃ³n en Viajes", category: "Paz" },
-  { emoji: "ðŸ‘¶", text: "Por nuestros Hijos", category: "Familia" },
-  { emoji: "â¤ï¸", text: "Sanidad del CorazÃ³n", category: "Paz" },
-  { emoji: "ðŸŒ¿", text: "Crecimiento Espiritual", category: "Gratitud" },
-  { emoji: "ðŸšª", text: "Nuevas Oportunidades", category: "Trabajo" },
-  { emoji: "ðŸ‘µ", text: "Nuestros Abuelitos", category: "Salud" },
-  { emoji: "ðŸ¤", text: "ReconciliaciÃ³n y PerdÃ³n", category: "Familia" },
-  { emoji: "ðŸž", text: "ProvisiÃ³n Diaria", category: "Trabajo" },
-  { emoji: "ðŸŒˆ", text: "Esperanza y Fe", category: "Gratitud" }
+  { emoji: "🏥", text: "Salud y Sanidad", category: "Salud" },
+  { emoji: "👨‍👩‍👧", text: "Familia y Hogar", category: "Familia" },
+  { emoji: "💼", text: "Trabajo y Finanzas", category: "Trabajo" },
+  { emoji: "✨", text: "Acción de Gracias", category: "Gratitud" },
+  { emoji: "🕊️", text: "Paz y Consuelo", category: "Paz" },
+  { emoji: "🎓", text: "Sabiduría y Estudios", category: "Trabajo" },
+  { emoji: "💍", text: "Matrimonio Bendecido", category: "Familia" },
+  { emoji: "🛡️", text: "Protección en Viajes", category: "Paz" },
+  { emoji: "👶", text: "Por nuestros Hijos", category: "Familia" },
+  { emoji: "❤️", text: "Sanidad del Corazón", category: "Paz" },
+  { emoji: "🌿", text: "Crecimiento Espiritual", category: "Gratitud" },
+  { emoji: "🚪", text: "Nuevas Oportunidades", category: "Trabajo" },
+  { emoji: "👵", text: "Nuestros Abuelitos", category: "Salud" },
+  { emoji: "🤝", text: "Reconciliación y Perdón", category: "Familia" },
+  { emoji: "🍞", text: "Provisión Diaria", category: "Trabajo" },
+  { emoji: "🌈", text: "Esperanza y Fe", category: "Gratitud" }
 ];
 
 const POSTIT_COLORS = ["c-yellow", "c-pink", "c-peach", "c-green", "c-cyan", "c-purple"];
@@ -1307,7 +1307,7 @@ function createPostItElement(topic, slot, colorClass) {
   if (slot.right) note.style.right = slot.right;
   note.style.setProperty("--rot", slot.rot);
   note.style.zIndex = slot.zIndex;
-  note.title = `Toca para pedir oraciÃ³n por: ${topic.text}`;
+  note.title = `Toca para pedir oración por: ${topic.text}`;
 
   note.innerHTML = `
     <span class="pin-dot"></span>
@@ -1326,7 +1326,7 @@ function createPostItElement(topic, slot, colorClass) {
       formSection.scrollIntoView({ behavior: "smooth" });
       const textarea = document.querySelector('textarea[name="texto"]');
       if (textarea) {
-        textarea.placeholder = `Escribe tu peticiÃ³n sobre ${topic.text}...`;
+        textarea.placeholder = `Escribe tu petición sobre ${topic.text}...`;
         setTimeout(() => textarea.focus(), 600);
       }
     }
@@ -1341,7 +1341,7 @@ function initFallingPostIts() {
 
   container.innerHTML = "";
 
-  // CaÃ­da inicial escalonada
+  // Caída inicial escalonada
   POSTIT_SLOTS.forEach((slot, i) => {
     const topic = PRAYER_TOPICS_POOL[i % PRAYER_TOPICS_POOL.length];
     const color = POSTIT_COLORS[i % POSTIT_COLORS.length];
@@ -1353,7 +1353,7 @@ function initFallingPostIts() {
     }, i * 220);
   });
 
-  // Ciclo periÃ³dico: cae una nueva nota cada 3 segundos
+  // Ciclo periódico: cae una nueva nota cada 3 segundos
   let currentSlotIndex = 0;
   setInterval(() => {
     const slot = POSTIT_SLOTS[currentSlotIndex];
@@ -1379,7 +1379,7 @@ function initFallingPostIts() {
   }, 3200);
 }
 
-// â”€â”€â”€ InicializaciÃ³n al cargar la pÃ¡gina â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Inicialización al cargar la página ─────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   initNav();
   initForms();
@@ -1389,7 +1389,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initLiveVoicePodio();
   initFallingPostIts();
 
-  // Registrar visita de la pÃ¡gina en la nube
+  // Registrar visita de la página en la nube
   if (window.PGFirebase && PGFirebase.recordPageVisit) {
     PGFirebase.recordPageVisit();
   }
@@ -1404,11 +1404,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (nameInput) nameInput.value = oranteActual;
   }
 
-  // â”€â”€ Activar suscripciones Firebase en tiempo real si estÃ¡ disponible â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Activar suscripciones Firebase en tiempo real si está disponible ────────
   if (window.PGFirebase && PGFirebase.initialized) {
-    console.info("ðŸ”¥ Firebase activo: suscribiendo peticiones, orantes y estadÃ­sticas en tiempo real.");
+    console.info("🔥 Firebase activo: suscribiendo peticiones, orantes y estadísticas en tiempo real.");
 
-    // EstadÃ­sticas globales en tiempo real
+    // Estadísticas globales en tiempo real
     PGFirebase.subscribeStats(() => {
       updateAllCounters();
     });
@@ -1421,7 +1421,7 @@ document.addEventListener("DOMContentLoaded", () => {
       renderHoy();
     });
 
-    // Orantes mundiales en tiempo real â†’ actualizar panel, contadores y Globo 3D
+    // Orantes mundiales en tiempo real → actualizar panel, contadores y Globo 3D
     PGFirebase.subscribeOrantes((list) => {
       _orantesCache = list;
       updateAllCounters();
@@ -1431,7 +1431,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   } else {
-    console.info("ðŸ“± Modo local activo: usando almacenamiento local.");
+    console.info("📱 Modo local activo: usando almacenamiento local.");
     _orantesCache = PGStorage.getOrantesMundiales();
     _peticionesCache = PGStorage.getPeticiones();
     renderConnectedPanel();
